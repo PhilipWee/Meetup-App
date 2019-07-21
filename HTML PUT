@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<h1>MeetUp Mouse</h1>
+
+<html>
+
+<h2>On a Scale from 1 to 5...</h2>
+<body>
+  <p>How fast do you need to get there? (1 being the slowest and 5 the fastest) </p><form action="/action_page.php">
+    <input list="speed">
+    <datalist id="speed">
+      <option value="1">
+      <option value="2">
+      <option value="3">
+      <option value="4">
+      <option value="5">
+    </datalist>
+  </form>
+
+  <p>Quality of transport? (1 having the least quality and 5 the best)</p><form action="/action_page.php">
+    <input list="quality">
+    <datalist id="quality">
+      <option value="1">
+      <option value="2">
+      <option value="3">
+      <option value="4">
+      <option value="5">
+    </datalist>
+
+
+<p>Press continue to allow meetup mouse to access your location</p>
+
+<button onclick="getLocation()">Continue</button>
+
+<p id="demo"></p>
+
+<script>
+var x = document.getElementById("demo");
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
+ }
+
+function showPosition(position) {
+  x.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude;
+}
+
+</script>
+<form action="/26.90.55.162:5/{{123456}}?_method=PUT" method="post">
+<input type="hidden" name="_method" value="PUT">
+</form>
+</body>
+</html>
