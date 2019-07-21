@@ -115,13 +115,16 @@ def manage_details(session_id):
         crsr.execute("SELECT info FROM sessions WHERE session_id = %s",(session_id,))
         info = crsr.fetchone()
         #The result is a tuple where the first value is the result in dictionary form alreadys
-        info_dict = info[0]
-        info_dict['users'].append(new_user_details)
-        info = json.dumps(info_dict)
-        #Upload the updated info into the tables
-        crsr.execute("UPDATE sessions SET info=(%s) WHERE session_id = (%s)",(info,session_id))
-        conn.commit()
-        return jsonify({'updated_info_for_session_id':session_id})
+        if info[0] is not None:
+            info_dict = info[0]
+            info_dict['users'].append(new_user_details)
+            info = json.dumps(info_dict)
+            #Upload the updated info into the tables
+            crsr.execute("UPDATE sessions SET info=(%s) WHERE session_id = (%s)",(info,session_id))
+            conn.commit()
+            return jsonify({'updated_info_for_session_id':session_id})
+        else:
+            return jsonify({'error':'The specified session id does not yet exist'})
 
     elif request.method == 'GET':
         ###Check the OAuth details
