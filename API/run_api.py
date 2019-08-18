@@ -158,30 +158,47 @@ def calculate(session_id):
                                         'rating':9}]
                         }
         ###Calculate the best route for each person and return it
+        user_osms = []
+        user_identifiers = []
         for user in info[0]['users']:
             print(user)
-            #user is a dictionary containing the details of each user
-            user_info = {'route':[{
-                                'lat':'0392302932',
-                                'long':'3209430'
-                                },{
-                                'lat':'03dsd2932',
-                                'long':'3209332430'
-                                },{
-                                'lat':'03925454932',
-                                'long':'323232230'
-                                },{
-                                'lat':'03977762932',
-                                'long':'3203232230'
-                                },
-                                ]}
-            #username is the username of the person in question
-            #Try to get the username, if unable to get the identifier, if unable to just label as unknown
-            best_routes['users'][user.get('username',user.get('identifier','unknown user'))] = user_info
-        #Upload the results to PGSQL
-        results = json.dumps(best_routes)
+            #Get the osm_id closest to the user's location
+            crsr_gis.execute("SELECT osm_source_id as osm_id FROM osm_2po_4pgr\
+            ORDER BY road_start <-> ST_GeometryFromText('POINT("+str(user['long'])+" "+str(user['lat'])+")',4326) \
+            LIMIT 1")
+            osm_id = crsr_gis.fetchone()[0]
+            user_osms.append(osm_id)
+            user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
+        print(user_osms)
+        #Get route
+        results = pd.read_sql("select \
+            start_vid as start_user,\
+            agg_cost as cost_for_user,\
+            total_cost,\
+            name,\
+            st_x(st_centroid(way)) as longtitude,\
+            st_y(st_centroid(way)) as latitude\
+        from\
+                (SELECT \
+                    start_vid,\
+                    end_vid,\
+                    agg_cost,\
+                    sum(agg_cost) over (partition by end_vid) as total_cost\
+                FROM pgr_dijkstra(\
+                'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
+                ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[],\
+                ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants))\
+                where edge = -1)\
+            as results\
+        join singapore_restaurants\
+            on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id  \
+            order by total_cost limit " + str(5 * len(user_osms)),conn_gis)
+        osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
+        #Replace the osm ids in results with the user's names
+        results = results.replace({'start_user':osm_id_to_name_dict})
+        results = results.to_json()
         crsr = conn.cursor()
-        crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(json.dumps(best_routes),session_id))
+        crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(results,session_id))
         conn.commit()
         return redirect("/session/"+session_id+"/results", code=302)
     else:
@@ -212,6 +229,13 @@ if __name__ == '__main__':
     conn=psycopg2.connect(conn_string)
     print("Connected!")
     crsr = conn.cursor()
+    #Set up a connection to gisdb, the routing database
+    print("Connecting to routing database")
+    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+    +" password="+ creds.PGPASSWORD
+    conn_gis=psycopg2.connect(conn_string)
+    print("Connected!")
+    crsr_gis = conn_gis.cursor()
     #--------------------------------------CONNECT TO DATABASE-------------------------------
 
     #Check if the database exists. If not, create it
