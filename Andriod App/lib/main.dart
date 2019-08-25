@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async';
 
 //Okay i think i get how branches work alrdy
 
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
         '/share_link': (context) => ShareLink(),
         '/updating_list': (context) => UpdatingList(),
         '/final_result': (context) => PickYourPlace(),
+        '/map_layout': (context) => MapLayout(),
       },
     );
   }
@@ -290,10 +293,18 @@ class PickYourPlace extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            Text('Here are your locations:'),
-            Text('Wee house @ Kensington Drive'),
-            Text('KFC @ Tiong Bahru Plaza'),
-            Text('NEX @ Serangoon')
+            RaisedButton(
+              child: Text('*Changi City Point*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            ),
+            RaisedButton(
+              child: Text('*Tampines Hub*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            ),
+            RaisedButton(
+              child: Text('*Tampines Mall*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            )
           ],
         )
         ),
@@ -301,94 +312,60 @@ class PickYourPlace extends StatelessWidget {
   }
 }
 
-// class DateButton extends StatefulWidget {
-//   DateButton({Key key}) : super(key: key);
-//   @override
-//   _DateButton createState() => _DateButton();
-// }
-// class _DateButton extends State<DateButton> {
-//   String dateType = 'Fun!';
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: DropdownButton<String>(
-//           value: dateType,
-//           onChanged: (String newDateType) {
-//             setState(() {
-//               dateType = newDateType;
-//             });
-//           },
-//           items: <String>['Fun!', 'Food', 'Study']
-//               .map<DropdownMenuItem<String>>((String value) {
-//             return DropdownMenuItem<String>(
-//               value: value,
-//               child: Text(value),
-//             );
-//           }).toList(),
-//         ),
-//       ),
-//     );
-//   }
-// }
 
-// class OutingButton extends StatefulWidget {
-//   OutingButton({Key key}) : super(key: key);
-//   @override
-//   _OutingButton createState() => _OutingButton();
-// }
-// class _OutingButton extends State<OutingButton> {
-//   String outingType = 'Fun!';
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: DropdownButton<String>(
-//           value: outingType,
-//           onChanged: (String newOutingType) {
-//             setState(() {
-//               outingType = newOutingType;
-//             });
-//           },
-//           items: <String>['Fun!', 'Food', 'Study']
-//               .map<DropdownMenuItem<String>>((String value) {
-//             return DropdownMenuItem<String>(
-//               value: value,
-//               child: Text(value),
-//             );
-//           }).toList(),
-//         ),
-//       ),
-//     );
-//   }
-// }
+class MapLayout extends StatelessWidget {
 
-// class MeetingButton extends StatefulWidget {
-//   MeetingButton({Key key}) : super(key: key);
-//   @override
-//   _MeetingButton createState() => _MeetingButton();
-// }
-// class _MeetingButton extends State<MeetingButton> {
-//   String meetingType = 'Fun!';
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       child: DropdownButton<String>(
-//         value: meetingType,
-//         onChanged: (String newMeetingType) {
-//           setState(() {
-//             meetingType = newMeetingType;
-//           });
-//         },
-//         items: <String>['Project', 'Food', 'Business']
-//             .map<DropdownMenuItem<String>>((String value) {
-//           return DropdownMenuItem<String>(
-//             value: value,
-//             child: Text(value),
-//           );
-//         }).toList(),
-//       ),
-//       );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("*Tampines Mall*"),
+        backgroundColor: Colors.black,
+      ),
+      body: MapSample()
+      );
+  }
+}
 
+class MapSample extends StatefulWidget {
+  @override
+  State<MapSample> createState() => MapSampleState();
+}
+
+class MapSampleState extends State<MapSample> {
+  Completer<GoogleMapController> _controller = Completer();
+
+  static final CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(1.366960, 103.869424),
+    zoom: 14.4746,
+  );
+
+  static final CameraPosition _location = CameraPosition(
+      bearing: 192.8334901395799+180-10,
+      target: LatLng(1.366960, 103.869424),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
+
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+      body: GoogleMap(
+        mapType: MapType.hybrid,
+        initialCameraPosition: _kGooglePlex,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _goToPosition,
+        label: Text('Lets\'s Go!'),
+        icon: Icon(Icons.directions_boat),
+      ),
+    );
+  }
+
+  Future<void> _goToPosition() async {
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(_location));
+  }
+}
