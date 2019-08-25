@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
 
 //Okay i think i get how branches work alrdy
 
@@ -282,6 +283,15 @@ class UpdatingList extends StatelessWidget {
 
 class PickYourPlace extends StatelessWidget {
 
+  // final url = 'http://192.168.0.101:5000/session/create';
+  // final data = {
+  //   "lat"             :       "1.284878"    ,
+  //   "long"            :       "103.826324"  ,
+  //   "transport_mode"  :       "Driving"     ,
+  //   "speed"           :       "Regular"     ,
+  //   "quality"         :       "Best"        ,
+  //   "sessionID"       :       "sessionID"   };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -303,7 +313,9 @@ class PickYourPlace extends StatelessWidget {
             ),
             RaisedButton(
               child: Text('*Tampines Mall*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {
+                Navigator.pushNamed(context, '/map_layout');
+                },
             )
           ],
         )
@@ -311,7 +323,6 @@ class PickYourPlace extends StatelessWidget {
       );
   }
 }
-
 
 class MapLayout extends StatelessWidget {
 
@@ -341,7 +352,7 @@ class MapSampleState extends State<MapSample> {
   );
 
   static final CameraPosition _location = CameraPosition(
-      bearing: 192.8334901395799+180-10,
+      bearing: 0,
       target: LatLng(1.366960, 103.869424),
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
@@ -359,7 +370,7 @@ class MapSampleState extends State<MapSample> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _goToPosition,
         label: Text('Lets\'s Go!'),
-        icon: Icon(Icons.directions_boat),
+        icon: Icon(Icons.fastfood),
       ),
     );
   }
@@ -369,3 +380,4 @@ class MapSampleState extends State<MapSample> {
     controller.animateCamera(CameraUpdate.newCameraPosition(_location));
   }
 }
+
