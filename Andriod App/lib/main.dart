@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-//HELLO PHILLIP (OKAY THIS IS BRANCH)
+//Okay i think i get how branches work alrdy
 
 void main() => runApp(MyApp());
 
