@@ -10,6 +10,10 @@ import pandas.io.sql as psql
 import json
 #--------------------------------------REQUIREMENTS--------------------------------------
 
+#--------------------------------------SETTINGS------------------------------------------
+NUMBER_OF_RESULTS = 5
+#--------------------------------------SETTINGS------------------------------------------
+
 """
 API important links explanation:
 /session/create (POST)
@@ -150,13 +154,6 @@ def calculate(session_id):
     crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
     info = crsr.fetchone()
     if info != None:
-        best_routes = {
-                        'users':{},
-                        'destinations':[{'name':'SIMPANG!?!?!??!?!',
-                                        'lat':'1.3312',
-                                        'long':'103.9475',
-                                        'rating':9}]
-                        }
         ###Calculate the best route for each person and return it
         user_osms = []
         user_identifiers = []
@@ -169,34 +166,63 @@ def calculate(session_id):
             osm_id = crsr_gis.fetchone()[0]
             user_osms.append(osm_id)
             user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
-        print(user_osms)
+        user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]"
         #Get route
-        results = pd.read_sql("select \
-            start_vid as start_user,\
-            agg_cost as cost_for_user,\
-            total_cost,\
-            name,\
-            st_x(st_centroid(way)) as longtitude,\
-            st_y(st_centroid(way)) as latitude\
-        from\
-                (SELECT \
-                    start_vid,\
-                    end_vid,\
-                    agg_cost,\
-                    sum(agg_cost) over (partition by end_vid) as total_cost\
-                FROM pgr_dijkstra(\
-                'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
-                ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[],\
-                ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants))\
-                where edge = -1)\
-            as results\
-        join singapore_restaurants\
-            on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id  \
-            order by total_cost limit " + str(5 * len(user_osms)),conn_gis)
+        results = pd.read_sql("with results as (\
+            select \
+                results.*,osm_nodes.the_geom\
+            from\
+                    ((SELECT \
+                        *				 \
+                    FROM pgr_dijkstra(\
+                    'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
+                    "+user_array+",\
+                    ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))\
+                as results\
+            join singapore_restaurants\
+                on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results\
+            left join\
+                osm_nodes on results.node = osm_nodes.osm_id\
+            ), best_places as (\
+                select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit "+str(NUMBER_OF_RESULTS)+"*cardinality("+user_array+")	\
+            )\
+            \
+            select \
+                path_seq,\
+                results.start_vid as start_user,\
+                agg_cost as cost_for_user,\
+                total_cost,\
+                name,\
+                results.end_vid,\
+                st_x(st_centroid(the_geom)) as longtitude,\
+                st_y(st_centroid(the_geom)) as latitude\
+            from\
+                results\
+                inner join\
+                best_places\
+                on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
         osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
         #Replace the osm ids in results with the user's names
-        results = results.replace({'start_user':osm_id_to_name_dict})
-        results = results.to_json()
+        results['start_user_name'] = pd.Series(osm_id_to_name_dict[row['start_user']] for index,row in results.iterrows())
+        #Format the results in dictionaries
+        results_dict = {}
+        results_dict['possible_locations'] = [row['name'] for index,row in results[results['cost_for_user'] == 0].iterrows()][0:NUMBER_OF_RESULTS]
+        results_dict['users'] = user_osms
+        for location in results_dict['possible_locations']:
+            results_dict[location] = {}
+            for user in results_dict['users']:
+                relevant_df = results[results['start_user'] == user][results['name'] == location].set_index('path_seq')
+                #Make a dictionary for each use
+                
+                results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
+                results_dict[location][user]['total_cost'] = str(relevant_df['total_cost'][1])
+                results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'][1])
+                results_dict[location][user]['start_user'] = str(relevant_df['start_user'][1])
+                results_dict[location][user]['start_user_name'] = str(relevant_df['start_user_name'][1])
+        
+        #Split dataframe by user
+        
+        results = json.dumps(results_dict)
         crsr = conn.cursor()
         crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(results,session_id))
         conn.commit()
