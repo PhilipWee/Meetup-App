@@ -1,0 +1,345 @@
+osm2pgrouting --addnodes --dbname gisdb --username postgres --password housepotato --file '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm.pbf' 
+
+sudo su postgres
+
+Start server
+pg_ctlcluster 11 main start
+
+sudo systemctl start postgresql@11-main
+
+locate pg_hba.conf
+
+/etc/init.d/postgresql restart
+
+osmconvert malaysia-singapore-brunei-latest.osm.pbf --out-osm -o=malaysia-singapore-brunei-latest.osm_01.osm
+
+SELECT gid as id, source, target, cost, reverse_cost, x1, y1, x2, y2 FROM ways
+
+SELECT * FROM pgr_astar(
+    'SELECT osm_id as id, source_osm as source, target_osm as target, cost, reverse_cost, x1, y1, x2, y2 FROM ways',
+    1674151284, 2517371826);
+
+103.8245345,1.2848411 #Stephen
+
+SELECT osm_id FROM ways_vertices_pgr
+    ORDER BY the_geom <-> ST_GeometryFromText('POINT(103.87938659999999 1.3568938)',4326) 
+    LIMIT 1;
+#Format is longtitude, then latitude
+
+osm2pgsql --create --database gisdb '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm.pbf' --prefix singapore
+
+SELECT osm_id,name,way FROM singapore_point WHERE amenity = 'restaurant';
+
+SELECT ST_MakePolygon(ST_GeomFromText('LINESTRING(103.747899 1.448418,
+103.717000 1.455884,
+103.672316 1.428042,
+103.567125 1.208307,
+103.645382 1.191688,
+104.035741 1.280736,
+104.049487 1.353505,
+103.984832 1.401563,
+103.948364 1.391565,
+103.915053 1.425629,
+103.878286 1.435270,
+103.829075 1.477364,
+103.747899 1.448418)'));
+
+#The above polygon
+0103000000010000000D000000836DC493DDEF5940EF004F5AB82CF73FD9CEF753E3ED59408B506C054D4BF73FF624B03907EB5940EA07759142D9F63F9EEFA7C64BE459402A7288B83955F33F55DB4DF04DE959400492B06F2711F33F16889E9449025A402CF52C08E57DF43FF0A485CB2A035A40478FDFDBF4A7F53F7903CC7C07FF5940D2890453CD6CF63F0A2DEBFEB1FC5940C02154A9D943F63FD446753A90FA5940BDAAB35A60CFF63F38A27BD635F85940F4E0EEACDDF6F63F99BB96900FF55940999A046F48A3F73F836DC493DDEF5940EF004F5AB82CF73F
+
+SELECT ST_IsClosed(ls),
+  ST_Equals(ST_StartPoint(ls), ST_EndPoint(ls)),
+  ST_AsText(ST_StartPoint(ls)) = ST_AsText(ST_EndPoint(ls)) AS WKT_equal,
+  ST_AsBinary(ST_StartPoint(ls)) = ST_AsBinary(ST_EndPoint(ls)) AS WKB_equal,
+  ST_Distance(ST_StartPoint(ls), ST_EndPoint(ls))
+FROM (
+  SELECT '0103000000010000000D000000836DC493DDEF5940EF004F5AB82CF73FD9CEF753E3ED59408B506C054D4BF73FF624B03907EB5940EA07759142D9F63F9EEFA7C64BE459402A7288B83955F33F55DB4DF04DE959400492B06F2711F33F16889E9449025A402CF52C08E57DF43FF0A485CB2A035A40478FDFDBF4A7F53F7903CC7C07FF5940D2890453CD6CF63F0A2DEBFEB1FC5940C02154A9D943F63FD446753A90FA5940BDAAB35A60CFF63F38A27BD635F85940F4E0EEACDDF6F63F99BB96900FF55940999A046F48A3F73F836DC493DDEF5940EF004F5AB82CF73F'::geometry AS ls
+) AS f;
+
+
+#Boundary of singapore
+103.747899 1.448418,
+103.717000 1.455884,
+103.672316 1.428042,
+103.567125 1.208307,
+103.645382 1.191688,
+104.035741 1.280736,
+104.049487 1.353505,
+103.984832 1.401563,
+103.948364 1.391565,
+103.915053 1.425629,
+103.878286 1.435270,
+103.829075 1.477364,
+103.717000 1.455884
+
+#Make sure one place is within the other
+ST_Within(geometry A, geometry B)
+
+#Failed but remains for reference
+SELECT osm_id,name,way FROM singapore_point WHERE amenity = 'restaurant' AND ST_Within(way, '0103000000010000000D000000836DC493DDEF5940EF004F5AB82CF73FD9CEF753E3ED59408B506C054D4BF73FF624B03907EB5940EA07759142D9F63F9EEFA7C64BE459402A7288B83955F33F55DB4DF04DE959400492B06F2711F33F16889E9449025A402CF52C08E57DF43FF0A485CB2A035A40478FDFDBF4A7F53F7903CC7C07FF5940D2890453CD6CF63F0A2DEBFEB1FC5940C02154A9D943F63FD446753A90FA5940BDAAB35A60CFF63F38A27BD635F85940F4E0EEACDDF6F63F99BB96900FF55940999A046F48A3F73F836DC493DDEF5940EF004F5AB82CF73F');
+
+SELECT sp.osm_id,sp.name,sp.way FROM singapore_point as sp join
+ST_BuildArea(ST_GeomFromText('LINESTRING(103.747899 1.448418,
+103.717000 1.455884,
+103.672316 1.428042,
+103.567125 1.208307,
+103.645382 1.191688,
+104.035741 1.280736,
+104.049487 1.353505,
+103.984832 1.401563,
+103.948364 1.391565,
+103.915053 1.425629,
+103.878286 1.435270,
+103.829075 1.477364,
+103.747899 1.448418)')) as sp_poly on ST_Within(sp.way, sp_poly.st_buildarea)
+ WHERE amenity = 'restaurant';
+
+#St transform syntax
+select (ST_Transform(way,4326)) as correct,amenity from singapore_point where amenity='restaurant'
+
+#All osm_polygons that are restaurants
+select osm_id, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_polygon
+where ST_Within(ST_Transform(way,4326), ST_SetSRID(ST_BuildArea(ST_GeomFromText('LINESTRING(103.747899 1.448418,
+103.717000 1.455884,
+103.672316 1.428042,
+103.567125 1.208307,
+103.645382 1.191688,
+104.035741 1.280736,
+104.049487 1.353505,
+103.984832 1.401563,
+103.948364 1.391565,
+103.915053 1.425629,
+103.878286 1.435270,
+103.829075 1.477364,
+103.747899 1.448418)')),4326)) and amenity='restaurant'
+
+#***********************All osm_points that are restaurantish ************************************
+select * from (select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from
+	(select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_polygon union 
+	select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_point union
+	select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_roads union
+	select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_line) as food_places
+	where ST_Within(ST_Transform(way,4326), ST_SetSRID(ST_BuildArea(ST_GeomFromText('LINESTRING(103.747899 1.448418,
+	103.717000 1.455884,
+	103.672316 1.428042,
+	103.567125 1.208307,
+	103.645382 1.191688,
+	104.035741 1.280736,
+	104.049487 1.353505,
+	103.984832 1.401563,
+	103.948364 1.391565,
+	103.915053 1.425629,
+	103.878286 1.435270,
+	103.829075 1.477364,
+	103.747899 1.448418)')),4326)) and amenity in ('restaurant','fast_food','food_court')) as result
+
+	
+
+select osm_id,amenity,ST_Transform(way,4326) from planet_osm_polygon where amenity='restaurant' limit 10000 
+
+select ST_Transform(way,4326) from planet_osm_polygon limit 10000
+
+
+
+
+
+
+
+
+#Full function
+
+	
+SELECT * FROM pgr_dijkstra(
+	/*The graph edge table*/
+    'SELECT osm_id as id, source_osm as source, target_osm as target, cost, reverse_cost, x1, y1, x2, y2 FROM ways',
+	/* The starting point */
+    (SELECT osm_id FROM ways_vertices_pgr
+    ORDER BY the_geom <-> ST_GeometryFromText('POINT(103.87938659999999 1.3568938)',4326) 
+    LIMIT 1)
+	, 
+	/* All restaurants in Singapore */
+	(select osm_id from
+	(select osm_id, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_polygon union 
+	select osm_id, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_point union
+	select osm_id, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_roads union
+	select osm_id, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_line) as food_places
+	where ST_Within(ST_Transform(way,4326), ST_SetSRID(ST_BuildArea(ST_GeomFromText('LINESTRING(103.747899 1.448418,
+	103.717000 1.455884,
+	103.672316 1.428042,
+	103.567125 1.208307,
+	103.645382 1.191688,
+	104.035741 1.280736,
+	104.049487 1.353505,
+	103.984832 1.401563,
+	103.948364 1.391565,
+	103.915053 1.425629,
+	103.878286 1.435270,
+	103.829075 1.477364,
+	103.747899 1.448418)')),4326)) and amenity in ('restaurant','fast_food','food_court') and osm_id = '3759860811')
+	,
+    FALSE
+);
+
+
+#-----------------------Create SG restaurants and add closest neighbour------------------
+create table singapore_restaurants as select * from (select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from
+	(select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_polygon union 
+	select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_point union
+	select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_roads union
+	select osm_id, name, amenity,  ST_Centroid(ST_Transform(way,4326)) as way from planet_osm_line) as food_places
+	where ST_Within(ST_Transform(way,4326), ST_SetSRID(ST_BuildArea(ST_GeomFromText('LINESTRING(103.747899 1.448418,
+	103.717000 1.455884,
+	103.672316 1.428042,
+	103.567125 1.208307,
+	103.645382 1.191688,
+	104.035741 1.280736,
+	104.049487 1.353505,
+	103.984832 1.401563,
+	103.948364 1.391565,
+	103.915053 1.425629,
+	103.878286 1.435270,
+	103.829075 1.477364,
+	103.747899 1.448418)')),4326)) and amenity in ('restaurant','fast_food','food_court')) as result
+
+ALTER TABLE singapore_restaurants
+ADD COLUMN nearest_road_neighbour geometry;
+ADD COLUMN nearest_road_neighbour_osm_id bigint;
+
+UPDATE singapore_restaurants tA1 SET nearest_road_neighbour = 
+(SELECT near_point.the_geom
+FROM singapore_restaurants tA2, 
+LATERAL (SELECT the_geom 
+         FROM (select * from ways_vertices_pgr) tableB
+         ORDER BY tableB.the_geom <-> tA2.way 
+         LIMIT 1) near_point
+WHERE tA2.osm_id = tA1.osm_id limit 1)
+
+UPDATE singapore_restaurants tA1 SET nearest_road_neighbour_osm_id = 
+(SELECT near_point.osm_id
+FROM singapore_restaurants tA2, 
+LATERAL (SELECT the_geom, osm_id
+         FROM (select * from ways_vertices_pgr) tableB
+         ORDER BY tableB.the_geom <-> tA2.way 
+         LIMIT 1) near_point
+WHERE tA2.osm_id = tA1.osm_id limit 1)
+
+#-------------------------------------test if pgrouting loaded properly---------------------
+select ST_Transform(the_geom,4326) as ways from ways
+	where ST_Within(ST_Transform(the_geom,4326), ST_SetSRID(ST_BuildArea(ST_GeomFromText('LINESTRING(103.850960 1.379987,
+	103.851443 1.357377, 
+	103.880304 1.355543, 
+	103.879789 1.374592,
+	103.850960 1.379987)')),4326))
+
+#Testing from osm line
+select ST_Transform(way,4326) as ways from planet_osm_line
+	where ST_Within(ST_Transform(way,4326), ST_SetSRID(ST_BuildArea(ST_GeomFromText('LINESTRING(103.850960 1.379987,
+	103.851443 1.357377, 
+	103.880304 1.355543, 
+	103.879789 1.374592,
+	103.850960 1.379987)')),4326))
+
+
+#Read in the file with osmosis instead, because osm2pgsql seems to suck
+bin/osmosis --read-pbf /home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm.pbf --log-progress --write-pgsql database=gisdb 
+
+#Try again with pg2sql
+sudo osm2pgsql -c -d gisdb -H 127.0.0.1 -U postgres --input-reader osm '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm_01.osm' -W
+
+#Some testing stuff in sgoon gardens
+4488193227 and 394634458
+#-------------------Entering the routing data-----------------------
+PSQL="psql"
+PGPORT=5432
+PGHOST=localhost
+PGPASSWORD=housepotato
+cd hh
+${PSQL} -U postgres -d mydb -q -f "hh_2po_4pgr.sql"
+pause
+
+#-----------------Creating the db---------------
+https://osm2po.de/
+
+cd '/home/meetup-dev/Downloads/osm2po-4.7.7'
+java -Xmx4G -jar osm2po-core-4.7.7-signed.jar tilesize=x '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm.pbf' 
+
+sudo su postgres
+psql gisdb
+\i osm_2po_4pgr.sql
+
+ALTER TABLE osm_2po_4pgr
+ADD COLUMN road_start geometry;
+UPDATE osm_2po_4pgr ta1 set road_start = ST_PointN(geom_way,1)
+
+
+#------------------Finding the best location-----------------------
+
+#Step 1: Get the closest node the the guy
+SELECT osm_source_id as osm_id FROM osm_2po_4pgr
+    ORDER BY geom_way <-> ST_GeometryFromText('POINT(103.87938659999999 1.3568938)',4326) 
+    LIMIT 1
+(242936757,1830483603,4593402970) (joel, stephen, philip)
+
+#Step 2: make array and calculate
+
+select 
+	start_vid as start_user,
+	agg_cost as cost_for_user,
+	total_cost,
+	name,
+	st_x(st_centroid(way)) as longtitude,
+	st_y(st_centroid(way)) as latitude
+from
+		(SELECT 
+			 start_vid,
+			 end_vid,
+			 agg_cost,
+			 sum(agg_cost) over (partition by end_vid) as total_cost
+		FROM pgr_dijkstra(
+		'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',
+		ARRAY[242936757,1830483603,4593402970]::bigint[],
+		ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants))
+		where edge = -1)
+	as results
+ join singapore_restaurants
+ 	on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id  
+ 	order by total_cost 
+
+#Step 2(Updated to have routes as well)
+with results as (
+	select 
+		results.*,osm_nodes.the_geom
+	from
+			((SELECT 
+				 *				 
+			FROM pgr_dijkstra(
+			'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',
+			ARRAY[242936757,1830483603,4593402970]::bigint[],
+			ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))
+		as results
+	join singapore_restaurants
+		on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results
+	left join
+		osm_nodes on results.node = osm_nodes.osm_id
+), best_places as (
+	select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality(ARRAY[242936757,1830483603,4593402970]::bigint[])	
+)
+
+select 
+	path_seq,
+	results.start_vid as start_user,
+	agg_cost as cost_for_user,
+	total_cost,
+	name,
+	results.end_vid,
+	the_geom as location,
+	st_x(st_centroid(the_geom)) as longtitude,
+	st_y(st_centroid(the_geom)) as latitude
+from
+	results
+	inner join
+	best_places
+	on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid
+
+
+
