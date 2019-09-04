@@ -93,13 +93,13 @@ def create_session():
     #Return the session id
     return jsonify({'session_id':session_id})
 
-@app.route('/session/<session_id>', methods=['PUT','GET'])
+@app.route('/session/<session_id>', methods=['POST','GET'])
 def manage_details(session_id):
-    if request.method == 'PUT':
+    if request.method == 'POST':
         ###Ensure that we have not yet received a message from this ip
         identifier = 'identifier'
 
-        #Get the content of the PUT
+        #Get the content of the POST
         content = request.get_json()
 
         ###Make sure the lat and long are provided and valid
@@ -127,20 +127,20 @@ def manage_details(session_id):
         conn.commit()
         return jsonify({'updated_info_for_session_id':session_id})
 
-    elif request.method == 'GET':
-        ###Check the OAuth details
+    # elif request.method == 'GET':
+    #     ###Check the OAuth details
 
-        ###Extract the username
-        username = 'username'
+    #     ###Extract the username
+    #     username = 'username'
 
-        #Get all the meetup details and return it to the user
-        crsr = conn.cursor()
-        crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
-        info = crsr.fetchone()
-        if info != None:
-            return jsonify(info[0])
-        else:
-            return jsonify({'error':'sesson_id or username is wrong'})
+    #     #Get all the meetup details and return it to the user
+    #     crsr = conn.cursor()
+    #     crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
+    #     info = crsr.fetchone()
+    #     if info != None:
+    #         return jsonify(info[0])
+    #     else:
+    #         return jsonify({'error':'sesson_id or username is wrong'})
 
 @app.route('/session/<session_id>/calculate', methods=['GET'])
 def calculate(session_id):
@@ -279,5 +279,5 @@ if __name__ == '__main__':
         print('table "sessions" already exist, moving on')
 
     #Run the App
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=False, host='0.0.0.0')
     crsr.close()

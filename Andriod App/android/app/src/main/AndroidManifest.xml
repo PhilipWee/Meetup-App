@@ -33,4 +33,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBHHH-S9mWVpIkiTPVVAb1p7zQgIhYA8_g" />
     </application>
+    <uses-permission android:name="android.permission.INTERNET" /> 
 </manifest>
+
