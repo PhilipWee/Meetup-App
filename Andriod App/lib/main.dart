@@ -314,12 +314,32 @@ class RatingsReviews extends StatelessWidget {
   }
 }
 
+
+makePostRequest() async {
+  // set up POST request arguments
+  
+  
+  Map<String, String> headers = {"Content-type": "application/json"};
+  String url = 'http://192.168.194.178:5000/session/123456';
+  String json = '{"identifier": "identifier","lat": 0, "long": 0, "metrics" : {"quality": 0,"speed":0},"transport_mode" :"0"}';
+  // String url = 'https://jsonplaceholder.typicode.com/posts';
+  // String json = '{"title": "Hello", "body": "body text", "userId": 1}';
+  // make POST request
+  http.Response response = await http.post(url, headers: headers, body: json);
+  // check the status code for the result
+  int statusCode = response.statusCode;
+  print(statusCode);
+  // this API passes back the id of the new item added to the body
+  String body = response.body;
+  print(body);
+  // debugPrint("hello testt test");
+}
+
+
 class ConfirmPreference extends StatelessWidget {
-  // final Future<PostData> post;
   final PrefData data;
-  // ConfirmPreference({Key key, this.post, this.data,}) : super(key: key);
-  ConfirmPreference({Key key, this.data,}) : super(key: key);
-  static final createposturl = 'http://192.168.194.210:5000/session/123456';
+  ConfirmPreference({this.data});
+
   @override
   Widget build(BuildContext context) {
 
@@ -337,7 +357,7 @@ class ConfirmPreference extends StatelessWidget {
               children: [
                 ListTile(title: Text(data.transportMode)),
                 ListTile(title: Text(data.quality)),
-                ListTile(title: Text(data.speed))
+                ListTile(title: Text(data.speed)),
               ]
             )
           ),
@@ -346,15 +366,7 @@ class ConfirmPreference extends StatelessWidget {
             onPressed: 
             () async{
               Navigator.pushNamed(context, '/share_link');
-              // PostData newPost = new PostData(
-              //   lat: 1.340595,
-              //   long: 103.963153,
-              //   quality: data.quality,
-              //   speed: data.speed,
-              //   transportmode: data.transportMode
-              // );
-              // PostData p = await createPost(createposturl,body: newPost.toMap());
-              // print(p.transportmode);
+              makePostRequest();
             }
           ),
         ]
@@ -591,10 +603,7 @@ class GetMemberList {
   final String member1;
   final String member2;
   final String member3;
-
-
   GetMemberList({this.member1, this.member2, this.member3,});
-
   factory GetMemberList.fromJson(Map<String, dynamic> json) {
     return GetMemberList(
       member1: json['member1'],
@@ -604,42 +613,3 @@ class GetMemberList {
   }
 }
 
-// class PostData {
-
-//   final double lat;
-//   final double long;
-//   final String quality;
-//   final String speed;
-//   final String transportmode;
-//   PostData({this.lat, this.long, this.quality, this.speed, this.transportmode,});
- 
-//   factory PostData.fromJson(Map<String, dynamic> json) {
-//     return PostData(
-//       lat: json['long'],
-//       long: json['lat'],
-//       quality: json['quality'],
-//       speed: json['speed'],
-//       transportmode: json['transport_mode'],
-//     );
-//   }
-//   Map toMap() {
-//     var map = new Map<String, dynamic>();
-//     map["lat"] = lat;
-//     map["long"] = long;
-//     map["quality"] = quality;
-//     map["speed"] = speed;
-//     map["transport_mode"] = transportmode;
-//     return map;
-//   }
-// }
-
-// Future<PostData> createPost(String url, {Map body}) async {
-//   return http.post(url, body: body).then((http.Response response) {
-//     final int statusCode = response.statusCode;
- 
-//     if (statusCode < 200 || statusCode > 400 || json == null) {
-//       throw new Exception("Error while fetching data");
-//     }
-//     return PostData.fromJson(json.decode(response.body));
-//   });
-// }
