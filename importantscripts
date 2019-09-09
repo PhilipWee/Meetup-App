@@ -1,0 +1,8 @@
+Installing postgres
+
+sudo su -
+apt-get install postgresql postgresql-contrib
+update-rc.d postgresql enable
+service postgresql start
+
+Install pgadmin3

@@ -1,4 +1,5 @@
-PGHOST='26.91.85.247'
+PGHOST='192.168.0.103'
 PGDATABASE='session_info'
+PGROUTINGDATABASE='gisdb'
 PGUSER='postgres'
 PGPASSWORD='housepotato'

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<h1>MeetUp Mouse</h1>
+<html>
+<p>Allow meetup mouse to access your location and squeak away!</p>
+
+<button onclick="getLocation()">Get my location</button>
+
+<p id="geoloc"></p>
+
+<script>
+var x = document.getElementById("geoloc");
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
+ }
+
+function showPosition(position) {
+  x.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude;
+}
+
+var myForm = document.getElementById('myForm');
+myForm.addEventListener('submit', function(event)
+{
+    event.preventDefault();
+    var formData = new FormData(myForm),
+        result = {};
+
+    for (var entry of formData.entries())
+    {
+        result[entry[0]] = entry[1];
+    }
+    result = JSON.stringify(result)
+    console.log(result);
+
+});
+
+</script>
+<form action="http://192.168.0.101:5000/session/123456" method="POST">
+      Locator not working? <br />
+      Enter your postal code: <input type="postal" name="postal"><br />
+      How important is speed to you?
+      <input type="radio" name="speed" value="1" /> Least important
+      <input type="radio" name="speed" value="2" /> Somewhat important
+      <input type="radio" name="speed" value="3" /> Most important<br />
+      What about the quality of the transport?
+      <input type="radio" name="quality" value="1" /> Least important
+      <input type="radio" name="quality" value="2" /> Somewhat important
+      <input type="radio" name="quality" value="3" /> Most important <br />
+      </select><br />
+      <input type="submit" value="SEND" />
+      <input type="reset" value="CLEAR" />
+      <input type="hidden" name="action" value="registration" />
+    </form>
+  </body>
+</form>
+</body>
+</html>

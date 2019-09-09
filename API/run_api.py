@@ -10,6 +10,10 @@ import pandas.io.sql as psql
 import json
 #--------------------------------------REQUIREMENTS--------------------------------------
 
+#--------------------------------------SETTINGS------------------------------------------
+NUMBER_OF_RESULTS = 5
+#--------------------------------------SETTINGS------------------------------------------
+
 """
 API important links explanation:
 /session/create (POST)
@@ -89,13 +93,13 @@ def create_session():
     #Return the session id
     return jsonify({'session_id':session_id})
 
-@app.route('/session/<session_id>', methods=['PUT','GET'])
+@app.route('/session/<session_id>', methods=['POST','GET'])
 def manage_details(session_id):
-    if request.method == 'PUT':
+    if request.method == 'POST':
         ###Ensure that we have not yet received a message from this ip
         identifier = 'identifier'
 
-        #Get the content of the PUT
+        #Get the content of the POST
         content = request.get_json()
 
         ###Make sure the lat and long are provided and valid
@@ -126,20 +130,20 @@ def manage_details(session_id):
         else:
             return jsonify({'error':'The specified session id does not yet exist'})
 
-    elif request.method == 'GET':
-        ###Check the OAuth details
+    # elif request.method == 'GET':
+    #     ###Check the OAuth details
 
-        ###Extract the username
-        username = 'username'
+    #     ###Extract the username
+    #     username = 'username'
 
-        #Get all the meetup details and return it to the user
-        crsr = conn.cursor()
-        crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
-        info = crsr.fetchone()
-        if info != None:
-            return jsonify(info[0])
-        else:
-            return jsonify({'error':'sesson_id or username is wrong'})
+    #     #Get all the meetup details and return it to the user
+    #     crsr = conn.cursor()
+    #     crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
+    #     info = crsr.fetchone()
+    #     if info != None:
+    #         return jsonify(info[0])
+    #     else:
+    #         return jsonify({'error':'sesson_id or username is wrong'})
 
 @app.route('/session/<session_id>/calculate', methods=['GET'])
 def calculate(session_id):
@@ -153,38 +157,77 @@ def calculate(session_id):
     crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
     info = crsr.fetchone()
     if info != None:
-        best_routes = {
-                        'users':{},
-                        'destinations':[{'name':'SIMPANG!?!?!??!?!',
-                                        'lat':'1.3312',
-                                        'long':'103.9475',
-                                        'rating':9}]
-                        }
         ###Calculate the best route for each person and return it
+        user_osms = []
+        user_identifiers = []
         for user in info[0]['users']:
             print(user)
-            #user is a dictionary containing the details of each user
-            user_info = {'route':[{
-                                'lat':'0392302932',
-                                'long':'3209430'
-                                },{
-                                'lat':'03dsd2932',
-                                'long':'3209332430'
-                                },{
-                                'lat':'03925454932',
-                                'long':'323232230'
-                                },{
-                                'lat':'03977762932',
-                                'long':'3203232230'
-                                },
-                                ]}
-            #username is the username of the person in question
-            #Try to get the username, if unable to get the identifier, if unable to just label as unknown
-            best_routes['users'][user.get('username',user.get('identifier','unknown user'))] = user_info
-        #Upload the results to PGSQL
-        results = json.dumps(best_routes)
+            #Get the osm_id closest to the user's location
+            crsr_gis.execute("SELECT osm_source_id as osm_id FROM osm_2po_4pgr\
+            ORDER BY road_start <-> ST_GeometryFromText('POINT("+str(user['long'])+" "+str(user['lat'])+")',4326) \
+            LIMIT 1")
+            osm_id = crsr_gis.fetchone()[0]
+            user_osms.append(osm_id)
+            user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
+        user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]"
+        #Get route
+        results = pd.read_sql("with results as (\
+            select \
+                results.*,osm_nodes.the_geom\
+            from\
+                    ((SELECT \
+                        *				 \
+                    FROM pgr_dijkstra(\
+                    'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
+                    "+user_array+",\
+                    ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))\
+                as results\
+            join singapore_restaurants\
+                on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results\
+            left join\
+                osm_nodes on results.node = osm_nodes.osm_id\
+            ), best_places as (\
+                select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit "+str(NUMBER_OF_RESULTS)+"*cardinality("+user_array+")	\
+            )\
+            \
+            select \
+                path_seq,\
+                results.start_vid as start_user,\
+                agg_cost as cost_for_user,\
+                total_cost,\
+                name,\
+                results.end_vid,\
+                st_x(st_centroid(the_geom)) as longtitude,\
+                st_y(st_centroid(the_geom)) as latitude\
+            from\
+                results\
+                inner join\
+                best_places\
+                on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
+        osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
+        #Replace the osm ids in results with the user's names
+        results['start_user_name'] = pd.Series(osm_id_to_name_dict[row['start_user']] for index,row in results.iterrows())
+        #Format the results in dictionaries
+        results_dict = {}
+        results_dict['possible_locations'] = [row['name'] for index,row in results[results['cost_for_user'] == 0].iterrows()][0:NUMBER_OF_RESULTS]
+        results_dict['users'] = user_osms
+        for location in results_dict['possible_locations']:
+            results_dict[location] = {}
+            for user in results_dict['users']:
+                relevant_df = results[results['start_user'] == user][results['name'] == location].set_index('path_seq')
+                #Make a dictionary for each use
+                
+                results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
+                results_dict[location][user]['total_cost'] = str(relevant_df['total_cost'][1])
+                results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'][1])
+                results_dict[location][user]['start_user'] = str(relevant_df['start_user'][1])
+                results_dict[location][user]['start_user_name'] = str(relevant_df['start_user_name'][1])
+        
+        #Split dataframe by user
+        
+        results = json.dumps(results_dict)
         crsr = conn.cursor()
-        crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(json.dumps(best_routes),session_id))
+        crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(results,session_id))
         conn.commit()
         return redirect("/session/"+session_id+"/results", code=302)
     else:
@@ -215,6 +258,13 @@ if __name__ == '__main__':
     conn=psycopg2.connect(conn_string)
     print("Connected!")
     crsr = conn.cursor()
+    #Set up a connection to gisdb, the routing database
+    print("Connecting to routing database")
+    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+    +" password="+ creds.PGPASSWORD
+    conn_gis=psycopg2.connect(conn_string)
+    print("Connected!")
+    crsr_gis = conn_gis.cursor()
     #--------------------------------------CONNECT TO DATABASE-------------------------------
 
     #Check if the database exists. If not, create it
