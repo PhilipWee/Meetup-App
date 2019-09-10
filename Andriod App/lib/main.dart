@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
-
-//Okay i think i get how branches work alrdy
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() => runApp(MyApp());
+
+class PrefData {
+  String transportMode;
+  String speed;
+  String quality;
+  String body;
+  PrefData({this.transportMode, this.quality, this.speed,});
+
+}
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     return MaterialApp(
-      title: 'Named Routes Demo',
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
@@ -19,8 +27,10 @@ class MyApp extends StatelessWidget {
         '/transport_mode': (context) => TransportMode(),
         '/travel_speed': (context) => TravelSpeed(),
         '/ratings_reviews': (context) => RatingsReviews(),
+        '/confirm_data': (context) => ConfirmPreference(),
         '/share_link': (context) => ShareLink(),
-        '/updating_list': (context) => UpdatingList(),
+        '/updating_list': (context) => UpdatingList(post: fetchUpdatingList()),
+        // '/updating_list': (context) => UpdatingList(),
         '/final_result': (context) => PickYourPlace(),
         '/map_layout': (context) => MapLayout(),
       },
@@ -29,6 +39,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
+  final data = PrefData(transportMode: "0", speed: "0", quality: "0");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,11 +51,15 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            RaisedButton(
+            FlatButton(
               child: Text('Custom'),
-              onPressed: () {Navigator.pushNamed(context, '/meeting_type');}
+              onPressed: 
+              () {
+                Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),); // send data to said screen and also go to the said screen
+                //Navigator.pushNamed(context, '/meeting_type');
+                }
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Defaults'),
               onPressed: () {Navigator.pushNamed(context, '/examples');}
             ),
@@ -57,33 +72,79 @@ class HomeScreen extends StatelessWidget {
 
 class MeetingType extends StatelessWidget {
 
+  final PrefData data;
+  MeetingType({this.data});
+
+  final List<String> custLabels = [
+    "Date",
+    "Outing",
+    "Meeting",
+    "About Us"
+    ];
+  final List<String> custImgs = [
+    "images/dateButton.jpg",
+    "images/outingButton.jpg",
+    "images/meetingButton.jpg",
+    "images/MeetUp_Logo.png"
+    ];
+
   @override
+
+  //Creates a listview with buildCustomButtons inside
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Meeting Type"),
-        backgroundColor: Colors.black,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(8.0),
-        children: <Widget>[
-          RaisedButton(
-            child: Text('Date'),
-            onPressed: () {Navigator.pushNamed(context, '/transport_mode');}
+
+    return ListView.builder(
+
+      padding: EdgeInsets.zero,
+      itemCount: custImgs.length,
+      itemBuilder: (context, index) {
+        return Card(
+          child: FlatButton(
+            padding: EdgeInsets.all(0.0),
+            onPressed: (){
+
+             Navigator.push(context,MaterialPageRoute(builder: (context) => TransportMode(data: data)),);
+
+           },
+           child:_buildCustomButton(custLabels[index], custImgs[index]) ,
           ),
-          RaisedButton(
-            child: Text('Group Outing'),
-            onPressed: () {Navigator.pushNamed(context, '/transport_mode');}
-          ),
-          RaisedButton(
-            child: Text('Group Meeting'),
-            onPressed: () {Navigator.pushNamed(context, '/transport_mode');}
-          )
-          
-        ]
-      )
-      );
+        );
+      },
+    );
   }
+
+  //Helper method to create layout of the buttons
+  Container _buildCustomButton(String label, String imgName) {
+    return Container(
+      height: 200.0,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(imgName),
+          fit: BoxFit.cover
+        )
+      ),
+      child: Container(
+        height: 50.0,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: <Color>[Colors.black54, Colors.white12],
+          ),
+        ),
+        padding: const EdgeInsets.all(0.0),
+        alignment: Alignment.bottomLeft,
+        child: Text(
+          label,
+          style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 20),
+        ),
+      ),
+      alignment: Alignment.bottomLeft,
+      padding: const EdgeInsets.all(0.0),
+    );
+  }
+
 }
 
 class Examples extends StatelessWidget {
@@ -99,21 +160,21 @@ class Examples extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children:[
-            RaisedButton(
+            FlatButton(
               child: Text('Custom'),
               onPressed: () {Navigator.pushNamed(context, '/meeting_type');}
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Example1'),
               onPressed: () {Navigator.pushNamed(context, '/share_link');}
               
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Example2'),
               onPressed: () {Navigator.pushNamed(context, '/share_link');}
               
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Example3'),
               onPressed: () {Navigator.pushNamed(context, '/share_link');}
               
@@ -126,9 +187,11 @@ class Examples extends StatelessWidget {
 }
 
 class TransportMode extends StatelessWidget {
-
+  final PrefData data;
+  TransportMode({this.data});
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Mode of Transport"),
@@ -136,19 +199,28 @@ class TransportMode extends StatelessWidget {
       ),
       body: Center(
         child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            RaisedButton(
+            FlatButton(
               child: Text('Driving'),
-              onPressed: () {Navigator.pushNamed(context, '/travel_speed');}
+              onPressed: () {
+                data.transportMode = "Driving";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => TravelSpeed(data: data)),);
+                }
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Public Transport'),
-              onPressed: () {Navigator.pushNamed(context, '/travel_speed');}
+              onPressed: () {
+                data.transportMode = "Public Transport";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => TravelSpeed(data: data)),);
+                }
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Walk'),
-              onPressed: () {Navigator.pushNamed(context, '/travel_speed');}
+              onPressed: () {
+                data.transportMode = "Walk";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => TravelSpeed(data: data)),);
+                }
             ),
           ],
         )
@@ -158,9 +230,11 @@ class TransportMode extends StatelessWidget {
 }
 
 class TravelSpeed extends StatelessWidget {
-
+  final PrefData data;
+  TravelSpeed({this.data});
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text("How fast do you need to get there?"),
@@ -170,17 +244,26 @@ class TravelSpeed extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            RaisedButton(
+            FlatButton(
               child: Text('Fast'),
-              onPressed: () {Navigator.pushNamed(context, '/ratings_reviews');}
+              onPressed: () {
+                data.speed = "Fast";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
+                }
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Regular'),
-              onPressed: () {Navigator.pushNamed(context, '/ratings_reviews');}
+              onPressed: () {
+                data.speed = "Regular";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
+              }
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Anything'),
-              onPressed: () {Navigator.pushNamed(context, '/ratings_reviews');}
+              onPressed: () {
+                data.speed = "Anything";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
+              }
             ),
           ],
         )
@@ -190,7 +273,8 @@ class TravelSpeed extends StatelessWidget {
 }
 
 class RatingsReviews extends StatelessWidget {
-
+  final PrefData data;
+  RatingsReviews({this.data});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -200,19 +284,28 @@ class RatingsReviews extends StatelessWidget {
       ),
       body: Center(
         child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            RaisedButton(
+            FlatButton(
               child: Text('Best'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
+              onPressed: () {
+                data.quality = "Best";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
+                }
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Regular'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
+              onPressed: () {
+                data.quality = "Regular";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
+                }
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Anything'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
+              onPressed: () {
+                data.quality = "Anything";
+                Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
+                }
             ),
           ],
         )
@@ -221,8 +314,68 @@ class RatingsReviews extends StatelessWidget {
   }
 }
 
-class ShareLink extends StatelessWidget {
 
+makePostRequest() async {
+  // set up POST request arguments
+  
+  
+  Map<String, String> headers = {"Content-type": "application/json"};
+  String url = 'http://192.168.194.178:5000/session/123456';
+  String json = '{"identifier": "identifier","lat": 0, "long": 0, "metrics" : {"quality": 0,"speed":0},"transport_mode" :"0"}';
+  // String url = 'https://jsonplaceholder.typicode.com/posts';
+  // String json = '{"title": "Hello", "body": "body text", "userId": 1}';
+  // make POST request
+  http.Response response = await http.post(url, headers: headers, body: json);
+  // check the status code for the result
+  int statusCode = response.statusCode;
+  print(statusCode);
+  // this API passes back the id of the new item added to the body
+  String body = response.body;
+  print(body);
+  // debugPrint("hello testt test");
+}
+
+
+class ConfirmPreference extends StatelessWidget {
+  final PrefData data;
+  ConfirmPreference({this.data});
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Confirm Preferences?"),
+        backgroundColor: Colors.black,
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children : [
+          Expanded(
+            child:
+            ListView(
+              children: [
+                ListTile(title: Text(data.transportMode)),
+                ListTile(title: Text(data.quality)),
+                ListTile(title: Text(data.speed)),
+              ]
+            )
+          ),
+          FlatButton(
+            child: Text('Confirm'),
+            onPressed: 
+            () async{
+              Navigator.pushNamed(context, '/share_link');
+              makePostRequest();
+            }
+          ),
+        ]
+      )
+    );
+  }
+}
+
+class ShareLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,17 +387,17 @@ class ShareLink extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            RaisedButton(
+            FlatButton(
               child: Text('Copy Link'),
               //copy the link to the clipboard on pressed
               onPressed: () {Navigator.pushNamed(context, '/updating_list');}
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Save This setting'),
-              //save the setting for the
+              //save the setting
               onPressed: () {Navigator.pushNamed(context, '/updating_list');}
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('Share'),
               //open app drawer and wait until item in drawer pressed
               onPressed: () {Navigator.pushNamed(context, '/updating_list');}
@@ -258,18 +411,67 @@ class ShareLink extends StatelessWidget {
 
 class UpdatingList extends StatelessWidget {
 
+  final Future<GetMemberList> post;
+  UpdatingList({Key key, this.post}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Updating List."),
+        title: Text("Updating List"),
         backgroundColor: Colors.black,
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            RaisedButton(
+            Container(                          //member 0
+              padding: EdgeInsets.all(20),
+              child: Text("You")
+            ),
+            Container(                          //member 1
+              padding: EdgeInsets.all(20),
+              child: FutureBuilder<GetMemberList>(
+                future: post,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(snapshot.data.member1);  
+                  } else if (snapshot.hasError) {
+                    return Text("${snapshot.error}");
+                  }
+                  return CircularProgressIndicator();
+                },
+              )
+            ),
+            Container(                          //member 2
+              padding: EdgeInsets.all(20),
+              child: FutureBuilder<GetMemberList>(
+                future: post,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(snapshot.data.member2);  
+                  } else if (snapshot.hasError) {
+                    return Text("${snapshot.error}");
+                  }
+                  return CircularProgressIndicator();
+                },
+              )
+            ),
+            Container(                          //member 3
+              padding: EdgeInsets.all(20),
+              child: FutureBuilder<GetMemberList>(
+                future: post,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(snapshot.data.member3);  
+                  } else if (snapshot.hasError) {
+                    return Text("${snapshot.error}");
+                  }
+                  return CircularProgressIndicator();
+                },
+              )
+            ),
+            FlatButton(
               child: Text('Make My Meetup!'),
               onPressed: () {Navigator.pushNamed(context, '/final_result');}
             ),
@@ -290,28 +492,46 @@ class PickYourPlace extends StatelessWidget {
         backgroundColor: Colors.black,
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: ListView(
           children:[
-            RaisedButton(
+            FlatButton(
               child: Text('*Changi City Point*'),
               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('*Tampines Hub*'),
               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
             ),
-            RaisedButton(
+            FlatButton(
               child: Text('*Tampines Mall*'),
               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            )
+            ),
+            FlatButton(
+              child: Text('*Tampines One*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            ),
+            FlatButton(
+              child: Text('*Tampines Eastpoint*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            ),
+            FlatButton(
+              child: Text('*Tampines Regional Library*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            ),
+            FlatButton(
+              child: Text('*White Sands*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            ),
+            FlatButton(
+              child: Text('*Downtown East*'),
+              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+            ),
           ],
         )
         ),
       );
   }
 }
-
 
 class MapLayout extends StatelessWidget {
 
@@ -341,7 +561,7 @@ class MapSampleState extends State<MapSample> {
   );
 
   static final CameraPosition _location = CameraPosition(
-      bearing: 192.8334901395799+180-10,
+      bearing: 0,
       target: LatLng(1.366960, 103.869424),
       tilt: 59.440717697143555,
       zoom: 19.151926040649414);
@@ -359,7 +579,7 @@ class MapSampleState extends State<MapSample> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _goToPosition,
         label: Text('Lets\'s Go!'),
-        icon: Icon(Icons.directions_boat),
+        icon: Icon(Icons.fastfood),
       ),
     );
   }
@@ -369,3 +589,27 @@ class MapSampleState extends State<MapSample> {
     controller.animateCamera(CameraUpdate.newCameraPosition(_location));
   }
 }
+
+Future<GetMemberList> fetchUpdatingList() async {
+  final response = await http.get('http://192.168.194.210:5000/'); 
+  if (response.statusCode == 200) {
+    return GetMemberList.fromJson(json.decode(response.body));
+  } else {
+    throw Exception('Failed to load post');
+  }
+}
+
+class GetMemberList {
+  final String member1;
+  final String member2;
+  final String member3;
+  GetMemberList({this.member1, this.member2, this.member3,});
+  factory GetMemberList.fromJson(Map<String, dynamic> json) {
+    return GetMemberList(
+      member1: json['member1'],
+      member2: json['member2'],
+      member3: json['member3'],
+    );
+  }
+}
+

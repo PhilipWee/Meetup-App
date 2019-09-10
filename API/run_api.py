@@ -119,28 +119,31 @@ def manage_details(session_id):
         crsr.execute("SELECT info FROM sessions WHERE session_id = %s",(session_id,))
         info = crsr.fetchone()
         #The result is a tuple where the first value is the result in dictionary form alreadys
-        info_dict = info[0]
-        info_dict['users'].append(new_user_details)
-        info = json.dumps(info_dict)
-        #Upload the updated info into the tables
-        crsr.execute("UPDATE sessions SET info=(%s) WHERE session_id = (%s)",(info,session_id))
-        conn.commit()
-        return jsonify({'updated_info_for_session_id':session_id})
-
-    elif request.method == 'GET':
-        ###Check the OAuth details
-
-        ###Extract the username
-        username = 'username'
-
-        #Get all the meetup details and return it to the user
-        crsr = conn.cursor()
-        crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
-        info = crsr.fetchone()
-        if info != None:
-            return jsonify(info[0])
+        if info is not None:
+            info_dict = info[0]
+            info_dict['users'].append(new_user_details)
+            info = json.dumps(info_dict)
+            #Upload the updated info into the tables
+            crsr.execute("UPDATE sessions SET info=(%s) WHERE session_id = (%s)",(info,session_id))
+            conn.commit()
+            return jsonify({'updated_info_for_session_id':session_id})
         else:
-            return jsonify({'error':'sesson_id or username is wrong'})
+            return jsonify({'error':'The specified session id does not yet exist'})
+
+    # elif request.method == 'GET':
+    #     ###Check the OAuth details
+
+    #     ###Extract the username
+    #     username = 'username'
+
+    #     #Get all the meetup details and return it to the user
+    #     crsr = conn.cursor()
+    #     crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
+    #     info = crsr.fetchone()
+    #     if info != None:
+    #         return jsonify(info[0])
+    #     else:
+    #         return jsonify({'error':'sesson_id or username is wrong'})
 
 @app.route('/session/<session_id>/calculate', methods=['GET'])
 def calculate(session_id):
@@ -303,5 +306,6 @@ if __name__ == '__main__':
         print('table "sessions" already exist, moving on')
 
     #Run the App
-    app.run(host = '0.0.0.0', debug=True, use_reloader=False,port = 5001)
+
+    app.run(host='0.0.0.0', debug=True, use_reloader=False)
     crsr.close()
