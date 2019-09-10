@@ -22,7 +22,7 @@ API important links explanation:
 -> Generates lat, long, preferences and others and stores it in the database
 -> Only for OAuth authenticated users
 
-/session/<session_id> (PUT)
+/session/<session_id> (POST)
 -> Insert details for each particular user
 -> Need key value for lat, long ,transport_mode, speed, quality
 
@@ -169,59 +169,83 @@ def calculate(session_id):
             osm_id = crsr_gis.fetchone()[0]
             user_osms.append(osm_id)
             user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
+        # print(user_osms)
         user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]"
         #Get route
         results = pd.read_sql("with results as (\
-            select \
-                results.*,osm_nodes.the_geom\
-            from\
-                    ((SELECT \
-                        *				 \
-                    FROM pgr_dijkstra(\
-                    'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
-                    "+user_array+",\
-                    ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))\
-                as results\
-            join singapore_restaurants\
-                on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results\
-            left join\
-                osm_nodes on results.node = osm_nodes.osm_id\
-            ), best_places as (\
-                select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit "+str(NUMBER_OF_RESULTS)+"*cardinality("+user_array+")	\
-            )\
-            \
-            select \
-                path_seq,\
-                results.start_vid as start_user,\
-                agg_cost as cost_for_user,\
-                total_cost,\
-                name,\
-                results.end_vid,\
-                st_x(st_centroid(the_geom)) as longtitude,\
-                st_y(st_centroid(the_geom)) as latitude\
-            from\
-                results\
-                inner join\
-                best_places\
-                on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
+                    select \
+                        results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1\
+                    from\
+                            ((SELECT \
+                                *				 \
+                            FROM pgr_dijkstra(\
+                            'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
+                            "+user_array+",\
+                            ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))\
+                        as results\
+                    join singapore_restaurants\
+                        on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results\
+                    join\
+                        osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id\
+                ), best_places as (\
+                    select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality("+user_array+")\
+                )\
+\
+                select \
+                    path_seq,\
+                    results.start_vid as start_user,\
+                    agg_cost as cost_for_user,\
+                    total_cost,\
+                    name,\
+                    results.end_vid,\
+                    geom_way as location,\
+                    x1 as longtitude,\
+                    y1 as latitude\
+                from\
+                    results\
+                    inner join\
+                    best_places\
+                    on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
+
+
         osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
         #Replace the osm ids in results with the user's names
         results['start_user_name'] = pd.Series(osm_id_to_name_dict[row['start_user']] for index,row in results.iterrows())
         #Format the results in dictionaries
         results_dict = {}
-        results_dict['possible_locations'] = [row['name'] for index,row in results[results['cost_for_user'] == 0].iterrows()][0:NUMBER_OF_RESULTS]
+        results_dict['possible_locations'] = results['name'].unique().tolist()
         results_dict['users'] = user_osms
+        # print('results_dict:')
+        # print(results_dict)
+        # print('results:')
+        # print(results)
+
         for location in results_dict['possible_locations']:
             results_dict[location] = {}
             for user in results_dict['users']:
-                relevant_df = results[results['start_user'] == user][results['name'] == location].set_index('path_seq')
-                #Make a dictionary for each use
-                
-                results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
-                results_dict[location][user]['total_cost'] = str(relevant_df['total_cost'][1])
-                results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'][1])
-                results_dict[location][user]['start_user'] = str(relevant_df['start_user'][1])
-                results_dict[location][user]['start_user_name'] = str(relevant_df['start_user_name'][1])
+                try:
+                    # print('location:')
+                    # print(location)
+                    # print('user:')
+                    # print(user)
+
+                    relevant_df = results[results['start_user'] == user][results['name'] == location].set_index('path_seq')
+
+                    # print('relevant_df:')
+                    # print(relevant_df)
+
+
+                    #Make a dictionary for each use
+                    
+                    results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
+                    results_dict[location][user]['total_cost'] = str(relevant_df['total_cost'].iloc[0])
+                    results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'].iloc[0])
+                    results_dict[location][user]['start_user'] = str(relevant_df['start_user'].iloc[0])
+                    results_dict[location][user]['start_user_name'] = str(relevant_df['start_user_name'].iloc[0])
+                except:
+                    print('WARNING: exception on location',location,'user',user)
+            
+
         
         #Split dataframe by user
         
@@ -282,5 +306,6 @@ if __name__ == '__main__':
         print('table "sessions" already exist, moving on')
 
     #Run the App
+
     app.run(host='0.0.0.0', debug=True, use_reloader=False)
     crsr.close()
