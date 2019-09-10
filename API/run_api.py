@@ -230,14 +230,17 @@ def calculate(session_id):
                     # print(user)
 
                     relevant_df = results[results['start_user'] == user][results['name'] == location].set_index('path_seq')
+                    relevant_df.sort_values('path_seq',inplace = True)
 
                     # print('relevant_df:')
                     # print(relevant_df)
 
 
                     #Make a dictionary for each use
-                    
-                    results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
+                    results_dict[location][user] = {}
+                    results_dict[location][user]['latitude'] = relevant_df['latitude'].values.tolist()
+                    results_dict[location][user]['longtitude'] = relevant_df['longtitude'].values.tolist()
+                    # results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
                     results_dict[location][user]['total_cost'] = str(relevant_df['total_cost'].iloc[0])
                     results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'].iloc[0])
                     results_dict[location][user]['start_user'] = str(relevant_df['start_user'].iloc[0])
@@ -306,6 +309,6 @@ if __name__ == '__main__':
         print('table "sessions" already exist, moving on')
 
     #Run the App
-
-    app.run(host='0.0.0.0', debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
+    # app.run(host='0.0.0.0', debug=True, use_reloader=False)
     crsr.close()
