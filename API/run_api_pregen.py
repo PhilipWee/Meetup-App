@@ -80,7 +80,6 @@ def create_session():
                             }}
 
         session['data'] = {'users': [host_user_details]}
-        json_details = json.dumps(session['data'])
 
         return jsonify({'session_id': session_id})
     else:
