@@ -35,6 +35,7 @@ API important links explanation:
 -> Redirect to results page
 
 /session/<session_id>/results (GET)
+-> Use this page to show results to prevent lag
 -> If OAuth is provided or IP address matches, show results
 
 """
