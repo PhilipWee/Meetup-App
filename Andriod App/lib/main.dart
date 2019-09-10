@@ -3,15 +3,19 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
+import 'package:flutter/services.dart';
+
 
 void main() => runApp(MyApp());
 
 class PrefData {
+  String link;
   String transportMode;
   String speed;
   String quality;
   String body;
-  PrefData({this.transportMode, this.quality, this.speed,});
+  PrefData({this.transportMode, this.quality, this.speed, this.link});
 
 }
 
@@ -29,8 +33,8 @@ class MyApp extends StatelessWidget {
         '/ratings_reviews': (context) => RatingsReviews(),
         '/confirm_data': (context) => ConfirmPreference(),
         '/share_link': (context) => ShareLink(),
-        '/updating_list': (context) => UpdatingList(post: fetchUpdatingList()),
-        // '/updating_list': (context) => UpdatingList(),
+        // '/updating_list': (context) => UpdatingList(post: fetchUpdatingList()),
+        '/updating_list': (context) => UpdatingList(),
         '/final_result': (context) => PickYourPlace(),
         '/map_layout': (context) => MapLayout(),
       },
@@ -39,7 +43,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  final data = PrefData(transportMode: "0", speed: "0", quality: "0");
+  final data = PrefData(transportMode: "", speed: "", quality: "", link:"");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -314,35 +318,26 @@ class RatingsReviews extends StatelessWidget {
   }
 }
 
-
-makePostRequest() async {
-  // set up POST request arguments
-  
-  
-  Map<String, String> headers = {"Content-type": "application/json"};
-  String url = 'http://192.168.194.178:5000/session/123456';
-  String json = '{"identifier": "identifier","lat": 0, "long": 0, "metrics" : {"quality": 0,"speed":0},"transport_mode" :"0"}';
-  // String url = 'https://jsonplaceholder.typicode.com/posts';
-  // String json = '{"title": "Hello", "body": "body text", "userId": 1}';
-  // make POST request
-  http.Response response = await http.post(url, headers: headers, body: json);
-  // check the status code for the result
-  int statusCode = response.statusCode;
-  print(statusCode);
-  // this API passes back the id of the new item added to the body
-  String body = response.body;
-  print(body);
-  // debugPrint("hello testt test");
-}
-
-
 class ConfirmPreference extends StatelessWidget {
+
+  createSessionLink() async {
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String url = 'http://192.168.194.210:5000/session/create';
+    String json = '{"lat":1.359310,   "long":103.989343   "quality":69,   "speed":69,    "transport_mode":"driving"}';
+    http.Response response = await http.post(url, headers:headers, body:json);
+    int statusCode = response.statusCode;
+    String body = response.body; //{"updated_info_for_session_id": "123456"}
+    Map<String, dynamic> user = jsonDecode(body);
+    var sessionid = user['session_id'];
+    print('HOWDY, $sessionid!');
+    data.link = "http://192.168.194.210:5000/session/$sessionid";
+    }
+
+
   final PrefData data;
   ConfirmPreference({this.data});
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Confirm Preferences?"),
@@ -365,8 +360,10 @@ class ConfirmPreference extends StatelessWidget {
             child: Text('Confirm'),
             onPressed: 
             () async{
-              Navigator.pushNamed(context, '/share_link');
-              makePostRequest();
+              // Navigator.pushNamed(context, '/share_link');
+              createSessionLink();
+              Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLink(data: data)),);
+              
             }
           ),
         ]
@@ -376,6 +373,8 @@ class ConfirmPreference extends StatelessWidget {
 }
 
 class ShareLink extends StatelessWidget {
+  final PrefData data;
+  ShareLink({this.data});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -387,10 +386,14 @@ class ShareLink extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
+            Text(data.link),
             FlatButton(
               child: Text('Copy Link'),
               //copy the link to the clipboard on pressed
-              onPressed: () {Navigator.pushNamed(context, '/updating_list');}
+              onPressed: () {
+                Navigator.pushNamed(context, '/updating_list');  
+                Clipboard.setData(new ClipboardData(text: data.link));
+                }
             ),
             FlatButton(
               child: Text('Save This setting'),
@@ -411,8 +414,24 @@ class ShareLink extends StatelessWidget {
 
 class UpdatingList extends StatelessWidget {
 
-  final Future<GetMemberList> post;
-  UpdatingList({Key key, this.post}) : super(key: key);
+  getMemberData() async {
+  http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
+  int statusCode = response.statusCode;
+  String json = response.body;
+  print(statusCode);
+  print(json);
+}
+
+  getPositionName(double lat, double long) async{
+    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(lat, long);
+    print(placemark[0].locality);
+    print(placemark[0].administrativeArea);
+    print(placemark[0].name);
+    print(placemark[0].thoroughfare);
+  }
+
+  // final Future<GetMemberList> post;
+  // UpdatingList({Key key, this.post}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -429,51 +448,13 @@ class UpdatingList extends StatelessWidget {
               padding: EdgeInsets.all(20),
               child: Text("You")
             ),
-            Container(                          //member 1
-              padding: EdgeInsets.all(20),
-              child: FutureBuilder<GetMemberList>(
-                future: post,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data.member1);  
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
-                  return CircularProgressIndicator();
-                },
-              )
-            ),
-            Container(                          //member 2
-              padding: EdgeInsets.all(20),
-              child: FutureBuilder<GetMemberList>(
-                future: post,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data.member2);  
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
-                  return CircularProgressIndicator();
-                },
-              )
-            ),
-            Container(                          //member 3
-              padding: EdgeInsets.all(20),
-              child: FutureBuilder<GetMemberList>(
-                future: post,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data.member3);  
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  }
-                  return CircularProgressIndicator();
-                },
-              )
-            ),
             FlatButton(
               child: Text('Make My Meetup!'),
-              onPressed: () {Navigator.pushNamed(context, '/final_result');}
+              onPressed: () {
+                // Navigator.pushNamed(context, '/final_result');
+                // getPositionName(1.284858,103.826318);
+                getMemberData();
+                }
             ),
           ],
         )
@@ -587,29 +568,6 @@ class MapSampleState extends State<MapSample> {
   Future<void> _goToPosition() async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(_location));
-  }
-}
-
-Future<GetMemberList> fetchUpdatingList() async {
-  final response = await http.get('http://192.168.194.210:5000/'); 
-  if (response.statusCode == 200) {
-    return GetMemberList.fromJson(json.decode(response.body));
-  } else {
-    throw Exception('Failed to load post');
-  }
-}
-
-class GetMemberList {
-  final String member1;
-  final String member2;
-  final String member3;
-  GetMemberList({this.member1, this.member2, this.member3,});
-  factory GetMemberList.fromJson(Map<String, dynamic> json) {
-    return GetMemberList(
-      member1: json['member1'],
-      member2: json['member2'],
-      member3: json['member3'],
-    );
   }
 }
 
