@@ -1,4 +1,4 @@
-osm2pgrouting --addnodes --dbname gisdb --username postgres --password housepotato --file '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm.pbf' 
+osm2pgrouting --addnodes --dbname gisdb --username postgres --password housepotato --file '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm_01.osm' 
 
 sudo su postgres
 
@@ -26,7 +26,7 @@ SELECT osm_id FROM ways_vertices_pgr
     LIMIT 1;
 #Format is longtitude, then latitude
 
-osm2pgsql --create --database gisdb '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm.pbf' --prefix singapore
+osm2pgsql -U postgres -W --create --database gisdb '/home/meetup-dev/Downloads/malaysia-singapore-brunei-latest.osm.pbf'
 
 SELECT osm_id,name,way FROM singapore_point WHERE amenity = 'restaurant';
 
@@ -203,25 +203,73 @@ create table singapore_restaurants as select * from (select osm_id, name, amenit
 
 ALTER TABLE singapore_restaurants
 ADD COLUMN nearest_road_neighbour geometry;
+
+ALTER TABLE singapore_restaurants
 ADD COLUMN nearest_road_neighbour_osm_id bigint;
 
 UPDATE singapore_restaurants tA1 SET nearest_road_neighbour = 
 (SELECT near_point.the_geom
 FROM singapore_restaurants tA2, 
-LATERAL (SELECT the_geom 
-         FROM (select * from ways_vertices_pgr) tableB
+LATERAL (SELECT the_geom
+         FROM (select * from osm_nodes) tableB
          ORDER BY tableB.the_geom <-> tA2.way 
          LIMIT 1) near_point
-WHERE tA2.osm_id = tA1.osm_id limit 1)
+WHERE tA2.osm_id = tA1.osm_id limit 1);
+
+#Create singapore_road_points v2
+create table singapore_road_points as 
+	(select osm_id, osm_target_id, osm_name,  geom_way as way from osm_2po_4pgr
+	where ST_Within(ST_Transform(geom_way,4326), ST_SetSRID(ST_BuildArea(ST_GeomFromText('LINESTRING(103.747899 1.448418,
+	103.717000 1.455884,
+	103.672316 1.428042,
+	103.567125 1.208307,
+	103.645382 1.191688,
+	104.035741 1.280736,
+	104.049487 1.353505,
+	103.984832 1.401563,
+	103.948364 1.391565,
+	103.915053 1.425629,
+	103.878286 1.435270,
+	103.829075 1.477364,
+	103.747899 1.448418)')),4326)))
+
+UPDATE singapore_restaurants tA1 SET nearest_road_neighbour = 
+(SELECT near_point.road_point
+FROM singapore_restaurants tA2, 
+LATERAL (
+	select way as road_point from (select * from singapore_road_points) tableB
+	order by ta2.way <-> tableB.way
+	limit 1
+         ) near_point
+WHERE tA2.osm_id = tA1.osm_id limit 1);
 
 UPDATE singapore_restaurants tA1 SET nearest_road_neighbour_osm_id = 
-(SELECT near_point.osm_id
+(SELECT near_point.osm_target_id
 FROM singapore_restaurants tA2, 
-LATERAL (SELECT the_geom, osm_id
-         FROM (select * from ways_vertices_pgr) tableB
-         ORDER BY tableB.the_geom <-> tA2.way 
-         LIMIT 1) near_point
-WHERE tA2.osm_id = tA1.osm_id limit 1)
+LATERAL (
+	select way as road_point, osm_target_id from (select * from singapore_road_points) tableB
+	order by ta2.way <-> tableB.way
+	limit 1
+         ) near_point
+WHERE tA2.osm_id = tA1.osm_id limit 1);
+
+#UPDATE singapore_restaurants tA1 SET nearest_road_neighbour = 
+#(SELECT near_point.geom_way
+#FROM singapore_restaurants tA2, 
+#LATERAL (SELECT geom_way
+#         FROM (select * from osm_2po_4pgr) tableB
+#         ORDER BY tableB.geom_way <-> tA2.way 
+#         LIMIT 1) near_point
+#WHERE tA2.osm_id = tA1.osm_id limit 1);
+
+#UPDATE singapore_restaurants tA1 SET nearest_road_neighbour_osm_id = 
+#(SELECT near_point.osm_id
+#FROM singapore_restaurants tA2, 
+#LATERAL (SELECT geom_way, osm_id
+#         FROM (select * from osm_2po_4pgr) tableB
+#         ORDER BY tableB.geom_way <-> tA2.way 
+#         LIMIT 1) near_point
+#WHERE tA2.osm_id = tA1.osm_id limit 1);
 
 #-------------------------------------test if pgrouting loaded properly---------------------
 select ST_Transform(the_geom,4326) as ways from ways
@@ -306,23 +354,24 @@ from
  	order by total_cost 
 
 #Step 2(Updated to have routes as well)
+
 with results as (
 	select 
-		results.*,osm_nodes.the_geom
+		results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1
 	from
 			((SELECT 
 				 *				 
 			FROM pgr_dijkstra(
 			'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',
-			ARRAY[242936757,1830483603,4593402970]::bigint[],
+			ARRAY[425482381, 4488019045, 243213958]::bigint[],
 			ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))
 		as results
 	join singapore_restaurants
 		on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results
-	left join
-		osm_nodes on results.node = osm_nodes.osm_id
+	join
+		osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id
 ), best_places as (
-	select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality(ARRAY[242936757,1830483603,4593402970]::bigint[])	
+	select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality(ARRAY[425482381, 4488019045, 243213958]::bigint[])	
 )
 
 select 
@@ -332,9 +381,9 @@ select
 	total_cost,
 	name,
 	results.end_vid,
-	the_geom as location,
-	st_x(st_centroid(the_geom)) as longtitude,
-	st_y(st_centroid(the_geom)) as latitude
+	geom_way as location,
+	x1 as longtitude,
+	y1 as latitude
 from
 	results
 	inner join
@@ -342,4 +391,30 @@ from
 	on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid
 
 
+
+#------------------------------------Speed tests for additional columns----------------------------
+select * from small_singapore_restaurants restaurants, osm_2po_4pgr
+where restaurants.way = '0101000020E6100000EC2B14763AF25940BB8A53D1A6B2F43F'
+order by ST_Distance(restaurants.way, osm_2po_4pgr.geom_way)
+limit 1
+2.6s
+
+select * from small_singapore_restaurants restaurants, osm_2po_4pgr
+where restaurants.way = '0101000020E6100000EC2B14763AF25940BB8A53D1A6B2F43F'
+order by restaurants.way <-> osm_2po_4pgr.geom_way
+limit 1
+
+1.1s
+
+select * from small_singapore_restaurants restaurants, osm_2po_4pgr
+where restaurants.way = '0101000020E6100000EC2B14763AF25940BB8A53D1A6B2F43F'
+order by restaurants.way <#> osm_2po_4pgr.geom_way
+limit 1
+863ms
+
+select * from small_singapore_restaurants restaurants, singapore_road_points
+where restaurants.way = '0101000020E6100000EC2B14763AF25940BB8A53D1A6B2F43F'
+order by restaurants.way <-> singapore_road_points.way
+limit 1
+62ms
 
