@@ -4,19 +4,21 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/services.dart';
-// import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
+import 'package:clipboard_manager/clipboard_manager.dart';
 
 
 void main() => runApp(MyApp());
 
 class PrefData {
+  double lat;
+  double long;
   String link;
   String transportMode;
   int speed;
   int quality;
   String body;
-  PrefData({this.transportMode, this.quality, this.speed, this.link});
+  PrefData({this.transportMode, this.quality, this.speed, this.link, this.body, this.lat, this.long});
 
 }
 
@@ -45,6 +47,15 @@ class MyApp extends StatelessWidget {
 
 class HomeScreen extends StatelessWidget {
   final data = PrefData(transportMode: "", speed: 0, quality: 0, link:"");
+
+  refreshServer() async {
+    http.Response response = await http.get('http://192.168.194.228:5000/refresh');
+    int statusCode = response.statusCode;
+    String body = response.body;
+    print("SERVER REFRESHED WITH STATUSCODE: $statusCode");
+    print("SERVER SAYS: $body");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,13 +72,13 @@ class HomeScreen extends StatelessWidget {
               onPressed: 
               () {
                 Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),); // send data to said screen and also go to the said screen
-                //Navigator.pushNamed(context, '/meeting_type');
+                refreshServer();
                 }
             ),
-            FlatButton(
-              child: Text('Defaults'),
-              onPressed: () {Navigator.pushNamed(context, '/examples');}
-            ),
+            // FlatButton(
+            //   child: Text('Defaults'),
+            //   onPressed: () {Navigator.pushNamed(context, '/examples');}
+            // ),
           ],
         )
         ),
@@ -324,31 +335,34 @@ class ConfirmPreference extends StatelessWidget {
   final PrefData data;
   ConfirmPreference({this.data});
 
-  getUserLocation() async{
+  createSessionLink() async {
+    // List coordinates = getUserLocation();
+    // double lat = coordinates[0];
+    // double long = coordinates[1];
     var location = Location();
     LocationData currentLocation = await location.getLocation();
+
     double lat = currentLocation.latitude;
     double long = currentLocation.longitude;
-    print("LAT = $lat, LONG = $long");
-  }
-
-
-  createSessionLink() async {
     int quality = data.quality;
     int speed = data.speed;
     String transportmode = data.transportMode;
-
     Map<String, String> headers = {"Content-type": "application/json"};
-    // String url = 'http://192.168.194.210:5000/session/create'; //use at Phillip's house
-    String url = 'http://192.168.194.228:5000/session/create'; //use at Stephen's house
-    String json = '{"lat":1.359310,   "long":103.989343,   "quality":$quality,   "speed":$speed,    "transport_mode":$transportmode}';
+    // String url = 'http://192.168.194.210:5000/session/create'; //server running on Philip's laptop
+    String url = 'http://192.168.194.228:5000/session/create'; //server running on Stephen's laptop
+    String json = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
     http.Response response = await http.post(url, headers:headers, body:json);
-    int statusCode = response.statusCode; 
+    int statusCode = response.statusCode;
     String body = response.body;
+    print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+    print("SERVER SAYS: $body");
     Map<String, dynamic> user = jsonDecode(body); //{sessionid: 123456}
     var sessionid = user['session_id'];
+    print("Transport Mode:$transportmode");
+    print("Quality:$quality");
+    print("Speed:$speed");
     data.link = "http://192.168.194.210:5000/session/$sessionid";
-    print('Sharable link--> http://192.168.194.210:5000/session/$sessionid');
+    print('Link Created--> http://192.168.194.210:5000/session/$sessionid');
     }
   
   @override
@@ -375,10 +389,9 @@ class ConfirmPreference extends StatelessWidget {
             child: Text('Confirm'),
             onPressed: 
             () async{
-              // createSessionLink();
-              getUserLocation();
-              // Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLink(data: data)),);
-              
+              createSessionLink();
+              Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLink(data: data)),);
+              print("Details Confirmed!");
             }
           ),
         ]
@@ -388,8 +401,18 @@ class ConfirmPreference extends StatelessWidget {
 }
 
 class ShareLink extends StatelessWidget {
+  final snackBar = SnackBar(content: Text('Link Copied'),duration: Duration(seconds: 2));
   final PrefData data;
   ShareLink({this.data});
+
+  getMemberData() async {
+    http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
+    int statusCode = response.statusCode;
+    String json = response.body;
+    print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+    print("SERVER SAYS: $json");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -397,46 +420,40 @@ class ShareLink extends StatelessWidget {
         title: Text("Share the Link!"),
         backgroundColor: Colors.black,
       ),
-      body: Center(
+      body:
+      Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children:[
-            Text(data.link),
+            Container(child: Text(data.link)),
+            Builder(
+              builder: (context) => FlatButton(
+                child: Text('Copy Link'),
+                onPressed: () {
+                  Scaffold.of(context).showSnackBar(snackBar);
+                  print("LINK COPIED");
+                },
+              ),
+            ),
+            // FlatButton(
+            //   child: Text('Share'),
+            //   onPressed: () {Navigator.pushNamed(context, '/updating_list');}
+            // ),
             FlatButton(
-              child: Text('Copy Link'),
-              //copy the link to the clipboard on pressed
+              child: Text('Now we wait...'),
               onPressed: () {
-                Navigator.pushNamed(context, '/updating_list');  
-                Clipboard.setData(new ClipboardData(text: data.link));
+                Navigator.pushNamed(context, '/updating_list');
+                getMemberData();
                 }
-            ),
-            FlatButton(
-              child: Text('Save This setting'),
-              //save the setting
-              onPressed: () {Navigator.pushNamed(context, '/updating_list');}
-            ),
-            FlatButton(
-              child: Text('Share'),
-              //open app drawer and wait until item in drawer pressed
-              onPressed: () {Navigator.pushNamed(context, '/updating_list');}
             ),
           ],
         )
-        ),
-      );
+      )
+    );
   }
 }
 
 class UpdatingList extends StatelessWidget {
-
-  getMemberData() async {
-  http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
-  int statusCode = response.statusCode;
-  String json = response.body;
-  print(statusCode);
-  print(json);
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -457,8 +474,6 @@ class UpdatingList extends StatelessWidget {
               child: Text('Make My Meetup!'),
               onPressed: () {
                 Navigator.pushNamed(context, '/final_result');
-                // getPositionName(1.284858,103.826318);
-                getMemberData();
                 }
             ),
           ],
