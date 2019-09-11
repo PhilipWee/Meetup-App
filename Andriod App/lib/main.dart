@@ -3,8 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/services.dart';
+// import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
 
 
 void main() => runApp(MyApp());
@@ -12,8 +13,8 @@ void main() => runApp(MyApp());
 class PrefData {
   String link;
   String transportMode;
-  String speed;
-  String quality;
+  int speed;
+  int quality;
   String body;
   PrefData({this.transportMode, this.quality, this.speed, this.link});
 
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  final data = PrefData(transportMode: "", speed: "", quality: "", link:"");
+  final data = PrefData(transportMode: "", speed: 0, quality: 0, link:"");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,21 +252,21 @@ class TravelSpeed extends StatelessWidget {
             FlatButton(
               child: Text('Fast'),
               onPressed: () {
-                data.speed = "Fast";
+                data.speed = 3;
                 Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
                 }
             ),
             FlatButton(
               child: Text('Regular'),
               onPressed: () {
-                data.speed = "Regular";
+                data.speed = 2;
                 Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
               }
             ),
             FlatButton(
               child: Text('Anything'),
               onPressed: () {
-                data.speed = "Anything";
+                data.speed = 1;
                 Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
               }
             ),
@@ -293,21 +294,21 @@ class RatingsReviews extends StatelessWidget {
             FlatButton(
               child: Text('Best'),
               onPressed: () {
-                data.quality = "Best";
+                data.quality = 3;
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
                 }
             ),
             FlatButton(
               child: Text('Regular'),
               onPressed: () {
-                data.quality = "Regular";
+                data.quality = 2;
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
                 }
             ),
             FlatButton(
               child: Text('Anything'),
               onPressed: () {
-                data.quality = "Anything";
+                data.quality = 1;
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
                 }
             ),
@@ -320,22 +321,36 @@ class RatingsReviews extends StatelessWidget {
 
 class ConfirmPreference extends StatelessWidget {
 
-  createSessionLink() async {
-    Map<String, String> headers = {"Content-type": "application/json"};
-    String url = 'http://192.168.194.210:5000/session/create';
-    String json = '{"lat":1.359310,   "long":103.989343   "quality":69,   "speed":69,    "transport_mode":"driving"}';
-    http.Response response = await http.post(url, headers:headers, body:json);
-    int statusCode = response.statusCode;
-    String body = response.body; //{"updated_info_for_session_id": "123456"}
-    Map<String, dynamic> user = jsonDecode(body);
-    var sessionid = user['session_id'];
-    print('HOWDY, $sessionid!');
-    data.link = "http://192.168.194.210:5000/session/$sessionid";
-    }
-
-
   final PrefData data;
   ConfirmPreference({this.data});
+
+  getUserLocation() async{
+    var location = Location();
+    LocationData currentLocation = await location.getLocation();
+    double lat = currentLocation.latitude;
+    double long = currentLocation.longitude;
+    print("LAT = $lat, LONG = $long");
+  }
+
+
+  createSessionLink() async {
+    int quality = data.quality;
+    int speed = data.speed;
+    String transportmode = data.transportMode;
+
+    Map<String, String> headers = {"Content-type": "application/json"};
+    // String url = 'http://192.168.194.210:5000/session/create'; //use at Phillip's house
+    String url = 'http://192.168.194.228:5000/session/create'; //use at Stephen's house
+    String json = '{"lat":1.359310,   "long":103.989343,   "quality":$quality,   "speed":$speed,    "transport_mode":$transportmode}';
+    http.Response response = await http.post(url, headers:headers, body:json);
+    int statusCode = response.statusCode; 
+    String body = response.body;
+    Map<String, dynamic> user = jsonDecode(body); //{sessionid: 123456}
+    var sessionid = user['session_id'];
+    data.link = "http://192.168.194.210:5000/session/$sessionid";
+    print('Sharable link--> http://192.168.194.210:5000/session/$sessionid');
+    }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -351,8 +366,8 @@ class ConfirmPreference extends StatelessWidget {
             ListView(
               children: [
                 ListTile(title: Text(data.transportMode)),
-                ListTile(title: Text(data.quality)),
-                ListTile(title: Text(data.speed)),
+                ListTile(title: Text(data.quality.toString())),
+                ListTile(title: Text(data.speed.toString())),
               ]
             )
           ),
@@ -360,9 +375,9 @@ class ConfirmPreference extends StatelessWidget {
             child: Text('Confirm'),
             onPressed: 
             () async{
-              // Navigator.pushNamed(context, '/share_link');
-              createSessionLink();
-              Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLink(data: data)),);
+              // createSessionLink();
+              getUserLocation();
+              // Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLink(data: data)),);
               
             }
           ),
@@ -422,16 +437,6 @@ class UpdatingList extends StatelessWidget {
   print(json);
 }
 
-  getPositionName(double lat, double long) async{
-    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(lat, long);
-    print(placemark[0].locality);
-    print(placemark[0].administrativeArea);
-    print(placemark[0].name);
-    print(placemark[0].thoroughfare);
-  }
-
-  // final Future<GetMemberList> post;
-  // UpdatingList({Key key, this.post}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -451,7 +456,7 @@ class UpdatingList extends StatelessWidget {
             FlatButton(
               child: Text('Make My Meetup!'),
               onPressed: () {
-                // Navigator.pushNamed(context, '/final_result');
+                Navigator.pushNamed(context, '/final_result');
                 // getPositionName(1.284858,103.826318);
                 getMemberData();
                 }
