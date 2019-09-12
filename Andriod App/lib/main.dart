@@ -3,12 +3,32 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:location/location.dart';
-import 'package:clipboard_manager/clipboard_manager.dart';
-
+import 'package:geolocator/geolocator.dart';
 
 void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context){
+    return MaterialApp(
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(),
+        '/meeting_type': (context) => MeetingType(),
+        '/transport_mode': (context) => TransportMode(),
+        '/travel_speed': (context) => TravelSpeed(),
+        '/ratings_reviews': (context) => RatingsReviews(),
+        '/confirm_data': (context) => ConfirmPreference(),
+        '/share_link': (context) => ShareLink(),
+        '/updating_list': (context) => UpdatingList(),
+        '/final_result': (context) => PickYourPlace(),
+        '/map_layout': (context) => MapLayout(),
+      },
+    );
+  }
+}
 
 class PrefData {
   double lat;
@@ -19,30 +39,6 @@ class PrefData {
   int quality;
   String body;
   PrefData({this.transportMode, this.quality, this.speed, this.link, this.body, this.lat, this.long});
-
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context){
-    return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) => HomeScreen(),
-        '/meeting_type': (context) => MeetingType(),
-        '/examples': (context) => Examples(),
-        '/transport_mode': (context) => TransportMode(),
-        '/travel_speed': (context) => TravelSpeed(),
-        '/ratings_reviews': (context) => RatingsReviews(),
-        '/confirm_data': (context) => ConfirmPreference(),
-        '/share_link': (context) => ShareLink(),
-        // '/updating_list': (context) => UpdatingList(post: fetchUpdatingList()),
-        '/updating_list': (context) => UpdatingList(),
-        '/final_result': (context) => PickYourPlace(),
-        '/map_layout': (context) => MapLayout(),
-      },
-    );
-  }
 }
 
 class HomeScreen extends StatelessWidget {
@@ -72,13 +68,9 @@ class HomeScreen extends StatelessWidget {
               onPressed: 
               () {
                 Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),); // send data to said screen and also go to the said screen
-                refreshServer();
+                // refreshServer();
                 }
             ),
-            // FlatButton(
-            //   child: Text('Defaults'),
-            //   onPressed: () {Navigator.pushNamed(context, '/examples');}
-            // ),
           ],
         )
         ),
@@ -161,45 +153,6 @@ class MeetingType extends StatelessWidget {
     );
   }
 
-}
-
-class Examples extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Examples"),
-        backgroundColor: Colors.black,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children:[
-            FlatButton(
-              child: Text('Custom'),
-              onPressed: () {Navigator.pushNamed(context, '/meeting_type');}
-            ),
-            FlatButton(
-              child: Text('Example1'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
-              
-            ),
-            FlatButton(
-              child: Text('Example2'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
-              
-            ),
-            FlatButton(
-              child: Text('Example3'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
-              
-            ),
-          ],
-        )
-        ),
-      );
-  }
 }
 
 class TransportMode extends StatelessWidget {
@@ -336,31 +289,32 @@ class ConfirmPreference extends StatelessWidget {
   ConfirmPreference({this.data});
 
   createSessionLink() async {
-    // List coordinates = getUserLocation();
-    // double lat = coordinates[0];
-    // double long = coordinates[1];
     var location = Location();
     LocationData currentLocation = await location.getLocation();
-
+    data.lat = currentLocation.latitude;
+    data.long = currentLocation.longitude;
     double lat = currentLocation.latitude;
     double long = currentLocation.longitude;
     int quality = data.quality;
     int speed = data.speed;
     String transportmode = data.transportMode;
+
     Map<String, String> headers = {"Content-type": "application/json"};
-    // String url = 'http://192.168.194.210:5000/session/create'; //server running on Philip's laptop
-    String url = 'http://192.168.194.228:5000/session/create'; //server running on Stephen's laptop
+    String url = 'http://192.168.194.210:5000/session/create'; //server running on Philip's laptop
+    // String url = 'http://192.168.194.228:5000/session/create'; //server running on Stephen's laptop
     String json = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
     http.Response response = await http.post(url, headers:headers, body:json);
     int statusCode = response.statusCode;
     String body = response.body;
     print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
     print("SERVER SAYS: $body");
-    Map<String, dynamic> user = jsonDecode(body); //{sessionid: 123456}
-    var sessionid = user['session_id'];
+    Map<String, dynamic> sessionidjsonversion = jsonDecode(body); //{sessionid: 123456}
+    var sessionid = sessionidjsonversion['session_id'];
     print("Transport Mode:$transportmode");
     print("Quality:$quality");
     print("Speed:$speed");
+    // data.link = "http://192.168.194.228:5000/session/$sessionid";
+    // print('Link Created--> http://192.168.194.228:5000/session/$sessionid');
     data.link = "http://192.168.194.210:5000/session/$sessionid";
     print('Link Created--> http://192.168.194.210:5000/session/$sessionid');
     }
@@ -389,7 +343,7 @@ class ConfirmPreference extends StatelessWidget {
             child: Text('Confirm'),
             onPressed: 
             () async{
-              createSessionLink();
+              // createSessionLink();
               Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLink(data: data)),);
               print("Details Confirmed!");
             }
@@ -404,14 +358,6 @@ class ShareLink extends StatelessWidget {
   final snackBar = SnackBar(content: Text('Link Copied'),duration: Duration(seconds: 2));
   final PrefData data;
   ShareLink({this.data});
-
-  getMemberData() async {
-    http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
-    int statusCode = response.statusCode;
-    String json = response.body;
-    print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-    print("SERVER SAYS: $json");
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -435,15 +381,11 @@ class ShareLink extends StatelessWidget {
                 },
               ),
             ),
-            // FlatButton(
-            //   child: Text('Share'),
-            //   onPressed: () {Navigator.pushNamed(context, '/updating_list');}
-            // ),
             FlatButton(
               child: Text('Now we wait...'),
               onPressed: () {
                 Navigator.pushNamed(context, '/updating_list');
-                getMemberData();
+                // Navigator.push(context,MaterialPageRoute(builder: (context) => UpdatingList(data: data)),);
                 }
             ),
           ],
@@ -453,141 +395,281 @@ class ShareLink extends StatelessWidget {
   }
 }
 
-class UpdatingList extends StatelessWidget {
-
+class UpdatingList extends StatefulWidget {
+  UpdatingList({Key key, this.title}) : super(key: key);
+  final String title;
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Updating List"),
-        backgroundColor: Colors.black,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[
-            Container(                          //member 0
-              padding: EdgeInsets.all(20),
-              child: Text("You")
-            ),
-            FlatButton(
-              child: Text('Make My Meetup!'),
-              onPressed: () {
-                Navigator.pushNamed(context, '/final_result');
-                }
-            ),
-          ],
-        )
-        ),
-      );
+  _UpdatingListState createState() => new _UpdatingListState();
+}
+
+class _UpdatingListState extends State<UpdatingList> {
+  final PrefData data;
+  _UpdatingListState({this.data});
+// THIS IS WHAT THE SERVER RETURNS WHEN AFTER HTTP GET
+// {
+//   "users": [
+//     {
+//       "lat": 37.4219983, 
+//       "long": -122.084, 
+//       "metrics": {
+//         "quality": 3, 
+//         "speed": 3
+//       }, 
+//       "transport_mode": "Driving", 
+//       "username": "username"
+//     }, 
+//     {
+//       "identifier": "identifier", 
+//       "lat": 1.2848664, 
+//       "long": 103.8244263, 
+//       "metrics": {
+//         "quality": 5, 
+//         "speed": 5
+//       }, 
+//       "transport_mode": "public"
+//     }
+//   ]
+// }
+  Future<List<Map<String, dynamic>>> getMembers() async {
+    // http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
+    http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
+    int statusCode = response.statusCode;
+    String body = response.body;
+    print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+    print("SERVER SAYS: $body");
+    Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
+    List membersData = memberDatajsonVersion["users"];    //extract the list of user detail maps into a list
+    List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
+    Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
+    for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
+      List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename and
+      placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
+    }
+    membersData.add(placeNameMap);
+    return membersData;
   }
-}
 
-class PickYourPlace extends StatelessWidget {
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Pick Your Place"),
-        backgroundColor: Colors.black,
-      ),
-      body: Center(
-        child: ListView(
-          children:[
-            FlatButton(
-              child: Text('*Changi City Point*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-            FlatButton(
-              child: Text('*Tampines Hub*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-            FlatButton(
-              child: Text('*Tampines Mall*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-            FlatButton(
-              child: Text('*Tampines One*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-            FlatButton(
-              child: Text('*Tampines Eastpoint*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-            FlatButton(
-              child: Text('*Tampines Regional Library*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-            FlatButton(
-              child: Text('*White Sands*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-            FlatButton(
-              child: Text('*Downtown East*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
-            ),
-          ],
-        )
-        ),
-      );
+  Future<List<Map<String, dynamic>>> getMembersFAKE() async {
+
+    await Future.delayed(Duration(milliseconds: 1000));
+
+    List<Map<String, dynamic>> membersData = [
+      {
+        "lat": 37.4219983, 
+        "long": -122.084, 
+        "metrics": {
+          "quality": 3, 
+          "speed": 3
+        }, 
+        "transport_mode": "Driving", 
+        "username": "username"
+      }, 
+      {
+        "identifier": "Philip", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Driving"
+      },
+      {
+        "identifier": "Julia", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Public Transport"
+      },
+      {
+        "identifier": "Joel", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Public Transport"
+      },
+      {
+        "identifier": "Veda", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Walking"
+      },
+      {
+        "username" : "Jalan Bukit Merah",
+        "Philip" : "Serangoon Gardens",
+        "Julia" : "Potong Pasir",
+        "Joel" : "Hougang",
+        "Veda" : "Upper Changi",
+      },
+    ];
+    print("Printing directly! $membersData");
+    return membersData;
   }
-}
-
-class MapLayout extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("*Tampines Mall*"),
-        backgroundColor: Colors.black,
-      ),
-      body: MapSample()
-      );
-  }
-}
-
-class MapSample extends StatefulWidget {
-  @override
-  State<MapSample> createState() => MapSampleState();
-}
-
-class MapSampleState extends State<MapSample> {
-  Completer<GoogleMapController> _controller = Completer();
-
-  static final CameraPosition _kGooglePlex = CameraPosition(
-    target: LatLng(1.366960, 103.869424),
-    zoom: 14.4746,
-  );
-
-  static final CameraPosition _location = CameraPosition(
-      bearing: 0,
-      target: LatLng(1.366960, 103.869424),
-      tilt: 59.440717697143555,
-      zoom: 19.151926040649414);
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: GoogleMap(
-        mapType: MapType.hybrid,
-        initialCameraPosition: _kGooglePlex,
-        onMapCreated: (GoogleMapController controller) {
-          _controller.complete(controller);
-        },
+      appBar: new AppBar(
+        title: new Text("Participants"),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _goToPosition,
-        label: Text('Lets\'s Go!'),
-        icon: Icon(Icons.fastfood),
-      ),
-    );
-  }
+      body: Container(
+          child: FutureBuilder(
+            future: getMembersFAKE(),
+            builder: (BuildContext context, AsyncSnapshot snapshot){
+              print(snapshot);
+              if(snapshot.data == null){
+                return Container(
+                  child: Center(
+                    child: Text("Loading...")
+                  )
+                );
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data.length-1,
+                  itemBuilder: (BuildContext context, int index) {
+                    Map<String,dynamic> myMap = snapshot.data[snapshot.data.length-1];
+                    if (index == 0){
+                      return ListTile(
+                        leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                        title: Text("You"),
+                        subtitle: Text(snapshot.data[index]["transport_mode"]),
+                        trailing: Text(myMap[snapshot.data[index]["username"]])
+                      );
+                    }
+                    return ListTile(
+                      leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                      title: Text(snapshot.data[index]["identifier"]),
+                      subtitle: Text(snapshot.data[index]["transport_mode"]),
+                      trailing: Text(myMap[snapshot.data[index]["identifier"]]),
 
-  Future<void> _goToPosition() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(_location));
+                    );
+                  },
+                );
+              }
+            },
+          ),
+        ),
+      );
   }
 }
 
+
+
+// class PickYourPlace extends StatelessWidget {
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("Pick Your Place"),
+//         backgroundColor: Colors.black,
+//       ),
+//       body: Center(
+//         child: ListView(
+//           children:[
+//             FlatButton(
+//               child: Text('*Changi City Point*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//             FlatButton(
+//               child: Text('*Tampines Hub*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//             FlatButton(
+//               child: Text('*Tampines Mall*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//             FlatButton(
+//               child: Text('*Tampines One*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//             FlatButton(
+//               child: Text('*Tampines Eastpoint*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//             FlatButton(
+//               child: Text('*Tampines Regional Library*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//             FlatButton(
+//               child: Text('*White Sands*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//             FlatButton(
+//               child: Text('*Downtown East*'),
+//               onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+//             ),
+//           ],
+//         )
+//         ),
+//       );
+//   }
+// }
+
+// class MapLayout extends StatelessWidget {
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("*Tampines Mall*"),
+//         backgroundColor: Colors.black,
+//       ),
+//       body: MapSample()
+//       );
+//   }
+// }
+
+// class MapSample extends StatefulWidget {
+//   @override
+//   State<MapSample> createState() => MapSampleState();
+// }
+
+// class MapSampleState extends State<MapSample> {
+//   Completer<GoogleMapController> _controller = Completer();
+
+//   static final CameraPosition _kGooglePlex = CameraPosition(
+//     target: LatLng(1.366960, 103.869424),
+//     zoom: 14.4746,
+//   );
+
+//   static final CameraPosition _location = CameraPosition(
+//       bearing: 0,
+//       target: LatLng(1.366960, 103.869424),
+//       tilt: 59.440717697143555,
+//       zoom: 19.151926040649414);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return new Scaffold(
+//       body: GoogleMap(
+//         mapType: MapType.hybrid,
+//         initialCameraPosition: _kGooglePlex,
+//         onMapCreated: (GoogleMapController controller) {
+//           _controller.complete(controller);
+//         },
+//       ),
+//       floatingActionButton: FloatingActionButton.extended(
+//         onPressed: _goToPosition,
+//         label: Text('Lets\'s Go!'),
+//         icon: Icon(Icons.fastfood),
+//       ),
+//     );
+//   }
+
+//   Future<void> _goToPosition() async {
+//     final GoogleMapController controller = await _controller.future;
+//     controller.animateCamera(CameraUpdate.newCameraPosition(_location));
+//   }
+// }
