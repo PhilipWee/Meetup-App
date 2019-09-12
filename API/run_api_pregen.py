@@ -138,12 +138,9 @@ def manage_details(session_id):
 
 @app.route('/session/<session_id>/calculate', methods=['GET'])
 def calculate(session_id):
+    #Always return the result, for testing purposes
+    return redirect("/session/"+session_id+"/results", code=302)
 
-    if session.get('data') is not None:
-        #Redirect the user to the results page
-        return redirect("/session/"+session_id+"/results", code=302)
-    else:
-        return jsonify({'error': 'please create the session first'})
 
 #The results come from here
 @app.route('/session/<session_id>/results', methods=['GET'])
