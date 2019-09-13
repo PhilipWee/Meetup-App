@@ -273,6 +273,7 @@ class CustomizationPageWidget extends StatefulWidget {
 class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
   CustomizationPageState({this.data});
+
   sessionIdPost() async {
     // Get user's current location
     var location = Location(); 
@@ -307,7 +308,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     print("Quality:$quality");
     print("Speed:$speed");
     data.link = "http://192.168.194.228:5000/session/$sessionid"; //Stephen's laptop
-    print('Link Created--> http://192.168.194.228:5000/session/$sessionid'); //Stephen's laptop
+    String tempvar = data.link;
+    print('Link Created--> $tempvar'); //Stephen's laptop
     // data.link = "http://192.168.194.210:5000/session/$sessionid"; //Philip's laptop
     // print('Link Created--> http://192.168.194.210:5000/session/$sessionid'); // Philip's laptop
     return jsonpackage;
@@ -505,7 +507,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
-              // print(sessionIdPost());                                                         //POST DATABASE TO SERVER
+              // sessionIdPost();                                                   //POST DATABASE TO SERVER
               if (value1 != "Select..." && value2 != "Select..."
                   && value3 != "Select..." && value4 != "Select...") {
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage()),);
@@ -733,8 +735,8 @@ class ShareLinkState extends State<ShareLinkWidget> {
               color: Colors.amber,
               textColor: Colors.black,
               onPressed: () {
-                //TODO create the list below this button on press
-
+                //TODO go to next page
+                print(data.link);
               },
               child: Text("Create Meetup!"),
             ),
@@ -769,7 +771,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
   Future<void> _shareText() async {
     try {
       Share.text('Link',
-          data.link, 'text/plain');
+          data.link.toString(), 'text/plain');
     } catch (e) {
       print('error: $e');
     }
