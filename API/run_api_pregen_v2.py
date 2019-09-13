@@ -55,85 +55,25 @@ def index():
 
 
 @app.route('/session/create', methods=['POST'])
-def create_session(): 
-    #Create the session if it does not exist
-    if session.get('data') is None:
-        # Here we create the session
-
-        # Get session details from OAUTH
-        username = 'username'
-
-        # Extract the post json details
-        content = request.get_json()
-
-        # Generate Random Session ID:
-        session_id = '123456'
-
-        # Consolidate the session details
-        host_user_details = {'username': username,
-                            'lat': content.get('lat'),
-                            'long': content.get('long'),
-                            'transport_mode': content.get('transport_mode', 'public'),
-                            'metrics': {
-                                'speed': int(content.get('speed', 5)),
-                                'quality': int(content.get('quality', 5))
-                            }}
-
-        session['data'] = {'users': [host_user_details]}
-
-        return jsonify({"session_id":session_id})    
-    else:
-        return jsonify({"warning":'session already exists'})
-
-
+def create_session():
+    result = '{"session_id":"123456"}'
+    return result
 #Create a function to refresh the data if necessary
 @app.route('/refresh', methods=['GET'])
 def refresh():
     #Remove the cookies
     session.clear()
-    return "Session has been refreshed"
+    return "No refresh necessary for api pregen v2"
 
 @app.route('/session/<session_id>', methods=['POST', 'GET'])
 def manage_details(session_id):
     if request.method == 'POST':
-
-        # Ensure that we have not yet received a message from this ip
-        identifier = 'identifier'
-
-        # Get the content of the PUT
-        content = request.get_json()
-
-        # Make sure the lat and long are provided and valid
-
-        # Consolidate the session details
-        new_user_details = {'identifier': identifier,
-                            'lat': content.get('lat'),
-                            'long': content.get('long'),
-                            'transport_mode': content.get('transport_mode', 'public'),
-                            'metrics': {
-                                'speed': int(content.get('speed', 5)),
-                                'quality': int(content.get('quality', 5))
-                            }}
-
-        #If the session does not yet exist
-        if session.get('data') is not None:
-
-            #append the users details to the session data
-            data = session['data']
-            data['users'].append(new_user_details)
-            session['data'] = data
-
-            return jsonify({'updated_info_for_session_id': session_id})
-        else:
-            return jsonify({'error': 'The specified session id does not yet exist'})
+        results = '{  "updated_info_for_session_id": "123456"}'
+        return results
 
     elif request.method == 'GET':
-
-        if session.get('data') is not None:
-            #Return the session details if a get request is performed
-            return jsonify(session['data'])
-        else:
-            return jsonify({'error': 'sesson_id or username is wrong'})
+        results = '{  "users": [    {      "lat": 1.3672154,      "long": 103.8674763,      "metrics": {        "quality": 5,        "speed": 5      },      "transport_mode": "public",      "username": "username"    },    {      "identifier": "identifier",      "lat": 1.2848664,      "long": 103.8244263,      "metrics": {        "quality": 5,        "speed": 5      },      "transport_mode": "public"    },    {      "identifier": "identifier",      "lat": 1.333489,      "long": 103.865812,      "metrics": {        "quality": 5,        "speed": 5      },      "transport_mode": "public"    }  ]}'
+        return results
 
 
 @app.route('/session/<session_id>/calculate', methods=['GET'])
