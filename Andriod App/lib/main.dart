@@ -725,35 +725,43 @@ class ShareLinkState extends State<ShareLinkWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ButtonTheme(
-            minWidth: 180,
-            height: 35,
-            child: FlatButton(
-              color: Colors.amber,
-              textColor: Colors.black,
-              onPressed: () async => await _shareText(),
-              child: Text("Share"),
-            ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15.0, right: 5.0),
+              child: ButtonTheme(
+                height: 35,
+                child: FlatButton(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                  color: Colors.amber,
+                  textColor: Colors.black,
+                  onPressed: () async => await _shareText(),
+                  child: Text("Share"),
+                ),
+              ),
+            )
           ),
-
-          ButtonTheme(
-            minWidth: 180,
-            height: 35,
-            child: FlatButton(
-              color: Colors.amber,
-              textColor: Colors.black,
-              onPressed: () {
-                //TODO go to next page
-                print(data.link);
-              },
-              child: Text("Create Meetup!"),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 5.0, right: 15.0),
+              child: ButtonTheme(
+                minWidth: 180,
+                height: 35,
+                child: FlatButton(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                  color: Colors.amber,
+                  textColor: Colors.black,
+                  onPressed: () {
+                    //TODO go to next page
+                    print(data.link);
+                  },
+                  child: Text("Create Meetup!"),
+                ),
+              ),
             ),
-          ),
-
+          )
         ],
       ) ,
     );
-
 
     return Scaffold(
       body: Column(
