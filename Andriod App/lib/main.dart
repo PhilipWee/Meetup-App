@@ -1,25 +1,25 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter/services.dart';
+import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:location/location.dart';
-import 'package:clipboard_manager/clipboard_manager.dart';
-
+import 'package:geolocator/geolocator.dart';
 
 void main() => runApp(MyApp());
 
 class PrefData {
+  String username;
+  String activityType;
   double lat;
   double long;
   String link;
   String transportMode;
   int speed;
   int quality;
-  String body;
-  PrefData({this.transportMode, this.quality, this.speed, this.link, this.body, this.lat, this.long});
-
+  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType});
 }
 
 class MyApp extends StatelessWidget {
@@ -29,24 +29,10 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
-        '/meeting_type': (context) => MeetingType(),
-        '/examples': (context) => Examples(),
-        '/transport_mode': (context) => TransportMode(),
-        '/travel_speed': (context) => TravelSpeed(),
-        '/ratings_reviews': (context) => RatingsReviews(),
-        '/confirm_data': (context) => ConfirmPreference(),
-        '/share_link': (context) => ShareLink(),
-        // '/updating_list': (context) => UpdatingList(post: fetchUpdatingList()),
-        '/updating_list': (context) => UpdatingList(),
-        '/final_result': (context) => PickYourPlace(),
-        '/map_layout': (context) => MapLayout(),
       },
     );
   }
 }
-
-class HomeScreen extends StatelessWidget {
-  final data = PrefData(transportMode: "", speed: 0, quality: 0, link:"");
 
   refreshServer() async {
     http.Response response = await http.get('http://192.168.194.228:5000/refresh');
@@ -56,34 +42,130 @@ class HomeScreen extends StatelessWidget {
     print("SERVER SAYS: $body");
   }
 
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
         backgroundColor: Colors.black,
+        leading: Icon(Icons.home), 
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[
-            FlatButton(
-              child: Text('Custom'),
-              onPressed: 
-              () {
-                Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),); // send data to said screen and also go to the said screen
-                refreshServer();
-                }
-            ),
-            // FlatButton(
-            //   child: Text('Defaults'),
-            //   onPressed: () {Navigator.pushNamed(context, '/examples');}
-            // ),
-          ],
-        )
-        ),
+      body: HomeUsernameWidget()
       );
   }
+
+}
+
+class HomeUsernameWidget extends StatefulWidget {
+  @override
+  HomeUsernameState createState() => HomeUsernameState();
+}
+
+class HomeUsernameState extends State<HomeUsernameWidget> {
+  static String name;
+  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,);
+  final textController  = TextEditingController();
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //Logo and start message
+    Widget welcomeSection = Container(
+      margin: const EdgeInsets.only(left: 50.0, top: 50.0, right: 50.0),
+      alignment: Alignment.center,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Image.asset(
+              'images/MeetUp_Logo.png',
+              scale: 3,
+            ),
+          ),
+          Text(
+            "Start Your Meetup!",
+            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+          )
+        ],
+      ),
+    );
+
+    //Button Section
+    Widget buttonSection = Container(
+      height: 100.0,
+      child: ButtonBar(
+        alignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          FlatButton(
+            onPressed: () {
+              // refreshServer();
+              if (textController.text != "") {
+                name = textController.text;
+                data.username = name;
+                Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+              } else {
+                Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Please enter your username!"),
+                      duration: Duration(seconds: 2),
+                    ));
+              }
+            },
+            child: _buildButtonColumn(Colors.black, Icons.arrow_forward, 'Get Started!'),
+            color: Colors.amber,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          )
+        ],
+      ) ,
+    );
+
+    return Center(
+        child: ListView(
+          children:[
+            welcomeSection,
+            Padding(
+              padding: const EdgeInsets.only(left: 50.0, top: 30.0, right: 50.0, bottom: 30.0),
+              child: TextFormField(
+                controller: textController,
+                decoration: InputDecoration(
+                    labelText: "Username"
+                ),
+              ),
+            ),
+            buttonSection
+          ],
+        )
+    );
+  }
+
+  //Helper method to create button icons with text
+  Row _buildButtonColumn(Color color, IconData icon, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Container(
+          margin: const EdgeInsets.only(right: 8),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ),
+        Icon(icon, color: color),
+      ],
+    );
+  }
+
 }
 
 class MeetingType extends StatelessWidget {
@@ -105,27 +187,28 @@ class MeetingType extends StatelessWidget {
     ];
 
   @override
-
   //Creates a listview with buildCustomButtons inside
   Widget build(BuildContext context) {
-
-    return ListView.builder(
-
-      padding: EdgeInsets.zero,
-      itemCount: custImgs.length,
-      itemBuilder: (context, index) {
-        return Card(
-          child: FlatButton(
-            padding: EdgeInsets.all(0.0),
-            onPressed: (){
-
-             Navigator.push(context,MaterialPageRoute(builder: (context) => TransportMode(data: data)),);
-
-           },
-           child:_buildCustomButton(custLabels[index], custImgs[index]) ,
-          ),
-        );
-      },
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Select Meetup Type"),
+        backgroundColor: Colors.black,
+      ),
+      body: ListView.builder(
+        padding: EdgeInsets.zero,
+        itemCount: custImgs.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: FlatButton(
+              padding: EdgeInsets.all(0.0),
+              onPressed: (){
+                Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data: data)),);
+              },
+              child:_buildCustomButton(custLabels[index], custImgs[index]) ,
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -146,7 +229,7 @@ class MeetingType extends StatelessWidget {
             colors: <Color>[Colors.black54, Colors.white12],
           ),
         ),
-        padding: const EdgeInsets.all(0.0),
+        padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
         child: Text(
           label,
@@ -163,256 +246,286 @@ class MeetingType extends StatelessWidget {
 
 }
 
-class Examples extends StatelessWidget {
+class CustomizationPage extends StatelessWidget {
+  final PrefData data;
+  CustomizationPage({this.data});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Examples"),
+        title: Text("Choose Your Preferences"),
         backgroundColor: Colors.black,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children:[
-            FlatButton(
-              child: Text('Custom'),
-              onPressed: () {Navigator.pushNamed(context, '/meeting_type');}
-            ),
-            FlatButton(
-              child: Text('Example1'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
-              
-            ),
-            FlatButton(
-              child: Text('Example2'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
-              
-            ),
-            FlatButton(
-              child: Text('Example3'),
-              onPressed: () {Navigator.pushNamed(context, '/share_link');}
-              
-            ),
-          ],
-        )
-        ),
-      );
+      body: CustomizationPageWidget(data: data,),
+    );
   }
+
 }
 
-class TransportMode extends StatelessWidget {
+class CustomizationPageWidget extends StatefulWidget {
   final PrefData data;
-  TransportMode({this.data});
+  CustomizationPageWidget({this.data});
   @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Mode of Transport"),
-        backgroundColor: Colors.black,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[
-            FlatButton(
-              child: Text('Driving'),
-              onPressed: () {
-                data.transportMode = "Driving";
-                Navigator.push(context,MaterialPageRoute(builder: (context) => TravelSpeed(data: data)),);
-                }
-            ),
-            FlatButton(
-              child: Text('Public Transport'),
-              onPressed: () {
-                data.transportMode = "Public Transport";
-                Navigator.push(context,MaterialPageRoute(builder: (context) => TravelSpeed(data: data)),);
-                }
-            ),
-            FlatButton(
-              child: Text('Walk'),
-              onPressed: () {
-                data.transportMode = "Walk";
-                Navigator.push(context,MaterialPageRoute(builder: (context) => TravelSpeed(data: data)),);
-                }
-            ),
-          ],
-        )
-        ),
-      );
-  }
+  CustomizationPageState createState() => CustomizationPageState(data: data);
 }
 
-class TravelSpeed extends StatelessWidget {
+class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
-  TravelSpeed({this.data});
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("How fast do you need to get there?"),
-        backgroundColor: Colors.black,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[
-            FlatButton(
-              child: Text('Fast'),
-              onPressed: () {
-                data.speed = 3;
-                Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
-                }
-            ),
-            FlatButton(
-              child: Text('Regular'),
-              onPressed: () {
-                data.speed = 2;
-                Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
-              }
-            ),
-            FlatButton(
-              child: Text('Anything'),
-              onPressed: () {
-                data.speed = 1;
-                Navigator.push(context,MaterialPageRoute(builder: (context) => RatingsReviews(data: data)),);
-              }
-            ),
-          ],
-        )
-        ),
-      );
-  }
-}
-
-class RatingsReviews extends StatelessWidget {
-  final PrefData data;
-  RatingsReviews({this.data});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Ratings & Reviews "),
-        backgroundColor: Colors.black,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[
-            FlatButton(
-              child: Text('Best'),
-              onPressed: () {
-                data.quality = 3;
-                Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
-                }
-            ),
-            FlatButton(
-              child: Text('Regular'),
-              onPressed: () {
-                data.quality = 2;
-                Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
-                }
-            ),
-            FlatButton(
-              child: Text('Anything'),
-              onPressed: () {
-                data.quality = 1;
-                Navigator.push(context,MaterialPageRoute(builder: (context) => ConfirmPreference(data: data)),);
-                }
-            ),
-          ],
-        )
-        ),
-      );
-  }
-}
-
-class ConfirmPreference extends StatelessWidget {
-
-  final PrefData data;
-  ConfirmPreference({this.data});
-
-  createSessionLink() async {
-    // List coordinates = getUserLocation();
-    // double lat = coordinates[0];
-    // double long = coordinates[1];
-    var location = Location();
+  CustomizationPageState({this.data});
+  sessionIdPost() async {
+    // Get user's current location
+    var location = Location(); 
     LocationData currentLocation = await location.getLocation();
+    data.lat = currentLocation.latitude;
+    data.long = currentLocation.longitude;
 
+    //extract data from PrefData to add to json package
     double lat = currentLocation.latitude;
     double long = currentLocation.longitude;
     int quality = data.quality;
     int speed = data.speed;
     String transportmode = data.transportMode;
+
+    //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
-    // String url = 'http://192.168.194.210:5000/session/create'; //server running on Philip's laptop
-    String url = 'http://192.168.194.228:5000/session/create'; //server running on Stephen's laptop
-    String json = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
-    http.Response response = await http.post(url, headers:headers, body:json);
+    // String url = 'http://192.168.194.210:5000/session/create'; //Philip's laptop
+    String url = 'http://192.168.194.228:5000/session/create'; //Stephen's laptop
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+    http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+
+    //store returned string-map "{sessionid: 123456}"" into a String
     int statusCode = response.statusCode;
     String body = response.body;
     print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
     print("SERVER SAYS: $body");
-    Map<String, dynamic> user = jsonDecode(body); //{sessionid: 123456}
-    var sessionid = user['session_id'];
+
+    //decode the string-map
+    Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
+    var sessionid = sessionidjsonversion['session_id'];
     print("Transport Mode:$transportmode");
     print("Quality:$quality");
     print("Speed:$speed");
-    data.link = "http://192.168.194.210:5000/session/$sessionid";
-    print('Link Created--> http://192.168.194.210:5000/session/$sessionid');
+    data.link = "http://192.168.194.228:5000/session/$sessionid"; //Stephen's laptop
+    print('Link Created--> http://192.168.194.228:5000/session/$sessionid'); //Stephen's laptop
+    // data.link = "http://192.168.194.210:5000/session/$sessionid"; //Philip's laptop
+    // print('Link Created--> http://192.168.194.210:5000/session/$sessionid'); // Philip's laptop
+    return jsonpackage;
     }
-  
+
+  String value1 = "Select...";
+  String value2 = "Select...";
+  String value3 = "Select...";
+  String value4 = "Select...";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Confirm Preferences?"),
-        backgroundColor: Colors.black,
-      ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children : [
-          Expanded(
-            child:
-            ListView(
-              children: [
-                ListTile(title: Text(data.transportMode)),
-                ListTile(title: Text(data.quality.toString())),
-                ListTile(title: Text(data.speed.toString())),
-              ]
-            )
-          ),
-          FlatButton(
-            child: Text('Confirm'),
-            onPressed: 
-            () async{
-              createSessionLink();
-              Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLink(data: data)),);
-              print("Details Confirmed!");
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.fastfood, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Activities", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0
+                        ),),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 240,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: value1,
+                      onChanged: (String newValue) {
+                        setState(() {
+                          value1 = newValue;
+                          data.activityType = newValue; //ADD TO DATABASE
+                        });
+                      },
+                      items: <String>["Select...", "Lunch/Dinner", "Recreation", "Study"].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                )
+              ],
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.directions_car, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Transport", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0
+                        ),),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 240,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: value2,
+                      onChanged: (String newValue) {
+                        setState(() {
+                          value2 = newValue;
+                          data.transportMode = newValue; //ADD TO DATABASE
+                        });
+                      },
+                      items: <String>["Select...", "Driving", "Public Transit", "Walk"].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.timer, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Speed", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0
+                        ),),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 240,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: value3,
+                      onChanged: (String newValue) {
+                        setState(() {
+                          value3 = newValue;
+                          if (value3=="Fast"){data.speed = 3;}  
+                          else if (value3=="Regular"){data.speed=2;}
+                          else if (value3=="No Preference"){data.speed=1;}  //ADD TO DATABASE
+                          else {data.speed=0;}
+                        });
+                      },
+                      items: <String>["Select...", "Fast", "Regular", "No Preference"].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.star, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Ratings", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0
+                        ),),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 240,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: value4,
+                      onChanged: (String newValue) {
+                        setState(() {
+                          value4 = newValue;
+                          if (value4=="Best"){data.quality=3;}
+                          else if (value4=="Regular"){data.quality=2;}
+                          else if (value4=="No Preference"){data.quality=1;}  //ADD TO DATABASE
+                          else{data.quality=0;}
+                        });
+                      },
+                      items: <String>["Select...", "Best", "Regular", "No Preference"]
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
+      bottomNavigationBar: BottomAppBar(
+        child: FlatButton(
+            child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
+            onPressed: () {
+              // print(sessionIdPost());                                                         //POST DATABASE TO SERVER
+              if (value1 != "Select..." && value2 != "Select..."
+                  && value3 != "Select..." && value4 != "Select...") {
+                Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage()),);
+              } else {
+                Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Please select preferences!"),
+                      duration: Duration(seconds: 2),
+                    ));
+              }
             }
-          ),
-        ]
-      )
+        ),
+      ),
     );
   }
 }
 
-class ShareLink extends StatelessWidget {
-  final snackBar = SnackBar(content: Text('Link Copied'),duration: Duration(seconds: 2));
+class ShareLinkPage extends StatelessWidget {
   final PrefData data;
-  ShareLink({this.data});
-
-  getMemberData() async {
-    http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
-    int statusCode = response.statusCode;
-    String json = response.body;
-    print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-    print("SERVER SAYS: $json");
-  }
-
+  ShareLinkPage({this.data});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -420,68 +533,250 @@ class ShareLink extends StatelessWidget {
         title: Text("Share the Link!"),
         backgroundColor: Colors.black,
       ),
-      body:
-      Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[
-            Container(child: Text(data.link)),
-            Builder(
-              builder: (context) => FlatButton(
-                child: Text('Copy Link'),
-                onPressed: () {
-                  Scaffold.of(context).showSnackBar(snackBar);
-                  print("LINK COPIED");
-                },
-              ),
-            ),
-            // FlatButton(
-            //   child: Text('Share'),
-            //   onPressed: () {Navigator.pushNamed(context, '/updating_list');}
-            // ),
-            FlatButton(
-              child: Text('Now we wait...'),
-              onPressed: () {
-                Navigator.pushNamed(context, '/updating_list');
-                getMemberData();
-                }
-            ),
-          ],
-        )
-      )
+      body: ShareLinkWidget(data: data),
     );
   }
 }
 
-class UpdatingList extends StatelessWidget {
+class ShareLinkWidget extends StatefulWidget {
+  final PrefData data;
+  ShareLinkWidget({this.data});
+  @override
+  ShareLinkState createState() => ShareLinkState(data: data);
+}
+
+class ShareLinkState extends State<ShareLinkWidget> {
+  final PrefData data;
+  ShareLinkState({this.data});
+  final linkCreated = TextEditingController();
+// THIS IS WHAT THE SERVER RETURNS WHEN AFTER HTTP GET
+// {
+//   "users": [
+//     {
+//       "lat": 37.4219983, 
+//       "long": -122.084, 
+//       "metrics": {
+//         "quality": 3, 
+//         "speed": 3
+//       }, 
+//       "transport_mode": "Driving", 
+//       "username": "username"
+//     }, 
+//     {
+//       "identifier": "identifier", 
+//       "lat": 1.2848664, 
+//       "long": 103.8244263, 
+//       "metrics": {
+//         "quality": 5, 
+//         "speed": 5
+//       }, 
+//       "transport_mode": "public"
+//     }
+//   ]
+// }
+  Future<List<Map<String, dynamic>>> getMembers() async {
+    // http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
+    http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
+    int statusCode = response.statusCode;
+    String body = response.body;
+    print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+    print("SERVER SAYS: $body");
+    Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
+    List membersData = memberDatajsonVersion["users"];    //extract the list of user detail maps into a list
+    List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
+    Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
+    for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
+      List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename and
+      placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
+    }
+    membersData.add(placeNameMap);
+    return membersData;
+  }
+
+
+  Future<List<Map<String, dynamic>>> getMembersFAKE() async {
+
+    await Future.delayed(Duration(milliseconds: 1000));
+
+    List<Map<String, dynamic>> membersData = [
+      {
+        "lat": 37.4219983, 
+        "long": -122.084, 
+        "metrics": {
+          "quality": 3, 
+          "speed": 3
+        }, 
+        "transport_mode": "Driving", 
+        "username": "username"
+      }, 
+      {
+        "identifier": "Philip", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Driving"
+      },
+      {
+        "identifier": "Julia", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Public Transport"
+      },
+      {
+        "identifier": "Joel", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Public Transport"
+      },
+      {
+        "identifier": "Veda", 
+        "lat": 1.2848664, 
+        "long": 103.8244263, 
+        "metrics": {
+          "quality": 5, 
+          "speed": 5
+        }, 
+        "transport_mode": "Walking"
+      },
+      {
+        "username" : "Jalan Bukit Merah",
+        "Philip" : "Serangoon Gardens",
+        "Julia" : "Potong Pasir",
+        "Joel" : "Hougang",
+        "Veda" : "Upper Changi",
+      },
+    ];
+    print("Printing directly! $membersData");
+    return membersData;
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Updating List"),
-        backgroundColor: Colors.black,
+    //Share and make meet up buttons section
+    Widget listSection = Container(
+      child: 
+      FutureBuilder(
+        future: getMembersFAKE(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          print(snapshot);
+          if(snapshot.data == null){
+            return Expanded(
+              child:
+              Container(
+                child: Center(
+                  child: Text("Loading...")
+                )
+              )
+            );
+          } else {
+            return 
+            Expanded(
+              child:
+              ListView.builder(
+                itemCount: snapshot.data.length-1,
+                itemBuilder: (BuildContext context, int index) {
+                  Map<String,dynamic> myMap = snapshot.data[snapshot.data.length-1];
+                  if (index == 0){
+                    return ListTile(
+                      leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                      title: Text("You"),
+                      subtitle: Text(snapshot.data[index]["transport_mode"]),
+                      trailing: Text(myMap[snapshot.data[index]["username"]])
+                    );
+                  }
+                  return ListTile(
+                    leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                    title: Text(snapshot.data[index]["identifier"]),
+                    subtitle: Text(snapshot.data[index]["transport_mode"]),
+                    trailing: Text(myMap[snapshot.data[index]["identifier"]]),
+                  );
+                },
+              )
+            );
+          }
+        },
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:[
-            Container(                          //member 0
-              padding: EdgeInsets.all(20),
-              child: Text("You")
+    );
+
+    Widget buttonSection = Container(
+      height: 50.0,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ButtonTheme(
+            minWidth: 180,
+            height: 35,
+            child: FlatButton(
+              color: Colors.amber,
+              textColor: Colors.black,
+              onPressed: () async => await _shareText(),
+              child: Text("Share"),
             ),
-            FlatButton(
-              child: Text('Make My Meetup!'),
+          ),
+
+          ButtonTheme(
+            minWidth: 180,
+            height: 35,
+            child: FlatButton(
+              color: Colors.amber,
+              textColor: Colors.black,
               onPressed: () {
-                Navigator.pushNamed(context, '/final_result');
-                }
+                //TODO create the list below this button on press
+
+              },
+              child: Text("Create Meetup!"),
             ),
-          ],
-        )
-        ),
-      );
+          ),
+
+        ],
+      ) ,
+    );
+
+
+    return Scaffold(
+      body: Column(
+        children:[
+          Padding(
+            padding: const EdgeInsets.only(left: 15.0, top: 15.0,
+                right: 15.0, bottom: 5.0),
+            child: TextField(
+              controller: linkCreated,
+              decoration: const InputDecoration(
+                  labelText: "Link:",
+                  border: OutlineInputBorder()
+              ),
+            ),
+          ),
+          buttonSection,
+          listSection
+        ],
+      ),
+    );
   }
+
+  Future<void> _shareText() async {
+    try {
+      Share.text('Link',
+          data.link, 'text/plain');
+    } catch (e) {
+      print('error: $e');
+    }
+  }
+
 }
+
 
 class PickYourPlace extends StatelessWidget {
 
@@ -497,35 +792,35 @@ class PickYourPlace extends StatelessWidget {
           children:[
             FlatButton(
               child: Text('*Changi City Point*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
             FlatButton(
               child: Text('*Tampines Hub*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
             FlatButton(
               child: Text('*Tampines Mall*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
             FlatButton(
               child: Text('*Tampines One*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
             FlatButton(
               child: Text('*Tampines Eastpoint*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
             FlatButton(
               child: Text('*Tampines Regional Library*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
             FlatButton(
               child: Text('*White Sands*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
             FlatButton(
               child: Text('*Downtown East*'),
-              onPressed: () {Navigator.pushNamed(context, '/map_layout');},
+              onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => MapLayout()),);},
             ),
           ],
         )
