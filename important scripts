@@ -383,7 +383,9 @@ select
 	results.end_vid,
 	geom_way as location,
 	x1 as longtitude,
-	y1 as latitude
+	y1 as latitude,
+	ST_X(way) as restaurant_x,
+	ST_Y(way) as restaurant_y
 from
 	results
 	inner join
@@ -418,3 +420,6 @@ order by restaurants.way <-> singapore_road_points.way
 limit 1
 62ms
 
+
+-----------------------------------Google Maps linking-----------------------------------
+https://www.google.com/maps/dir/?api=1&destination=47.5951518,-122.3316393

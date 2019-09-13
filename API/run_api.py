@@ -161,6 +161,7 @@ def calculate(session_id):
         ###Calculate the best route for each person and return it
         user_osms = []
         user_identifiers = []
+        user_details = {}
         for user in info[0]['users']:
             print(user)
             #Get the osm_id closest to the user's location
@@ -168,6 +169,7 @@ def calculate(session_id):
             ORDER BY road_start <-> ST_GeometryFromText('POINT("+str(user['long'])+" "+str(user['lat'])+")',4326) \
             LIMIT 1")
             osm_id = crsr_gis.fetchone()[0]
+            user_details[osm_id] = {"latitude":user['lat'],"longtitude":user['long']}
             user_osms.append(osm_id)
             user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
         # print(user_osms)
@@ -199,9 +201,10 @@ def calculate(session_id):
                     total_cost,\
                     name,\
                     results.end_vid,\
-                    geom_way as location,\
                     x1 as longtitude,\
-                    y1 as latitude\
+                    y1 as latitude,\
+                    ST_X(way) as restaurant_x,\
+                    ST_Y(way) as restaurant_y\
                 from\
                     results\
                     inner join\
@@ -215,7 +218,7 @@ def calculate(session_id):
         #Format the results in dictionaries
         results_dict = {}
         results_dict['possible_locations'] = results['name'].unique().tolist()
-        results_dict['users'] = user_osms
+        results_dict['users'] = user_details
         # print('results_dict:')
         # print(results_dict)
         # print('results:')
@@ -246,6 +249,8 @@ def calculate(session_id):
                     results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'].iloc[0])
                     results_dict[location][user]['start_user'] = str(relevant_df['start_user'].iloc[0])
                     results_dict[location][user]['start_user_name'] = str(relevant_df['start_user_name'].iloc[0])
+                    results_dict[location][user]['restaurant_x'] = relevant_df['restaurant_x'].iloc[0]
+                    results_dict[location][user]['restaurant_y'] = relevant_df['restaurant_y'].iloc[0]
                 except:
                     print('WARNING: exception on location',location,'user',user)
             

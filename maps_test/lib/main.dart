@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,6 +25,7 @@ class MapSample extends StatefulWidget {
 class MapSampleState extends State<MapSample> {
   Completer<GoogleMapController> _controller = Completer();
   List<Polyline> polylines = [];
+  List<Marker> markers = [];
 
 
   //Create the get request function
@@ -56,6 +58,7 @@ class MapSampleState extends State<MapSample> {
         _controller.complete(controller);
       },
       polylines: Set<Polyline>.of(polylines),
+      markers: Set<Marker>.of(markers),
     );
   }
 
@@ -72,8 +75,8 @@ class MapSampleState extends State<MapSample> {
   Polyline _makeLine(List<dynamic> latitude, List<dynamic> longtitude, int polylineid) {
     List<LatLng> latLngList = [];
     for (var i = 0; i < latitude.length; i++) {
-      print(latitude[i]);
-      print(longtitude[i]);
+      // print(latitude[i]);
+      // print(longtitude[i]);
       latLngList.add(LatLng(latitude[i],longtitude[i]));
     }
     return Polyline(
@@ -84,27 +87,56 @@ class MapSampleState extends State<MapSample> {
     );
   }
 
+  //Make a function that makes a widget appear to show the current selection
+
+
+  //Place a marker
+  Marker _makeMarker(LatLng location, int markerid) {
+    return Marker(
+      markerId: MarkerId(markerid.toString()),
+      position: location,
+      consumeTapEvents: false,
+    );
+  }
+
   //Drawing the map lines
   Future<void> _drawRoutes(String locationName, Map<String,dynamic> data) async {
     print('Now showing routes for ' + locationName);
     print(data[locationName]);
     List<Polyline> polylineContainer = [];
+    List<Marker> markerContainer = [];
     int lineIterator = 0;
+    double destinationLat = 0;
+    double destinationLong = 0;
     LatLng destinationLatLng;
     for (String key in data[locationName].keys) {
         var latitude = data[locationName][key]['latitude'];
         var longtitude = data[locationName][key]['longtitude'];
-        print(latitude);
-        print(longtitude);
+        // print(latitude);
+        // print(longtitude);
         polylineContainer.add(_makeLine(latitude,longtitude,lineIterator));
         lineIterator++;
-        if (latitude.length > 0) {
-          destinationLatLng = LatLng(latitude.last,longtitude.last);
-        }
+        
+        destinationLong = data[locationName][key]['restaurant_x'];
+        destinationLat = data[locationName][key]['restaurant_y'];
+        
+        destinationLatLng = LatLng(destinationLat,destinationLong);
+        
+        print(destinationLatLng);
+        markerContainer.add(_makeMarker(destinationLatLng, lineIterator));
+
       }
     //Draw routes
     setState(() {
+      print("111111111111111111111111111111");
+      print(markerContainer.length.toString());
+      _locationName = locationName;
+      _destinationLat = destinationLat;
+      _destinationLong = destinationLong;
+
+      visibility = true;
       polylines = polylineContainer;
+      markers = markerContainer;
     });
 
     //Center the map on the appropriate location
@@ -159,12 +191,57 @@ class MapSampleState extends State<MapSample> {
       );
   }
 
-  //Build the main widget
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        body: SafeArea(
-          child: Center( 
+  //generate the necessary variables for display location details
+  String _locationName = "";
+  bool visibility = false;
+  double _destinationLong = 0;
+  double _destinationLat = 0;
+
+  //Make a button that launches the google maps
+  _launchGoogleMaps() async {
+    String url = "https://www.google.com/maps/dir/?api=1&destination="+_destinationLat.toString()+","+_destinationLong.toString();
+    if (await canLaunch(url)) {
+    await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  //Make a widget to display the final location, as well as allow the user to go to google maps
+  Visibility displayLocationDetails() {
+    return Visibility(
+      child: Card(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              title: Center(
+                child:Text(_locationName)
+              )
+            ),
+            ButtonTheme.bar(
+              child: ButtonBar(
+                children: <Widget>[
+                  FlatButton(
+                    child: Text("SHOW IN MAPS"),
+                    onPressed: () {
+                      _launchGoogleMaps();
+                    },
+                  )
+                ],
+              )
+            )
+          ],
+        )
+      ),
+      visible: visibility,
+    );
+    
+  }
+
+  //Make a widget for the background objects, namely the map and the options
+  Center displayBackground() {
+    return Center( 
             child: Container(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -180,6 +257,19 @@ class MapSampleState extends State<MapSample> {
                 ]
                 )
             )
+          );
+  }
+
+  //Build the main widget
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              displayBackground(),
+              displayLocationDetails()
+            ],
           )
         )
       );
