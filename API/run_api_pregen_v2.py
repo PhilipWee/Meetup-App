@@ -1769,4 +1769,3 @@ if __name__ == '__main__':
     app.config['PERMANANT_SESSION_LIFETIME'] = True
     app.config.from_object(__name__)
     Session(app)
-
