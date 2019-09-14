@@ -331,14 +331,15 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: ListView(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                Container(
+                  width: 180,
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.fastfood, color: Colors.black),
@@ -353,25 +354,26 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 240,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value1,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value1 = newValue;
-                          data.activityType = newValue; //ADD TO DATABASE
-                        });
-                      },
-                      items: <String>["Select...", "Lunch/Dinner", "Recreation", "Study"].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                Expanded(
+                  child: Container(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: value1,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            value1 = newValue;
+                            data.activityType = newValue; //ADD TO DATABASE
+                          });
+                        },
+                        items: <String>["Select...", "Lunch/Dinner", "Recreation", "Study"].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
+                  ) ,
                 )
               ],
             ),
@@ -380,8 +382,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                Container(
+                  width: 180,
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.directions_car, color: Colors.black),
@@ -396,23 +399,24 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 240,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value2,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value2 = newValue;
-                          data.transportMode = newValue; //ADD TO DATABASE
-                        });
-                      },
-                      items: <String>["Select...", "Driving", "Public Transit", "Walk"].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                Expanded(
+                  child: Container(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: value2,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            value2 = newValue;
+                            data.transportMode = newValue; //ADD TO DATABASE
+                          });
+                        },
+                        items: <String>["Select...", "Driving", "Public Transit", "Walk"].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 )
@@ -422,8 +426,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                Container(
+                  width: 180,
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.timer, color: Colors.black),
@@ -438,26 +443,27 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 240,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value3,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value3 = newValue;
-                          if (value3=="Fast"){data.speed = 3;}  
-                          else if (value3=="Regular"){data.speed=2;}
-                          else if (value3=="No Preference"){data.speed=1;}  //ADD TO DATABASE
-                          else {data.speed=0;}
-                        });
-                      },
-                      items: <String>["Select...", "Fast", "Regular", "No Preference"].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                Expanded(
+                  child: Container(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: value3,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            value3 = newValue;
+                            if (value3=="Fast"){data.speed = 3;}
+                            else if (value3=="Regular"){data.speed=2;}
+                            else if (value3=="No Preference"){data.speed=1;}  //ADD TO DATABASE
+                            else {data.speed=0;}
+                          });
+                        },
+                        items: <String>["Select...", "Fast", "Regular", "No Preference"].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 )
@@ -467,8 +473,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                Container(
+                  width: 180,
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.star, color: Colors.black),
@@ -483,27 +490,28 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                     ],
                   ),
                 ),
-                Container(
-                  width: 240,
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value4,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value4 = newValue;
-                          if (value4=="Best"){data.quality=3;}
-                          else if (value4=="Regular"){data.quality=2;}
-                          else if (value4=="No Preference"){data.quality=1;}  //ADD TO DATABASE
-                          else{data.quality=0;}
-                        });
-                      },
-                      items: <String>["Select...", "Best", "Regular", "No Preference"]
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                Expanded(
+                  child: Container(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: value4,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            value4 = newValue;
+                            if (value4=="Best"){data.quality=3;}
+                            else if (value4=="Regular"){data.quality=2;}
+                            else if (value4=="No Preference"){data.quality=1;}  //ADD TO DATABASE
+                            else{data.quality=0;}
+                          });
+                        },
+                        items: <String>["Select...", "Best", "Regular", "No Preference"]
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 )
@@ -650,12 +658,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
     return membersData;
   }
 
-  // @override
-  // void initState() {   
-  //   super.initState();
-  //   textController.text = data.link.toString();
-  // }
-
   @override
   Widget build(BuildContext context) {
     //Share and make meet up buttons section
@@ -710,32 +712,40 @@ class ShareLinkState extends State<ShareLinkWidget> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ButtonTheme(
-            minWidth: 180,
-            height: 35,
-            child: FlatButton(
-              color: Colors.amber,
-              textColor: Colors.black,
-              onPressed: ()
-              async => await _shareText(),
-              child: Text("Share"),
-            ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 15.0, right: 5.0),
+              child: ButtonTheme(
+                height: 35,
+                child: FlatButton(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                  color: Colors.amber,
+                  textColor: Colors.black,
+                  onPressed: () async => await _shareText(),
+                  child: Text("Share"),
+                ),
+              ),
+            )
           ),
-
-          ButtonTheme(
-            minWidth: 180,
-            height: 35,
-            child: FlatButton(
-              color: Colors.amber,
-              textColor: Colors.black,
-              onPressed: () {
-                //TODO go to next page
-                print(data.link.toString());
-              },
-              child: Text("Create Meetup!"),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 5.0, right: 15.0),
+              child: ButtonTheme(
+                minWidth: 180,
+                height: 35,
+                child: FlatButton(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                  color: Colors.amber,
+                  textColor: Colors.black,
+                  onPressed: () {
+                    //TODO go to next page
+                    print(data.link);
+                  },
+                  child: Text("Create Meetup!"),
+                ),
+              ),
             ),
-          ),
-
+          )
         ],
       ) ,
     );
@@ -762,8 +772,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
   Future<void> _shareText() async {
     try {
-      Share.text('Link',
-          data.link, 'text/plain');
+      Share.text('Link', data.link, 'text/plain');
     } catch (e) {
       print('error: $e');
     }
