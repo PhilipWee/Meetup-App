@@ -67,6 +67,16 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,);
   final textController  = TextEditingController();
 
+  saveLocation() async{
+    // Get user's current location
+    var location = Location(); 
+    LocationData currentLocation = await location.getLocation();
+    data.lat = currentLocation.latitude;
+    data.long = currentLocation.longitude;
+    print(data.lat);
+    print(data.long);
+  }
+
   @override
   void dispose() {
     textController.dispose();
@@ -104,7 +114,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         children: [
           FlatButton(
             onPressed: () {
-              // refreshServer();
+              refreshServer();
+              saveLocation();
               if (textController.text != "") {
                 name = textController.text;
                 data.username = name;
@@ -275,15 +286,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   CustomizationPageState({this.data});
 
   sessionIdPost() async {
-    // Get user's current location
-    var location = Location(); 
-    LocationData currentLocation = await location.getLocation();
-    data.lat = currentLocation.latitude;
-    data.long = currentLocation.longitude;
 
     //extract data from PrefData to add to json package
-    double lat = currentLocation.latitude;
-    double long = currentLocation.longitude;
+    double lat = data.lat;
+    double long = data.long;
     int quality = data.quality;
     int speed = data.speed;
     String transportmode = data.transportMode;
@@ -293,6 +299,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     // String url = 'http://192.168.194.210:5000/session/create'; //Philip's laptop
     String url = 'http://192.168.194.228:5000/session/create'; //Stephen's laptop
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+    print("jsonpackage $jsonpackage");
     http.Response response = await http.post(url, headers:headers, body:jsonpackage);
 
     //store returned string-map "{sessionid: 123456}"" into a String
@@ -308,6 +315,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     print("Quality:$quality");
     print("Speed:$speed");
     data.link = "http://192.168.194.228:5000/session/$sessionid"; //Stephen's laptop
+
     String tempvar = data.link;
     print('Link Created--> $tempvar'); //Stephen's laptop
     // data.link = "http://192.168.194.210:5000/session/$sessionid"; //Philip's laptop
@@ -507,10 +515,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
-              // sessionIdPost();                                                   //POST DATABASE TO SERVER
+              sessionIdPost();                                                   //POST DATABASE TO SERVER
               if (value1 != "Select..." && value2 != "Select..."
                   && value3 != "Select..." && value4 != "Select...") {
-                Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage()),);
+                Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
               } else {
                 Scaffold.of(context).showSnackBar(
                     SnackBar(
@@ -527,7 +535,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
 class ShareLinkPage extends StatelessWidget {
   final PrefData data;
-  ShareLinkPage({this.data});
+  ShareLinkPage({this.data,});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -550,51 +558,31 @@ class ShareLinkWidget extends StatefulWidget {
 class ShareLinkState extends State<ShareLinkWidget> {
   final PrefData data;
   ShareLinkState({this.data});
-  final linkCreated = TextEditingController();
-// THIS IS WHAT THE SERVER RETURNS WHEN AFTER HTTP GET
-// {
-//   "users": [
-//     {
-//       "lat": 37.4219983, 
-//       "long": -122.084, 
-//       "metrics": {
-//         "quality": 3, 
-//         "speed": 3
-//       }, 
-//       "transport_mode": "Driving", 
-//       "username": "username"
-//     }, 
-//     {
-//       "identifier": "identifier", 
-//       "lat": 1.2848664, 
-//       "long": 103.8244263, 
-//       "metrics": {
-//         "quality": 5, 
-//         "speed": 5
-//       }, 
-//       "transport_mode": "public"
-//     }
-//   ]
-// }
-  Future<List<Map<String, dynamic>>> getMembers() async {
-    // http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
-    http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
+
+  Future<List<dynamic>> getMembers() async {
+    http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
+    // http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
     int statusCode = response.statusCode;
     String body = response.body;
     print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
     print("SERVER SAYS: $body");
     Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
-    List membersData = memberDatajsonVersion["users"];    //extract the list of user detail maps into a list
+    List membersData = memberDatajsonVersion["users"];
+    print(data.lat);
+    print(data.long);  
+    //extract the list of user detail maps into a list
     List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
     Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
     for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
       List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename and
-      placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
+      if (mapcontent["identifier"] != null){
+        placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
+      }
     }
     membersData.add(placeNameMap);
+    print("membersData-> $membersData");
     return membersData;
   }
-
 
   Future<List<Map<String, dynamic>>> getMembersFAKE() async {
 
@@ -659,10 +647,14 @@ class ShareLinkState extends State<ShareLinkWidget> {
         "Veda" : "Upper Changi",
       },
     ];
-    print("Printing directly! $membersData");
     return membersData;
   }
 
+  // @override
+  // void initState() {   
+  //   super.initState();
+  //   textController.text = data.link.toString();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -670,11 +662,12 @@ class ShareLinkState extends State<ShareLinkWidget> {
     Widget listSection = Container(
       child: 
       FutureBuilder(
-        future: getMembersFAKE(),
+        future: getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           print(snapshot);
           if(snapshot.data == null){
-            return Expanded(
+            return 
+            Expanded(
               child:
               Container(
                 child: Center(
@@ -694,15 +687,15 @@ class ShareLinkState extends State<ShareLinkWidget> {
                     return ListTile(
                       leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
                       title: Text("You"),
-                      subtitle: Text(snapshot.data[index]["transport_mode"]),
-                      trailing: Text(myMap[snapshot.data[index]["username"]])
+                      subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
+                      trailing: Text(myMap["username"].toString())
                     );
                   }
                   return ListTile(
                     leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                    title: Text(snapshot.data[index]["identifier"]),
-                    subtitle: Text(snapshot.data[index]["transport_mode"]),
-                    trailing: Text(myMap[snapshot.data[index]["identifier"]]),
+                    title: Text(snapshot.data[index]["identifier"].toString()),
+                    subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
+                    trailing: Text(myMap[snapshot.data[index]["identifier"]].toString()),
                   );
                 },
               )
@@ -723,7 +716,8 @@ class ShareLinkState extends State<ShareLinkWidget> {
             child: FlatButton(
               color: Colors.amber,
               textColor: Colors.black,
-              onPressed: () async => await _shareText(),
+              onPressed: ()
+              async => await _shareText(),
               child: Text("Share"),
             ),
           ),
@@ -736,7 +730,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
               textColor: Colors.black,
               onPressed: () {
                 //TODO go to next page
-                print(data.link);
+                print(data.link.toString());
               },
               child: Text("Create Meetup!"),
             ),
@@ -746,17 +740,15 @@ class ShareLinkState extends State<ShareLinkWidget> {
       ) ,
     );
 
-
     return Scaffold(
       body: Column(
         children:[
           Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 15.0,
-                right: 15.0, bottom: 5.0),
+            padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
             child: TextField(
-              controller: linkCreated,
-              decoration: const InputDecoration(
-                  labelText: "Link:",
+              controller: TextEditingController(text:data.link),
+              decoration: InputDecoration(
+                  labelText: "Tap here for link",
                   border: OutlineInputBorder()
               ),
             ),
@@ -771,14 +763,13 @@ class ShareLinkState extends State<ShareLinkWidget> {
   Future<void> _shareText() async {
     try {
       Share.text('Link',
-          data.link.toString(), 'text/plain');
+          data.link, 'text/plain');
     } catch (e) {
       print('error: $e');
     }
   }
 
 }
-
 
 class PickYourPlace extends StatelessWidget {
 

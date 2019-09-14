@@ -72,7 +72,42 @@ def manage_details(session_id):
         return results
 
     elif request.method == 'GET':
-        results = '{  "users": [    {      "lat": 1.3672154,      "long": 103.8674763,      "metrics": {        "quality": 5,        "speed": 5      },      "transport_mode": "public",      "username": "username"    },    {      "identifier": "identifier",      "lat": 1.2848664,      "long": 103.8244263,      "metrics": {        "quality": 5,        "speed": 5      },      "transport_mode": "public"    },    {      "identifier": "identifier",      "lat": 1.333489,      "long": 103.865812,      "metrics": {        "quality": 5,        "speed": 5      },      "transport_mode": "public"    }  ]}'
+        results = """
+                { 
+        "users":[ 
+            { 
+                "lat":1.3672154,
+                "long":103.8674763,
+                "metrics":{ 
+                    "quality":5,
+                    "speed":5
+                },
+                "transport_mode":"public",
+                "username":"Philip"
+            },
+            { 
+                "identifier":"Stephen",
+                "lat":1.2848664,
+                "long":103.8244263,
+                "metrics":{ 
+                    "quality":5,
+                    "speed":5
+                },
+                "transport_mode":"public"
+            },
+            { 
+                "identifier":"Julia",
+                "lat":1.333489,
+                "long":103.865812,
+                "metrics":{ 
+                    "quality":5,
+                    "speed":5
+                },
+                "transport_mode":"public"
+            }
+        ]
+        }
+        """
         return results
 
 
@@ -104,4 +139,3 @@ if __name__ == '__main__':
     app.config['PERMANANT_SESSION_LIFETIME'] = True
     app.config.from_object(__name__)
     Session(app)
-
