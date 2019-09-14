@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 
 void main() => runApp(MyApp());
 
+
 class PrefData {
   String username;
   String activityType;
@@ -23,6 +24,7 @@ class PrefData {
 }
 
 class MyApp extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context){
     return MaterialApp(
@@ -43,15 +45,59 @@ class MyApp extends StatelessWidget {
   }
 
 class HomeScreen extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Home'),
         backgroundColor: Colors.black,
-        leading: Icon(Icons.home), 
+        leading: Icon(Icons.list),
+         ),
+      body: HomeUsernameWidget(),
+      drawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              child: Text('Meetup Mouse',style: TextStyle(
+                color: Colors.white,
+                fontSize: 23
+                ),
+              ),
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                color: Colors.black,
+              ),
+            ),
+            ListTile(
+              title: Text('Account'),
+              onTap: () {
+                //TODO
+              },
+            ),
+            ListTile(
+              title: Text('Settings'),
+              onTap: () {
+                // TODO
+              },
+            ),
+            ListTile(
+              title: Text('Contact Us'),
+              onTap: () {
+                //TODO
+              },
+            ),
+            ListTile(
+              title: Text('Exit'),
+              onTap: () {
+                //TODO
+              },
+            ),
+          ],
+        ),
       ),
-      body: HomeUsernameWidget()
       );
   }
 
