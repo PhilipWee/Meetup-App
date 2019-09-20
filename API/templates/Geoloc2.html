@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        #basicMap {
+            width: 400px;
+            height: 400px;
+        }
+
+        #basicMap:after {
+            width: 22px;
+            height: 40px;
+            display: block;
+            content: ' ';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin: -40px 0 0 -11px;
+            background: url('https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi_hdpi.png');
+            background-size: 22px 40px;
+            pointer-events: none;
+
+
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <!-- Load the google maps api stuff -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpE4hgWe71uVid7ZN2oGdHUTSy4jjky3A&callback=initMap"
+        async defer></script>
+
+</head>
+
+<body>
+    <h1>MeetUp Mouse</h1>
+
+    <p>Allow meetup mouse to access your location and squeak away!</p>
+    <button id='getlocation'>Get my location</button>
+
+    <p id='geoloc'></p>
+
+    <form id='meetupData' method='POST'>
+        <input type='hidden' name='lat' id='lat' />
+        <input type='hidden' name='lng' id='lng' />
+        <p>Locator not working?</p>
+        <p>Enter your postal code:
+            <input type='postal' name='postal'> </p>
+        <p>How important is speed to you?</p>
+        <p><input type='radio' name='speed' value='1'> Least important </input>
+            <input type='radio' name='speed' value='2'> Somewhat important </input>
+            <input type='radio' name='speed' value='3'> Most important </input></p>
+        <p>What about the quality of the transport?</p>
+        <p><input type="radio" name="quality" value="1"> Least important </input>
+            <input type="radio" name="quality" value="2"> Somewhat important </input>
+            <input type="radio" name="quality" value="3"> Most important </input></p>
+        <input type='reset' value='CLEAR' />
+        <button type='button' id='submitbutton'>Submit</button>
+    </form>
+    <div id='basicMap'></div>
+
+
+
+    <script src="static/js/button.js"></script>
+    <script src="static/js/maps.js"></script>
+</body>
+
+
+</html>
