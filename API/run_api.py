@@ -38,6 +38,8 @@ API important links explanation:
 -> Use this page to show results to prevent lag
 -> If OAuth is provided or IP address matches, show results
 
+/session/<session_id>/get_details (GET)
+-> Returns the website for friends to input details
 """
 
 app = Flask(__name__)
@@ -46,6 +48,11 @@ app = Flask(__name__)
 def index():
     return('Main Site Goes Here')
 
+@app.route('/session/<session_id>/get_details')
+def get_details(session_id):
+    if request.method == "GET":
+        return render_template('Geoloc2.html')
+    
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
