@@ -1,6 +1,7 @@
 #--------------------------------------REQUIREMENTS--------------------------------------
-from flask import Flask,jsonify,request,abort, redirect, url_for
+from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
+from flask_cors import CORS
 import psycopg2
 import sys, os
 import numpy as np
@@ -43,6 +44,7 @@ API important links explanation:
 """
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def index():
@@ -108,7 +110,11 @@ def manage_details(session_id):
         identifier = 'identifier'
 
         #Get the content of the POST
-        content = request.get_json()
+        content_unparsed = request.get_json()
+        content = {}
+        for data_item in content_unparsed:
+            content[data_item['name']] = data_item['value']
+        print(content)
 
         ###Make sure the lat and long are provided and valid
 

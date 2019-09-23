@@ -21,7 +21,8 @@ class PrefData {
   String transportMode;
   int speed;
   int quality;
-  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType});
+  int sessionid;
+  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid});
 }
 
 class MyApp extends StatelessWidget {
@@ -111,7 +112,7 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
   static String name;
-  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,);
+  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: 0);
   final textController  = TextEditingController();
 
   saveLocation() async{
@@ -343,8 +344,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
-    // String url = 'http://192.168.194.210:5000/session/create'; //Philip's laptop
-    String url = 'http://192.168.194.228:5000/session/create'; //Stephen's laptop
+    String url = 'http://192.168.194.228:5000/session/create';
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
     print("jsonpackage $jsonpackage");
     http.Response response = await http.post(url, headers:headers, body:jsonpackage);
@@ -361,12 +361,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     print("Transport Mode:$transportmode");
     print("Quality:$quality");
     print("Speed:$speed");
-    data.link = "http://192.168.194.228:5000/session/$sessionid"; //Stephen's laptop
+    data.link = "http://192.168.194.228:5000/session/$sessionid/get_details";
 
     String tempvar = data.link;
-    print('Link Created--> $tempvar'); //Stephen's laptop
-    // data.link = "http://192.168.194.210:5000/session/$sessionid"; //Philip's laptop
-    // print('Link Created--> http://192.168.194.210:5000/session/$sessionid'); // Philip's laptop
+    print('Link Created--> $tempvar'); 
     return jsonpackage;
     }
 
@@ -615,24 +613,27 @@ class ShareLinkState extends State<ShareLinkWidget> {
   ShareLinkState({this.data});
 
   Future<List<dynamic>> getMembers() async {
+    int sessID = data.sessionid;
+    // http.Response response = await http.get('http://192.168.194.228:5000/session/$sessID');
     http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
-    // http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
     int statusCode = response.statusCode;
     String body = response.body;
     print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
     print("SERVER SAYS: $body");
     Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
     List membersData = memberDatajsonVersion["users"];
-    print(data.lat);
-    print(data.long);  
+    // print(data.lat);
+    // print(data.long);  
     //extract the list of user detail maps into a list
     List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
     Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
     for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
-      List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename and
-      if (mapcontent["identifier"] != null){
+      print(mapcontent);
+      if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
+        List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
         placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
       }
+      else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
     }
     membersData.add(placeNameMap);
     print("membersData-> $membersData");

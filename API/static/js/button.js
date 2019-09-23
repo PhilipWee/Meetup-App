@@ -37,16 +37,16 @@ function submitButton() {
     function newFunction() {
         $.ajax({
             type: 'POST',
-            url: 'http://127.0.0.1:5000/',
+            url: 'http://192.168.194.228:5000/session/123456',
             data: JSON.stringify(meetupData),
             contentType:'application/json',
             success: function (response_data) {
                 alert("success");
             }          
         })
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://127.0.0.1:5000/session/123456", true);
-    xhttp.send(result)
+    // var xhttp = new XMLHttpRequest();
+    // xhttp.open("POST", "http://192.168.194.228:5000/session/123456", true);
+    // xhttp.send(result)
     }
 };
 
