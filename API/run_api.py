@@ -173,11 +173,11 @@ def calculate(session_id):
             user_osms.append(osm_id)
             user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
         # print(user_osms)
-        user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]"
+        user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]" #THIS LINE
         #Get route
         results = pd.read_sql("with results as (\
                     select \
-                        results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1\
+                        results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1 \
                     from\
                             ((SELECT \
                                 *				 \

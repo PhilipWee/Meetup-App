@@ -1,4 +1,4 @@
-PGHOST='192.168.0.103'
+PGHOST='127.0.0.1'
 PGDATABASE='session_info'
 PGROUTINGDATABASE='gisdb'
 PGUSER='postgres'

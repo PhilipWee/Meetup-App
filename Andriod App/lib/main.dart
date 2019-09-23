@@ -38,7 +38,8 @@ class MyApp extends StatelessWidget {
 }
 
   refreshServer() async {
-    http.Response response = await http.get('http://192.168.194.228:5000/refresh');
+    // http.Response response = await http.get('http://192.168.194.228:5000/refresh'); // Stephen's Laptop
+    http.Response response = await http.get('http://127.0.0.1:5000/refresh'); // run_api.py
     int statusCode = response.statusCode;
     String body = response.body;
     print("SERVER REFRESHED WITH STATUSCODE: $statusCode");
@@ -343,8 +344,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
-    // String url = 'http://192.168.194.210:5000/session/create'; //Philip's laptop
-    String url = 'http://192.168.194.228:5000/session/create'; //Stephen's laptop
+
+    // String url = 'http://192.168.194.228:5000/session/create'; //Stephen's laptop
+    String url = 'http://127.0.0.1:5000/session/create'; // run_api.py
+
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
     print("jsonpackage $jsonpackage");
     http.Response response = await http.post(url, headers:headers, body:jsonpackage);
@@ -361,13 +364,12 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     print("Transport Mode:$transportmode");
     print("Quality:$quality");
     print("Speed:$speed");
-    data.link = "http://192.168.194.228:5000/session/$sessionid"; //Stephen's laptop
+
+    // data.link = "http://192.168.194.228:5000/session/$sessionid"; //Stephen's laptop
+    data.link = "http://127.0.0.1:5000/session/$sessionid"; //run_api.py
 
     String tempvar = data.link;
-    print('Link Created--> $tempvar'); //Stephen's laptop
-    // data.link = "http://192.168.194.210:5000/session/$sessionid"; //Philip's laptop
-    // print('Link Created--> http://192.168.194.210:5000/session/$sessionid'); // Philip's laptop
-    return jsonpackage;
+    print('Link Created--> $tempvar');
     }
 
   String value1 = "Select...";
@@ -615,8 +617,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
   ShareLinkState({this.data});
 
   Future<List<dynamic>> getMembers() async {
-    http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
+    // http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
     // http.Response response = await http.get('http://192.168.194.210:5000/session/123456');
+    http.Response response = await http.get('http://127.0.0.1:5000/session/123456');
     int statusCode = response.statusCode;
     String body = response.body;
     print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
@@ -734,7 +737,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
                   Map<String,dynamic> myMap = snapshot.data[snapshot.data.length-1];
                   if (index == 0){
                     return ListTile(
-                      leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                      leading: CircleAvatar(backgroundImage: AssetImage("images/lake.jpg"),),
                       title: Text("You"),
                       subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
                       trailing: Text(myMap["username"].toString())
