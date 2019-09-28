@@ -9,10 +9,12 @@ import pandas as pd
 import credentials as creds
 import pandas.io.sql as psql
 import json
+import time
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS------------------------------------------
 NUMBER_OF_RESULTS = 5
+
 #--------------------------------------SETTINGS------------------------------------------
 
 """
@@ -166,7 +168,9 @@ def calculate(session_id):
     ###Extract the username
     username = 'username'
 
-    #Get all the meetup details
+    #Get all the meetup details\
+    section_start_time = time.time()
+
     crsr = conn.cursor()
     crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
     info = crsr.fetchone()
@@ -188,6 +192,10 @@ def calculate(session_id):
         # print(user_osms)
         user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]"
         #Get route
+
+        print('Get User Closest Node -', time.time() - section_start_time)
+        section_start_time = time.time()
+
         results = pd.read_sql("with results as (\
                     select \
                         results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1\
@@ -197,10 +205,10 @@ def calculate(session_id):
                             FROM pgr_dijkstra(\
                             'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
                             "+user_array+",\
-                            ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))\
+                            ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants_2)))\
                         as results\
-                    join singapore_restaurants\
-                        on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results\
+                    join singapore_restaurants_2\
+                        on results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) as results\
                     join\
                         osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id\
                 ), best_places as (\
@@ -223,6 +231,9 @@ def calculate(session_id):
                     inner join\
                     best_places\
                     on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
+
+        print('Perform optimisation -', time.time() - section_start_time)
+        section_start_time = time.time()
 
 
         osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
@@ -275,6 +286,7 @@ def calculate(session_id):
         crsr = conn.cursor()
         crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(results,session_id))
         conn.commit()
+        print('Update Tables, etc -', time.time() - section_start_time)
         return redirect("/session/"+session_id+"/results", code=302)
     else:
         return jsonify({'error':'sesson_id or username is wrong'})

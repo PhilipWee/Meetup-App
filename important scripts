@@ -420,6 +420,42 @@ order by restaurants.way <-> singapore_road_points.way
 limit 1
 62ms
 
+-------------------------------- Using the google maps csv-----------------------
+See python file upload_csv.py
+
+ALTER TABLE singapore_restaurants_2
+ADD COLUMN way geometry(Point, 4326);
+
+
+UPDATE singapore_restaurants_2 ta1 SET way = ST_SetSRID(ST_MakePoint(long, lat), 4326);
+
+
+ALTER TABLE singapore_restaurants_2
+ADD COLUMN nearest_road_neighbour geometry;
+
+ALTER TABLE singapore_restaurants_2
+ADD COLUMN nearest_road_neighbour_osm_id bigint;
+
+UPDATE singapore_restaurants_2 tA1 SET nearest_road_neighbour = 
+(SELECT near_point.the_geom
+FROM singapore_restaurants_2 tA2, 
+LATERAL (SELECT the_geom
+         FROM (select * from osm_nodes) tableB
+         ORDER BY tableB.the_geom <-> tA2.way 
+         LIMIT 1) near_point
+WHERE tA2.place_id = tA1.place_id limit 1);
+
+
+UPDATE singapore_restaurants_2 tA1 SET nearest_road_neighbour_osm_id = 
+(SELECT near_point.osm_target_id
+FROM singapore_restaurants_2 tA2, 
+LATERAL (
+	select way as road_point, osm_target_id from (select * from singapore_road_points) tableB
+	order by ta2.way <-> tableB.way
+	limit 1
+         ) near_point
+WHERE tA2.place_id = tA1.place_id limit 1);
+
 
 -----------------------------------Google Maps linking-----------------------------------
 https://www.google.com/maps/dir/?api=1&destination=47.5951518,-122.3316393
