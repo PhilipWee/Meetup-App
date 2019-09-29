@@ -183,7 +183,7 @@ def calculate(session_id):
             print(user)
             #Get the osm_id closest to the user's location
             crsr_gis.execute("SELECT osm_source_id as osm_id FROM osm_2po_4pgr\
-            ORDER BY road_start <-> ST_GeometryFromText('POINT("+str(user['long'])+" "+str(user['lat'])+")',4326) \
+                ORDER BY sqrt((x1-"+str(user['long'])+")^2 + (y1-"+str(user['lat'])+")^2) \
             LIMIT 1")
             osm_id = crsr_gis.fetchone()[0]
             user_details[osm_id] = {"latitude":user['lat'],"longtitude":user['long']}

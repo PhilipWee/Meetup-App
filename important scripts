@@ -456,6 +456,9 @@ LATERAL (
          ) near_point
 WHERE tA2.place_id = tA1.place_id limit 1);
 
+------------------------------------ Running Server Backup -------------------------------------
+pg_dump gisdb -Fc -n public > '/home/meetup-dev/Desktop/Meetup-App/server_backup_29sep.bak'
+
 
 -----------------------------------Google Maps linking-----------------------------------
 https://www.google.com/maps/dir/?api=1&destination=47.5951518,-122.3316393
