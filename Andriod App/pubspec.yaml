@@ -19,11 +19,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: ^0.5.11
+  share: ^0.6.2+1
+  location: ^2.3.5
+  google_maps_flutter: ^0.5.21
+  google_sign_in: ^4.0.7
+  geolocator: ^5.1.3
   http: ^0.12.0+2
   cupertino_icons: ^0.1.2
-  geolocator: ^5.1.3
-  clipboard_manager: ^0.0.1
+  clipboard_manager: ^0.0.4
+  esys_flutter_share: ^1.0.2
+  url_launcher: ^5.1.2
 
 dev_dependencies:
   flutter_test:
@@ -45,6 +50,7 @@ flutter:
     - images/meetingButton.jpg
     - images/outingButton.jpg
     - images/lake.jpg
+    - images/mouseAvatar.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

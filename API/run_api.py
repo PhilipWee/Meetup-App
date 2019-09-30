@@ -1,6 +1,7 @@
 #--------------------------------------REQUIREMENTS--------------------------------------
-from flask import Flask,jsonify,request,abort, redirect, url_for
+from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
+from flask_cors import CORS
 import psycopg2
 import sys, os
 import numpy as np
@@ -8,10 +9,12 @@ import pandas as pd
 import credentials as creds
 import pandas.io.sql as psql
 import json
+import time
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS------------------------------------------
 NUMBER_OF_RESULTS = 5
+
 #--------------------------------------SETTINGS------------------------------------------
 
 """
@@ -38,14 +41,22 @@ API important links explanation:
 -> Use this page to show results to prevent lag
 -> If OAuth is provided or IP address matches, show results
 
+/session/<session_id>/get_details (GET)
+-> Returns the website for friends to input details
 """
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def index():
     return('Main Site Goes Here')
 
+@app.route('/session/<session_id>/get_details')
+def get_details(session_id):
+    if request.method == "GET":
+        return render_template('Geoloc2.html')
+    
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
@@ -101,7 +112,11 @@ def manage_details(session_id):
         identifier = 'identifier'
 
         #Get the content of the POST
-        content = request.get_json()
+        content_unparsed = request.get_json()
+        content = {}
+        for data_item in content_unparsed:
+            content[data_item['name']] = data_item['value']
+        print(content)
 
         ###Make sure the lat and long are provided and valid
 
@@ -153,7 +168,9 @@ def calculate(session_id):
     ###Extract the username
     username = 'username'
 
-    #Get all the meetup details
+    #Get all the meetup details\
+    section_start_time = time.time()
+
     crsr = conn.cursor()
     crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
     info = crsr.fetchone()
@@ -161,18 +178,24 @@ def calculate(session_id):
         ###Calculate the best route for each person and return it
         user_osms = []
         user_identifiers = []
+        user_details = {}
         for user in info[0]['users']:
             print(user)
             #Get the osm_id closest to the user's location
             crsr_gis.execute("SELECT osm_source_id as osm_id FROM osm_2po_4pgr\
-            ORDER BY road_start <-> ST_GeometryFromText('POINT("+str(user['long'])+" "+str(user['lat'])+")',4326) \
+                ORDER BY sqrt((x1-"+str(user['long'])+")^2 + (y1-"+str(user['lat'])+")^2) \
             LIMIT 1")
             osm_id = crsr_gis.fetchone()[0]
+            user_details[osm_id] = {"latitude":user['lat'],"longtitude":user['long']}
             user_osms.append(osm_id)
             user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
         # print(user_osms)
         user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]"
         #Get route
+
+        print('Get User Closest Node -', time.time() - section_start_time)
+        section_start_time = time.time()
+
         results = pd.read_sql("with results as (\
                     select \
                         results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1\
@@ -182,10 +205,10 @@ def calculate(session_id):
                             FROM pgr_dijkstra(\
                             'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
                             "+user_array+",\
-                            ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))\
+                            ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants_2)))\
                         as results\
-                    join singapore_restaurants\
-                        on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results\
+                    join singapore_restaurants_2\
+                        on results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) as results\
                     join\
                         osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id\
                 ), best_places as (\
@@ -199,14 +222,18 @@ def calculate(session_id):
                     total_cost,\
                     name,\
                     results.end_vid,\
-                    geom_way as location,\
                     x1 as longtitude,\
-                    y1 as latitude\
+                    y1 as latitude,\
+                    ST_X(way) as restaurant_x,\
+                    ST_Y(way) as restaurant_y\
                 from\
                     results\
                     inner join\
                     best_places\
                     on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
+
+        print('Perform optimisation -', time.time() - section_start_time)
+        section_start_time = time.time()
 
 
         osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
@@ -215,7 +242,7 @@ def calculate(session_id):
         #Format the results in dictionaries
         results_dict = {}
         results_dict['possible_locations'] = results['name'].unique().tolist()
-        results_dict['users'] = user_osms
+        results_dict['users'] = user_details
         # print('results_dict:')
         # print(results_dict)
         # print('results:')
@@ -246,6 +273,8 @@ def calculate(session_id):
                     results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'].iloc[0])
                     results_dict[location][user]['start_user'] = str(relevant_df['start_user'].iloc[0])
                     results_dict[location][user]['start_user_name'] = str(relevant_df['start_user_name'].iloc[0])
+                    results_dict[location][user]['restaurant_x'] = relevant_df['restaurant_x'].iloc[0]
+                    results_dict[location][user]['restaurant_y'] = relevant_df['restaurant_y'].iloc[0]
                 except:
                     print('WARNING: exception on location',location,'user',user)
             
@@ -257,6 +286,7 @@ def calculate(session_id):
         crsr = conn.cursor()
         crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(results,session_id))
         conn.commit()
+        print('Update Tables, etc -', time.time() - section_start_time)
         return redirect("/session/"+session_id+"/results", code=302)
     else:
         return jsonify({'error':'sesson_id or username is wrong'})
