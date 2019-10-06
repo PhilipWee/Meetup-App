@@ -2,7 +2,7 @@
 
 *An Undergraduate Research Opportunities Programme (UROP) initiated by a group of 5*
 
-![](Pictures/MeetUp_Logo-0a25f6e3-6fca-46d1-98f1-4e5de3f25612.png)
+![](Pictures/MeetUp_Logo-0a25f6e3-6fca-46d1-98f1-4e5de3f25612.png | width=50)
 
 # Team
 
