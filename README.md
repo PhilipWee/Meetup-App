@@ -2,7 +2,7 @@
 
 *An Undergraduate Research Opportunities Programme (UROP) initiated by a group of 5*
 
-![](Pictures/MeetUp_Logo-0a25f6e3-6fca-46d1-98f1-4e5de3f25612.png | width=50)
+<img src="Pictures/MeetUp_Logo-0a25f6e3-6fca-46d1-98f1-4e5de3f25612.png" width="200" height="270">
 
 # Team
 
@@ -44,11 +44,7 @@ People planning for any sort of gathering event (e.g. business meeting, class ou
 
 ### Step 1: Gather data
 
-![](Pictures/Untitled-14dc3173-0ac4-4794-8dd7-0c340ecd297f.png)
-
-![](Pictures/Untitled-d4e976fd-7ce8-4baf-95ca-15eef643b05d.png)
-
-![](Pictures/Untitled-9a75828c-de66-43b5-9092-e558df8aec55.png)
+<img src="Pictures/Untitled-14dc3173-0ac4-4794-8dd7-0c340ecd297f.png" width="200" height="430"> <img src="Pictures/Untitled-d4e976fd-7ce8-4baf-95ca-15eef643b05d.png" width="200" height="430"><img src="Pictures/Untitled-9a75828c-de66-43b5-9092-e558df8aec55.png" width="200" height="430">
 
 - Username & Current Location
 - Meeting Type
@@ -78,11 +74,11 @@ Shareable link will be created after the initial details have been provided to t
 
 Once all participants have signed up, the organizer can tap on the button to calculate and give a list of possible locations for the meet up
 
-![](Pictures/Untitled-91b77229-5891-4a16-ba8f-e3b1f85b6277.png)
-
-![](Pictures/Untitled-7682abbb-661d-449f-a731-62ad178400eb.png)
+<img src="Pictures/Untitled-91b77229-5891-4a16-ba8f-e3b1f85b6277.png" width="200" height="430">
 
 ### Step 3: Server Calculation
+
+<img src="Pictures/Untitled-7682abbb-661d-449f-a731-62ad178400eb.png" width="200" height="430">
 
 **Data**
 Location data of all possible places is taken from Google Places API and temporarily stored on PostgreSQL.
