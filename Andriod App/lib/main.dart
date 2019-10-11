@@ -362,6 +362,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     print("Quality:$quality");
     print("Speed:$speed");
     data.link = "http://192.168.194.228:5000/session/$sessionid/get_details";
+    
 
     String tempvar = data.link;
     print('Link Created--> $tempvar'); 
@@ -736,7 +737,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
                   if (index == 0){
                     return ListTile(
                       leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                      title: Text("You"),
+                      title: Text(data.username),
                       subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
                       trailing: Text(myMap["username"].toString())
                     );
@@ -846,8 +847,8 @@ class MapSampleState extends State<MapSample> {
 
   //Create the get request function
   Future<Map<String, dynamic>> _getCalculate() async {
-    String lunk = data.link;
-    final result = await http.get('$lunk/calculate');
+    int id = data.sessionid;
+    final result = await http.get("http://192.168.194.228:5000/session/$id/calculate");
     if (result.statusCode == 200) {
       Map<String, dynamic> results = jsonDecode(result.body);
       print(results);
