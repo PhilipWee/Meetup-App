@@ -12,7 +12,7 @@ conn_gis=psycopg2.connect(conn_string)
 print("Connected!")
 crsr_gis = conn_gis.cursor()
 
-data = pd.read_csv('/home/meetup-dev/Desktop/Meetup-App/sample4.csv')
+data = pd.read_csv('D:/restaurant_data.csv')
 print(data.head())
 
 data.to_sql('singapore_restaurants_2',engine)
