@@ -1,10 +1,10 @@
+
+
 function getLocation() {
     navigator.geolocation.getCurrentPosition(success, error, options);
     console.log('test')
     
 };
-
-document.getElementById ("getlocation").addEventListener ("click", getLocation);
 
 function success(pos) {
     var crd = pos.coords;
@@ -15,6 +15,10 @@ function success(pos) {
     LatLng = new google.maps.LatLng(crd.latitude, crd.longitude);
     map.setCenter(LatLng);
 };
+
+document.getElementById ("getlocation").addEventListener ("click", getLocation);
+
+
 
 function error(err) {
     console.warn('ERROR(' + err.code + '): ' + err.message);
@@ -44,9 +48,7 @@ function submitButton() {
                 alert("success");
             }          
         })
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://127.0.0.1:5000/session/123456", true);
-    xhttp.send(result)
+
     }
 };
 
@@ -54,7 +56,7 @@ document.getElementById ("submitbutton").addEventListener ("click", submitButton
 
 function redirect() {
     console.log("running redirect")
-    window.location.href='/results'
+    window.location.href='results_display'
   };
   
   

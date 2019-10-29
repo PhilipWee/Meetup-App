@@ -1,5 +1,5 @@
 # --------------------------------------REQUIREMENTS--------------------------------------
-from flask import Flask, jsonify, request, abort, redirect, url_for, session
+from flask import Flask, jsonify, request, abort, redirect, url_for, session, render_template
 from flask_session import Session
 from flask_dance.contrib.github import make_github_blueprint, github
 import psycopg2
@@ -53,6 +53,15 @@ def index():
     #A placeholder to check if the website is working
     return 'Main Site Goes Here'
 
+@app.route('/session/<session_id>/get_details')
+def get_details(session_id):
+    if request.method == "GET":
+        return render_template('Geoloc2.html')
+
+@app.route('/session/<session_id>/results_display')
+def results_display(session_id):
+    if request.method == "GET":
+        return render_template('Geoloc.html') 
 
 @app.route('/session/create', methods=['POST'])
 def create_session():

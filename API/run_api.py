@@ -44,7 +44,6 @@ API important links explanation:
 
 app = Flask(__name__)
 
-@app.route('/')
 def index():
     return('Main Site Goes Here')
 
@@ -53,6 +52,10 @@ def get_details(session_id):
     if request.method == "GET":
         return render_template('Geoloc2.html')
     
+@app.route('/session/<session_id>/results_display')
+def results_display(session_id):
+    if request.method == "GET"
+        return render_template('Geoloc.html')    
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
