@@ -1,12 +1,12 @@
 #--------------------------------------REQUIREMENTS--------------------------------------
 from flask import Flask,render_template,jsonify,request,abort, redirect, url_for
 from flask_dance.contrib.github import make_github_blueprint, github
-import psycopg2
+# import psycopg2
 import sys, os
 import numpy as np
-import pandas as pd
+# import pandas as pd
 import credentials as creds
-import pandas.io.sql as psql
+# import pandas.io.sql as psql
 import json
 #--------------------------------------REQUIREMENTS--------------------------------------
 
