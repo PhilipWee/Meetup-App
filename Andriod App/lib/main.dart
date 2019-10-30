@@ -8,6 +8,13 @@ import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:connectivity/connectivity.dart';
+
+String globalurl(){
+  String serverAddress = "http://192.168.194.228:5000";
+  // String serverAddress = "http://169.254.158.154:5000";
+  return serverAddress;
+}
 
 void main() => runApp(MyApp());
 
@@ -25,6 +32,7 @@ class PrefData {
   PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid});
 }
 
+
 class MyApp extends StatelessWidget {
   
   @override
@@ -32,18 +40,52 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
+        '/': (context) => CheckNetworkPage(),
       },
     );
   }
 }
 
+class CheckNetworkPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        // appBar: AppBar(
+        //   title: Text(""),
+        // ),
+        body: StreamBuilder(
+            stream: Connectivity().onConnectivityChanged,
+            builder: (BuildContext ctxt,
+                AsyncSnapshot<ConnectivityResult> snapShot) {
+              if (!snapShot.hasData) return CircularProgressIndicator();
+              var result = snapShot.data;
+              switch (result) {
+                case ConnectivityResult.none:
+                  print("no net");
+                  return Center(child: Text("No Internet Connection!"));
+                case ConnectivityResult.mobile:
+                case ConnectivityResult.wifi:
+                  print("yes net");
+                  return HomeScreen();
+                default:
+                  return Center(child: Text("No Internet Connection!"));
+              }
+            })
+      );
+  }
+}
+
+
   refreshServer() async {
-    http.Response response = await http.get('http://192.168.194.228:5000/refresh');
-    int statusCode = response.statusCode;
-    String body = response.body;
-    print("SERVER REFRESHED WITH STATUSCODE: $statusCode");
-    print("SERVER SAYS: $body");
+    String address = globalurl();
+    try{
+      http.Response response = await http.get('$address/refresh');
+      int statusCode = response.statusCode;
+      String body = response.body;
+      print("SERVER REFRESHED WITH STATUSCODE: $statusCode");
+      print("SERVER SAYS: $body");
+      }
+    catch(e){print(e);}
   }
 
 class HomeScreen extends StatelessWidget {
@@ -162,7 +204,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         children: [
           FlatButton(
             onPressed: () {
-              refreshServer();
+              // refreshServer();
               saveLocation();
               if (textController.text != "") {
                 name = textController.text;
@@ -233,14 +275,14 @@ class MeetingType extends StatelessWidget {
   MeetingType({this.data});
 
   final List<String> custLabels = [
-    "Date",
+    "Food",
     "Outing",
     "Meeting",
     "About Us"
     ];
   final List<String> custImgs = [
-    "images/dateButton.jpg",
-    "images/outingButton.jpg",
+    "images/food.jpg",
+    "images/outing.jpg",
     "images/meetingButton.jpg",
     "images/MeetUp_Logo.png"
     ];
@@ -344,29 +386,49 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
-    String url = 'http://192.168.194.228:5000/session/create';
+    String address = globalurl();
+
+    String url = '$address/session/create';
+
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
     print("jsonpackage $jsonpackage");
-    http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+    try{
 
-    //store returned string-map "{sessionid: 123456}"" into a String
-    int statusCode = response.statusCode;
-    String body = response.body;
-    print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-    print("SERVER SAYS: $body");
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
 
-    //decode the string-map
-    Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
-    var sessionid = sessionidjsonversion['session_id'];
-    print("Transport Mode:$transportmode");
-    print("Quality:$quality");
-    print("Speed:$speed");
-    data.link = "http://192.168.194.228:5000/session/$sessionid/get_details";
+      if (statusCode != 200){
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error 404!"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+
+      else{
+
+        String body = response.body; //store returned string-map "{sessionid: 123456}"" into String body
+        print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+        print("SERVER SAYS: $body");
+
+        //decode the string-map
+        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
+        var sessionid = sessionidjsonversion['session_id'];
+        print("Transport Mode:$transportmode");
+        print("Quality:$quality");
+        print("Speed:$speed");
+        data.link = "$address/session/$sessionid/get_details";
+
+        String tempvar = data.link;
+        print('Link Created--> $tempvar'); 
+        return jsonpackage;
+
+      }
+    }
+
+    catch(e){print("Session Create Failed with Error: $e");}
     
 
-    String tempvar = data.link;
-    print('Link Created--> $tempvar'); 
-    return jsonpackage;
     }
 
   String value1 = "Select...";
@@ -570,8 +632,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
               sessionIdPost();                                                   //POST DATABASE TO SERVER
-              if (value1 != "Select..." && value2 != "Select..."
-                  && value3 != "Select..." && value4 != "Select...") {
+              if (
+                value1 != "Select..." && 
+                value2 != "Select..." && 
+                value3 != "Select..." && 
+                value4 != "Select...") {
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
               } else {
                 Scaffold.of(context).showSnackBar(
@@ -615,30 +680,49 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
   Future<List<dynamic>> getMembers() async {
     int sessID = data.sessionid;
-    // http.Response response = await http.get('http://192.168.194.228:5000/session/$sessID');
-    http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
-    int statusCode = response.statusCode;
-    String body = response.body;
-    print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-    print("SERVER SAYS: $body");
-    Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
-    List membersData = memberDatajsonVersion["users"];
-    // print(data.lat);
-    // print(data.long);  
-    //extract the list of user detail maps into a list
-    List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
-    Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
-    for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
-      print(mapcontent);
-      if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
-        List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
-        placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
+    String address = globalurl();
+
+    try{
+
+      http.Response response = await http.get('$address/session/123456');
+      // http.Response response = await http.get('$address/session/$sessID'); //use this when session id can be generated
+      int statusCode = response.statusCode;
+      String body = response.body;
+      print(response.statusCode);
+      
+      if (statusCode != 200){
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error 404"),
+              duration: Duration(seconds: 2),
+            ));
       }
-      else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
+
+      else{
+        
+        print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+        print("SERVER SAYS: $body");
+        Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
+        List membersData = memberDatajsonVersion["users"];
+        //extract the list of user detail maps into a list
+        List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
+        Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
+        for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
+          print(mapcontent);
+          if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
+            List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
+            placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
+          }
+          else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
+        }
+        membersData.add(placeNameMap);
+        print("membersData-> $membersData");
+        return membersData;
+      }
     }
-    membersData.add(placeNameMap);
-    print("membersData-> $membersData");
-    return membersData;
+
+    catch(e){print("Get-session-details Failed with error: $e");}
+
   }
 
   Future<List<Map<String, dynamic>>> getMembersFAKE() async {
@@ -713,7 +797,8 @@ class ShareLinkState extends State<ShareLinkWidget> {
     Widget listSection = Container(
       child: 
       FutureBuilder(
-        future: getMembers(),
+        future:
+        getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           print(snapshot);
           if(snapshot.data == null){
@@ -848,8 +933,9 @@ class MapSampleState extends State<MapSample> {
   //Create the get request function
   Future<Map<String, dynamic>> _getCalculate() async {
     int id = data.sessionid;
-    final result = await http.get("http://192.168.194.228:5000/session/$id/calculate");
-    if (result.statusCode == 200) {
+    String address = globalurl();
+    final result = await http.get("$address/session/$id/calculate");
+    if (result.statusCode != 200) {
       Map<String, dynamic> results = jsonDecode(result.body);
       print(results);
       print(results['possible_locations']);
@@ -863,8 +949,6 @@ class MapSampleState extends State<MapSample> {
     target: LatLng(1.3385253,103.8),
     zoom: 10,
   );
-  
-
 
   //Build the map
   GoogleMap displayMap() {
