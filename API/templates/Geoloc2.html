@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<<<<<<< HEAD
           
 <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -8,6 +9,13 @@
         <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>   
    <style>
 
+=======
+    
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+>>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
         #basicMap {
             width: 400px;
             height: 400px;
@@ -28,6 +36,7 @@
 
 
         }
+<<<<<<< HEAD
         body {
             background-color: SeaShell ;
            
@@ -77,6 +86,8 @@
       margin: 0 20px 0 0;
     }
 
+=======
+>>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
     </style>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -95,6 +106,7 @@
 </head>
 
 <body>
+<<<<<<< HEAD
     
     <div>
             
@@ -198,6 +210,39 @@
 
     <script src="static/js/button.js"></script>
     <script src="static/js/maps.js"></script>
+=======
+    <h1>MeetUp Mouse</h1>
+
+    <p>Allow meetup mouse to access your location and squeak away!</p>
+    <button id='getlocation'>Get my location</button>
+
+    <p id='geoloc'></p>
+
+    <form id='meetupData' method='POST'>
+        <input type='hidden' name='lat' id='lat' />
+        <input type='hidden' name='lng' id='lng' />
+        <p>Locator not working?</p>
+        <p>Enter your postal code:
+            <input type='postal' name='postal'> </p>
+        <p>How important is speed to you?</p>
+        <p><input type='radio' name='speed' value='1'> Least important </input>
+            <input type='radio' name='speed' value='2'> Somewhat important </input>
+            <input type='radio' name='speed' value='3'> Most important </input></p>
+        <p>What about the quality of the transport?</p>
+        <p><input type="radio" name="quality" value="1"> Least important </input>
+            <input type="radio" name="quality" value="2"> Somewhat important </input>
+            <input type="radio" name="quality" value="3"> Most important </input></p>
+        <input type='reset' value='CLEAR' />
+        <button type='button' id='submitbutton'>Submit</button>
+        <p><button type='button' id='redirect'>I confirm that my details are correct! Display my Route!</button></p>
+    </form>
+    <div id='basicMap'></div>
+    
+    
+    <script src="{{url_for('static', filename='js/application2.js') }}"></script>
+    <script src="/static/js/button.js"></script>
+    <script src="/static/js/maps.js"></script>
+>>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
 </body>
 
 
