@@ -29,6 +29,7 @@ dependencies:
   clipboard_manager: ^0.0.4
   esys_flutter_share: ^1.0.2
   url_launcher: ^5.1.2
+  connectivity: ^0.4.4
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +53,8 @@ flutter:
     - images/lake.jpg
     - images/mouseAvatar.jpg
     - images/Mouse copy.png
+    - images/food.jpg
+    - images/outing.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
