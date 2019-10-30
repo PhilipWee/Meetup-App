@@ -2,7 +2,7 @@
 from flask import Flask, jsonify, request, abort, redirect, url_for, session, render_template
 from flask_session import Session
 from flask_dance.contrib.github import make_github_blueprint, github
-import psycopg2
+#import psycopg2
 import sys
 import os
 import numpy as np
