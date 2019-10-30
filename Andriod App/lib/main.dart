@@ -461,7 +461,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
         String body = response.body; //store returned string-map "{sessionid: 123456}"" into String body
         print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-        print("SERVER SAYS: $body");
+        print("SERVER ara ara SAYS: $body");
 
         //decode the string-map
         Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
@@ -982,14 +982,19 @@ class MapSampleState extends State<MapSample> {
   Future<Map<String, dynamic>> _getCalculate() async {
     int id = data.sessionid;
     String address = globalurl();
-    final result = await http.get("$address/session/$id/calculate");
-    if (result.statusCode != 200) {
+    // final result = await http.get("$address/session/$id/calculate");
+    final result = await http.get("$address/session/123456/calculate");
+    if (result.statusCode != 200 || result.statusCode != 302) {
       Map<String, dynamic> results = jsonDecode(result.body);
       print(results);
       print(results['possible_locations']);
       return results;
     } else {
-      throw ("Error getting results with statusCode " + result.statusCode.toString());
+      // throw ("Error getting results with statusCode " + result.statusCode.toString());
+      Map<String, dynamic> results = jsonDecode(result.body);
+      print(results);
+      print(results['possible_locations']);
+      return results;
     }
   }
 
