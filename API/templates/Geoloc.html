@@ -1,6 +1,94 @@
 <!DOCTYPE html>
 <html>
-  THIS IS THE REDIRECTED PAGE
+ 
 <head>
-<script src="static/js/application.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>   
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpE4hgWe71uVid7ZN2oGdHUTSy4jjky3A"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <style>
+        html, body {
+          height: 70%;
+          margin: 0;
+          padding: 0;
+      }
+      #map {
+  height: 300px;
+  width: 600px;
+  border: 1px solid black;
+  margin: 0 auto;
+}
+body {
+            background-color: SeaShell ;
+           
+          } 
+          h1 {
+  color: white;
+  margin-left: 20px;
+  font-size:5vw;
+  font-family: 'Pacifico';
+        
+}
+        h2 {
+  margin-left: 20px;
+  font-family: 'Patrick Hand SC';
+  font-size: 3vw;
+        
+}
+
+        .round3 {
+  border: 5px dotted rgb(214,129,137);
+  border-radius: 12px;
+  padding: 2px;
+  position:relative;
+}
+</style>
+<style>
+
+</style>
 </head>
+
+<script src="{{url_for('static', filename='js/application2.js') }}"></script>
+<body>
+<div>
+    <div style='position:absolute;' class='row pl-2'>
+        <div class='col col-10'>
+
+        </div>
+        <div class='col col-2'>
+        <img style = "height:103%;width:170%;margin-right:0px;"  align = right src="/static/Mousenspeech.png" alt="Mouse n speech" width="500" height="500">
+        </div>
+      
+    </div>
+    <div class='row pl-2' style='background-color:Tomato;height:100%;'>
+            <h1>MeetUp Mouse</h1>
+    </div>
+    <div class='row pl-2' style="background-color:White;">
+            <h2>CHOOSE YOUR MEETUP LOCATION!</h2>
+    </div>
+  </div>
+</div>
+
+
+ <div style='padding:3%;' class='row'> 
+      <div style=' width: 100%; align-items: center; justify-content: center; height: 400px;border:5px dotted rgb(214,129,137);border-radius:12px;position:relative;'  class="round3" id="map">
+      </div>
+      <script src="{{url_for('static', filename='js/application.js') }}"></script>  
+</div>
+
+<div class="container-fluid" style='height:10%;margin-left:2%; font-family:Patrick Hand SC;'>
+ <div class='row' style='margin-left:3.5%;align-items: center;justify-content: space-evenly;'>
+    <div style= 'font-family: Patrick Hand SC;'  id='buttons_div'>
+    </div>
+ </div>
+</div>
+
+
+
+</body>
+

@@ -1,32 +1,3 @@
-function getLocation() {
-    navigator.geolocation.getCurrentPosition(success, error, options);
-    console.log('Geolocation running')
-};
-
-document.getElementById ("getlocation").addEventListener ("click", getLocation(), true);
-
-function success(pos) {
-    var crd = pos.coords;
-    lat = crd.latitude;
-    lng = crd.longitude;
-    $('#lat').val(lat);
-    $('#lng').val(lng);
-    LatLng = new google.maps.LatLng(crd.latitude, crd.longitude);
-    map.setCenter(LatLng);
-};
-
-function error(err) {
-    console.warn('ERROR(' + err.code + '): ' + err.message);
-};
-
-var options = {
-    enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0
-};
-
-
-
 var map;
 function initMap() {
     // 1.287828, 103.865900

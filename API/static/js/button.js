@@ -4,8 +4,6 @@ function getLocation() {
     
 };
 
-document.getElementById ("getlocation").addEventListener ("click", getLocation);
-
 function success(pos) {
     var crd = pos.coords;
     lat = crd.latitude;
@@ -15,6 +13,10 @@ function success(pos) {
     LatLng = new google.maps.LatLng(crd.latitude, crd.longitude);
     map.setCenter(LatLng);
 };
+
+document.getElementById ("getlocation").addEventListener ("click", getLocation);
+
+
 
 function error(err) {
     console.warn('ERROR(' + err.code + '): ' + err.message);
@@ -44,9 +46,13 @@ function submitButton() {
                 alert("success");
             }          
         })
+<<<<<<< HEAD
     // var xhttp = new XMLHttpRequest();
     // xhttp.open("POST", "http://192.168.194.228:5000/session/123456", true);
     // xhttp.send(result)
+=======
+
+>>>>>>> websitetest
     }
 };
 
@@ -54,7 +60,7 @@ document.getElementById ("submitbutton").addEventListener ("click", submitButton
 
 function redirect() {
     console.log("running redirect")
-    window.location.href='/results'
+    window.location.href='results_display'
   };
   
   
