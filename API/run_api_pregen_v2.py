@@ -1,15 +1,8 @@
 # --------------------------------------REQUIREMENTS--------------------------------------
-<<<<<<< HEAD
-from flask import Flask, jsonify, request, abort, redirect, url_for, session
-from flask_session import Session
-from flask_dance.contrib.github import make_github_blueprint, github
-import psycopg2
-=======
 from flask import Flask, jsonify, request, abort, redirect, url_for, session, render_template
 from flask_session import Session
 from flask_dance.contrib.github import make_github_blueprint, github
 #import psycopg2
->>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
 import sys
 import os
 import numpy as np
@@ -60,8 +53,6 @@ def index():
     #A placeholder to check if the website is working
     return 'Main Site Goes Here'
 
-<<<<<<< HEAD
-=======
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
     if request.method == "GET":
@@ -71,7 +62,6 @@ def get_details(session_id):
 def results_display(session_id):
     if request.method == "GET":
         return render_template('Geoloc.html') 
->>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
@@ -1781,11 +1771,7 @@ def results(session_id):
 if __name__ == '__main__':
 
     # Run the App
-<<<<<<< HEAD
-    app.run(host='0.0.0.0', debug=True, use_reloader=False, port=5001)
-=======
     app.run(host='0.0.0.0', debug=True, use_reloader=False, port=5000)
->>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
 
     #These settings are required for session to work
     app.config['SESSION_TYPE'] = 'filesystem'
