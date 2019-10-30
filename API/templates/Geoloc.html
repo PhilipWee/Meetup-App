@@ -30,14 +30,14 @@ body {
           h1 {
   color: white;
   margin-left: 20px;
-  font-size: 90px;
+  font-size:5vw;
   font-family: 'Pacifico';
         
 }
         h2 {
   margin-left: 20px;
   font-family: 'Patrick Hand SC';
-  font-size: 40px;
+  font-size: 3vw;
         
 }
 
@@ -61,7 +61,7 @@ body {
 
         </div>
         <div class='col col-2'>
-        <img style = "height:100%;width:230%;margin-right:0px;"  align = right src="/static/Mouse.png" alt="Mouse" width="500" height="500">
+        <img style = "height:103%;width:170%;margin-right:0px;"  align = right src="/static/Mousenspeech.png" alt="Mouse n speech" width="500" height="500">
         </div>
       
     </div>
@@ -74,27 +74,20 @@ body {
   </div>
 </div>
 
- <div class='container-fluid'>
- <div style='margin-right:3%;margin-left:0%;' class='row'>
-   <div class='col'>
-   <div class='col ' style='margin-left:0%; margin-top: 5%;'>
-      <div style='margin-right:0%;margin-left:0%;border:5px dotted rgb(214,129,137);border-radius:12px;padding:2px;position:relative;' class="round3" id="map">
+
+ <div style='padding:3%;' class='row'> 
+      <div style=' width: 100%; align-items: center; justify-content: center; height: 400px;border:5px dotted rgb(214,129,137);border-radius:12px;position:relative;'  class="round3" id="map">
       </div>
-      <script src="{{url_for('static', filename='js/application.js') }}"></script>
-   </div>   
-</div>
-   <div class='col '>
-      <img style = "height:50%;width:30%;margin-left:10%;margin-top:2%;"  align-content = left src="/static/Speech1.png" alt="Speech" width="500" height="500">
-    </div> 
+      <script src="{{url_for('static', filename='js/application.js') }}"></script>  
 </div>
 
-<div class="container-fluid" style='height:10%;margin-left:2%;background-color: white; font-family:Patrick Hand SC;'>
+<div class="container-fluid" style='height:10%;margin-left:2%; font-family:Patrick Hand SC;'>
  <div class='row' style='margin-left:3.5%;align-items: center;justify-content: space-evenly;'>
     <div style= 'font-family: Patrick Hand SC;'  id='buttons_div'>
     </div>
  </div>
 </div>
-</div> 
+
 
 
 </body>

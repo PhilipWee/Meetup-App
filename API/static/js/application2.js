@@ -1,16 +1,5 @@
 console.log('test1')
 
-<<<<<<< HEAD
-function getLocation() {
-    navigator.geolocation.getCurrentPosition(success, error, options);
-    console.log('test')
-};
-
-document.getElementById ("getlocation").addEventListener ("click", getLocation(), true);
-
-
-=======
->>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
 
 function submitButton() {
     var latituder = document.getElementById('lat').value;
@@ -25,33 +14,6 @@ function submitButton() {
             type: 'POST',
             url: '127.0.0.1:5000',
             data: JSON.stringify(meetupData),
-<<<<<<< HEAD
-            contentType='application/json',
-            success: function (response_data) {
-                alert("success");
-            }          
-        })
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://127.0.0.1:5000/session/123456", true);
-    xhttp.send(result)
-};
-
-var map;
-function initMap() {
-    myLatLng = { lat: 1.37, lng: 103.8 }; //first position
-    map = new google.maps.Map(document.getElementById('basicMap'), {
-        center: myLatLng,
-        zoom: 14
-    });
-    map.addListener('center_changed', function () {
-        lat = map.getCenter().lat();
-        lng = map.getCenter().lng();
-        $("#lat").val(lat);
-        $("#lng").val(lng);
-    });
-}
-
-=======
             contentType: 'application/json',
             success: function (response_data) {
                 alert("success");
@@ -74,4 +36,3 @@ function initMap() {
         });
     }
 }
->>>>>>> f4dd909ba86df63cdd2ee487f837d8c052c55199
