@@ -62,6 +62,8 @@ def get_details(session_id):
 def create_session():
     #Here we create the session
 
+    
+
     ###Get session details from OAUTH
     username = 'username'
 
@@ -69,11 +71,19 @@ def create_session():
     crsr = conn.cursor()
     crsr.execute("SELECT username FROM sessions WHERE username = (%s) LIMIT 1;",(username,))
     exists = crsr.fetchone()
+    content = request.get_json()
+
+    #Set the meeting type
+    if content.get('meeting_type') is not None:
+        meeting_type = content.get('meeting_type')
+    else:
+        meeting_type = "food"
+
     if exists != None:
         return jsonify({'warning':'session already exists'})
 
     #Extract the post json details
-    content = request.get_json()
+    
 
     ###OAUTH REQUIRED HERE, ONLY REGISTERED USERS CAN MAKE SESSION
 
@@ -82,6 +92,8 @@ def create_session():
     #After checks, allow the creation of a session
     ###Generate Random Session ID:
     session_id = '123456'
+
+    
 
     #Consolidate the session details
     host_user_details = {'username':username,
@@ -93,7 +105,7 @@ def create_session():
                             'quality':int(content.get('quality',5))
                         }}
 
-    details = {'users':[host_user_details]}
+    details = {'users':[host_user_details],'meeting_type':meeting_type}
     json_details = json.dumps(details)
     print(json_details)
 
@@ -108,15 +120,17 @@ def create_session():
 @app.route('/session/<session_id>', methods=['POST','GET'])
 def manage_details(session_id):
     if request.method == 'POST':
+        print('help la')
         ###Ensure that we have not yet received a message from this ip
         identifier = 'identifier'
 
         #Get the content of the POST
         content_unparsed = request.get_json()
-        content = {}
-        for data_item in content_unparsed:
-            content[data_item['name']] = data_item['value']
-        print(content)
+        # print(content_unparsed)
+        
+        content = content_unparsed
+
+
 
         ###Make sure the lat and long are provided and valid
 
@@ -191,6 +205,12 @@ def calculate(session_id):
             user_identifiers.append(user.get('username',user.get('identifier','unknown user')))
         # print(user_osms)
         user_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_osms)+"]::bigint[]"
+        # set the meeting type
+        if info[0]['meeting_type'] == 'food':
+            location_db = "singapore_restaurants_2"
+        elif info[0]['meeting_type'] == 'outing':
+            location_db = "outing_data"
+
         #Get route
 
         print('Get User Closest Node -', time.time() - section_start_time)
@@ -203,12 +223,12 @@ def calculate(session_id):
                             ((SELECT \
                                 *				 \
                             FROM pgr_dijkstra(\
-                            'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
+                            'select * from public_edges',\
                             "+user_array+",\
-                            ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants_2)))\
+                            ARRAY(select nearest_road_neighbour_osm_id from "+location_db+")))\
                         as results\
-                    join singapore_restaurants_2\
-                        on results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) as results\
+                    join "+location_db+"\
+                        on results.end_vid = "+location_db+".nearest_road_neighbour_osm_id) as results\
                     join\
                         osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id\
                 ), best_places as (\
@@ -231,6 +251,78 @@ def calculate(session_id):
                     inner join\
                     best_places\
                     on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
+
+#         results = pd.read_sql("with results as (\
+#                     select \
+#                         results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1\
+#                     from\
+#                             ((SELECT \
+#                                 *				 \
+#                             FROM pgr_dijkstra(\
+#                             'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
+#                             "+user_array+",\
+#                             ARRAY(select nearest_road_neighbour_osm_id from "+location_db+")))\
+#                         as results\
+#                     join "+location_db+"\
+#                         on results.end_vid = "+location_db+".nearest_road_neighbour_osm_id) as results\
+#                     join\
+#                         osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id\
+#                 ), best_places as (\
+#                     select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality("+user_array+")\
+#                 )\
+# \
+#                 select \
+#                     path_seq,\
+#                     results.start_vid as start_user,\
+#                     agg_cost as cost_for_user,\
+#                     total_cost,\
+#                     name,\
+#                     results.end_vid,\
+#                     x1 as longtitude,\
+#                     y1 as latitude,\
+#                     ST_X(way) as restaurant_x,\
+#                     ST_Y(way) as restaurant_y\
+#                 from\
+#                     results\
+#                     inner join\
+#                     best_places\
+#                     on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
+
+#         results = pd.read_sql("with results as (\
+#                     select \
+#                         results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1\
+#                     from\
+#                             ((SELECT \
+#                                 *				 \
+#                             FROM pgr_dijkstra(\
+#                             'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',\
+#                             "+user_array+",\
+#                             ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants_2)))\
+#                         as results\
+#                     join singapore_restaurants_2\
+#                         on results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) as results\
+#                     join\
+#                         osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id\
+#                 ), best_places as (\
+#                     select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality("+user_array+")\
+#                 )\
+# \
+#                 select \
+#                     path_seq,\
+#                     results.start_vid as start_user,\
+#                     agg_cost as cost_for_user,\
+#                     total_cost,\
+#                     name,\
+#                     results.end_vid,\
+#                     x1 as longtitude,\
+#                     y1 as latitude,\
+#                     ST_X(way) as restaurant_x,\
+#                     ST_Y(way) as restaurant_y\
+#                 from\
+#                     results\
+#                     inner join\
+#                     best_places\
+#                     on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
 
         print('Perform optimisation -', time.time() - section_start_time)
         section_start_time = time.time()
