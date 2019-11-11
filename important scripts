@@ -364,7 +364,7 @@ with results as (
 			FROM pgr_dijkstra(
 			'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',
 			ARRAY[425482381, 4488019045, 243213958]::bigint[],
-			ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants)))
+			ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants_2)))
 		as results
 	join singapore_restaurants
 		on results.end_vid = singapore_restaurants.nearest_road_neighbour_osm_id) as results
@@ -420,6 +420,76 @@ order by restaurants.way <-> singapore_road_points.way
 limit 1
 62ms
 
+-------------------------------- Using the google maps csv-----------------------
+See python file upload_csv.py
 
+ALTER TABLE singapore_restaurants_2
+ADD COLUMN way geometry(Point, 4326);
+
+
+UPDATE singapore_restaurants_2 ta1 SET way = ST_SetSRID(ST_MakePoint(long, lat), 4326);
+
+
+ALTER TABLE singapore_restaurants_2
+ADD COLUMN nearest_road_neighbour geometry;
+
+ALTER TABLE singapore_restaurants_2
+ADD COLUMN nearest_road_neighbour_osm_id bigint;
+
+UPDATE singapore_restaurants_2 tA1 SET nearest_road_neighbour = 
+(SELECT near_point.the_geom
+FROM singapore_restaurants_2 tA2, 
+LATERAL (SELECT the_geom
+         FROM (select * from osm_nodes) tableB
+         ORDER BY tableB.the_geom <-> tA2.way 
+         LIMIT 1) near_point
+WHERE tA2.place_id = tA1.place_id limit 1);
+
+
+UPDATE singapore_restaurants_2 tA1 SET nearest_road_neighbour_osm_id = 
+(SELECT near_point.osm_target_id
+FROM singapore_restaurants_2 tA2, 
+LATERAL (
+	select way as road_point, osm_target_id from (select * from singapore_road_points) tableB
+	order by ta2.way <-> tableB.way
+	limit 1
+         ) near_point
+WHERE tA2.place_id = tA1.place_id limit 1);
+
+#-----------------------For bus routes--------------------------------
+UPDATE bus_routes_locations tA1 SET osm_source_id = 
+(SELECT near_point.osm_target_id
+FROM bus_routes_locations tA2, 
+LATERAL (
+	select way as road_point, osm_target_id from (select * from singapore_road_points) tableB
+	order by ta2.way1 <-> tableB.way
+	limit 1
+         ) near_point
+WHERE tA2.index = tA1.index limit 1);
+
+UPDATE bus_routes_locations SET reverse_cost = 1000000 where 1=1
+
+------------------------------------ Running Server Backup -------------------------------------
+pg_dump -U postgres -Fc -n public -t osm_2po_4pgr -t singapore_restaurants_2 gisdb > C:\Users\Philip\Desktop\backup.bak
+
+
+PGUSER=postgres PGPASSWORD=housepotato heroku pg:pull DATABASE_URL mylocaldb -a meetup-mouse
 -----------------------------------Google Maps linking-----------------------------------
 https://www.google.com/maps/dir/?api=1&destination=47.5951518,-122.3316393
+
+-----------------------------------------Combining the mrt, bus and walking maps------------------
+#Create the table
+CREATE TABLE public_edges (id SERIAL, source bigint, target bigint, cost double precision, reverse_cost double precision, x1 double precision, y1 double precision,x2 double precision,y2 double precision, PRIMARY KEY(id));
+
+#For walking routes
+insert into public_edges (source,target,cost,reverse_cost,x1,y1,x2,y2)
+SELECT  osm_source_id as source, osm_target_id as target, cost*kmh/5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2 FROM osm_2po_4pgr where clazz!=11
+
+
+#For bus routes
+insert into public_edges (source,target,cost,reverse_cost,x1,y1,x2,y2)
+SELECT osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y1,x2,y2 FROM bus_routes_locations
+
+#For mrt routes
+insert into public_edges (source,target,cost,reverse_cost,x1,y1,x2,y2)
+SELECT osm_source_id as source, osm_target_id as target, "Time" as cost, "Time" as reverse_cost, "Longitude_Start" as x1,"Latitude_Start" as y1,"Longitude_End" as x2,"Latitude_End" as y2 FROM mrt_map_edges

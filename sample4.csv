@@ -1,0 +1,8 @@
+﻿UPDATE singapore_restaurants_2 tA1 SET nearest_road_neighbour = 
+(SELECT near_point.the_geom
+FROM singapore_restaurants_2 tA2, 
+LATERAL (SELECT the_geom
+         FROM (select * from osm_nodes) tableB
+         ORDER BY tableB.the_geom <-> tA2.way 
+         LIMIT 1) near_point
+WHERE tA2.place_id = tA1.place_id limit 1);
