@@ -10,7 +10,7 @@
 - Stephen Alvin 😁
 - Julia Chua 🤣
 - Veda Alexandra 😉
-- Joel Yang 🤗
+- Joel Ng 🤗
 
 # Problem Statement
 
