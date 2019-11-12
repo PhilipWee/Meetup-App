@@ -470,7 +470,7 @@ WHERE tA2.index = tA1.index limit 1);
 UPDATE bus_routes_locations SET reverse_cost = 1000000 where 1=1
 
 ------------------------------------ Running Server Backup -------------------------------------
-pg_dump -U postgres -Fc -n public -t osm_2po_4pgr -t singapore_restaurants_2 gisdb > C:\Users\Philip\Desktop\backup.bak
+pg_dump -U postgres -Fc -n public -t osm_2po_4pgr -t singapore_restaurants_2 -t outing_data gisdb > C:\Users\Philip\Desktop\backup.bak
 
 
 PGUSER=postgres PGPASSWORD=housepotato heroku pg:pull DATABASE_URL mylocaldb -a meetup-mouse
