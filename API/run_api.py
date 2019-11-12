@@ -50,7 +50,6 @@ API important links explanation:
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/')
 def index():
     return('Main Site Goes Here')
 
@@ -59,6 +58,10 @@ def get_details(session_id):
     if request.method == "GET":
         return render_template(session_id = session_id,'Geoloc2.html')
     
+@app.route('/session/<session_id>/results_display')
+def results_display(session_id):
+    if request.method == "GET":
+        return render_template('Geoloc.html')    
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
@@ -79,6 +82,13 @@ def create_session():
         meeting_type = content.get('meeting_type')
     else:
         meeting_type = "food"
+
+
+    if exists != None:
+        # return jsonify({'warning':'session already exists','session_id':123456})
+        return jsonify({'session_id':123456})
+
+    #Extract the post json details
 
 
     ###OAUTH REQUIRED HERE, ONLY REGISTERED USERS CAN MAKE SESSION
