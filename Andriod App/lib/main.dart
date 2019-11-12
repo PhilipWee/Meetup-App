@@ -11,13 +11,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
 
 String globalurl(){
-  String serverAddress = "http://192.168.194.228:5000";
+  String serverAddress = "http://192.168.194.178:5000";
   // String serverAddress = "http://169.254.158.154:5000";
   return serverAddress;
 }
 
 void main() => runApp(MyApp());
-
 
 class PrefData {
   String username;
@@ -28,7 +27,7 @@ class PrefData {
   String transportMode;
   int speed;
   int quality;
-  int sessionid;
+  String sessionid;
   PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid});
 }
 
@@ -165,7 +164,7 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
   static String name;
-  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: 0);
+  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '123456');
   final textController  = TextEditingController();
 
   saveLocation() async{
@@ -479,8 +478,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     }
 
     catch(e){print("Session Create Failed with Error: $e");}
-    
-
     }
 
 //  String value1 = "Select...";
@@ -727,6 +724,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
   ShareLinkState({this.data});
 
   Future<List<dynamic>> getMembers() async {
+
     int sessID = data.sessionid;
     String address = globalurl();
 
