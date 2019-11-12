@@ -493,3 +493,6 @@ SELECT osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y
 #For mrt routes
 insert into public_edges (source,target,cost,reverse_cost,x1,y1,x2,y2)
 SELECT osm_source_id as source, osm_target_id as target, "Time" as cost, "Time" as reverse_cost, "Longitude_Start" as x1,"Latitude_Start" as y1,"Longitude_End" as x2,"Latitude_End" as y2 FROM mrt_map_edges
+
+# --------------------------RUNNING THE DOCKER POSTGRES------------------------------
+sudo docker run --name postgres -p 5432:5432 -v $HOME/Desktop/Meetup-Data/postgresdatadir:/var/lib/postgresql/data -d pgrouting/pgrouting:v2.6.3-postgresql_10
