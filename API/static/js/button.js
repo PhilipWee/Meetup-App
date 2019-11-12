@@ -1,3 +1,5 @@
+var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
+
 function getLocation() {
     navigator.geolocation.getCurrentPosition(success, error, options);
     console.log('test')
@@ -39,20 +41,13 @@ function submitButton() {
     function newFunction() {
         $.ajax({
             type: 'POST',
-            url: 'http://192.168.194.228:5000/session/123456',
+            url: host_address_port + '/session/123456',
             data: JSON.stringify(meetupData),
             contentType:'application/json',
             success: function (response_data) {
                 alert("success");
             }          
         })
-<<<<<<< HEAD
-    // var xhttp = new XMLHttpRequest();
-    // xhttp.open("POST", "http://192.168.194.228:5000/session/123456", true);
-    // xhttp.send(result)
-=======
-
->>>>>>> websitetest
     }
 };
 

@@ -56,12 +56,12 @@ def index():
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
     if request.method == "GET":
-        return render_template(session_id = session_id,'Geoloc2.html')
+        return render_template('Geoloc2.html',session_id = session_id)
     
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     if request.method == "GET":
-        return render_template('Geoloc.html')    
+        return render_template('Geoloc.html',session_id = session_id)    
 
 @app.route('/session/create', methods=['POST'])
 def create_session():

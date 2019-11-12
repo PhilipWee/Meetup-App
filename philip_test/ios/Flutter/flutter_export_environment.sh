@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
 export "FLUTTER_ROOT=D:\Flutter\flutter"
-export "FLUTTER_APPLICATION_PATH=D:\Documents\UROP WITH FRIENDS\Meetup App\maps_test"
+export "FLUTTER_APPLICATION_PATH=D:\Documents\UROP WITH FRIENDS\Meetup App\philip_test"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "SYMROOT=${SOURCE_ROOT}/../build\ios"
