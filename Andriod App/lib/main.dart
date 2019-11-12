@@ -11,6 +11,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 
+class Constants {
+  static const String CONNECTION_URL="http://192.168.194.178:5000";
+}
 
 class PrefData {
   String username;
@@ -21,7 +24,7 @@ class PrefData {
   String transportMode;
   int speed;
   int quality;
-  int sessionid;
+  String sessionid;
   PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid});
 }
 
@@ -39,7 +42,7 @@ class MyApp extends StatelessWidget {
 }
 
   refreshServer() async {
-    http.Response response = await http.get('http://192.168.194.228:5000/refresh');
+    http.Response response = await http.get(Constants.CONNECTION_URL + '/refresh');
     int statusCode = response.statusCode;
     String body = response.body;
     print("SERVER REFRESHED WITH STATUSCODE: $statusCode");
@@ -112,7 +115,7 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
   static String name;
-  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: 0);
+  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '123456');
   final textController  = TextEditingController();
 
   saveLocation() async{
@@ -344,7 +347,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
-    String url = 'http://192.168.194.228:5000/session/create';
+    String url = Constants.CONNECTION_URL + '/session/create';
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
     print("jsonpackage $jsonpackage");
     http.Response response = await http.post(url, headers:headers, body:jsonpackage);
@@ -354,6 +357,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     String body = response.body;
     print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
     print("SERVER SAYS: $body");
+    print('11111111111111111111111111111111111111111111111');
 
     //decode the string-map
     Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
@@ -361,7 +365,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     print("Transport Mode:$transportmode");
     print("Quality:$quality");
     print("Speed:$speed");
-    data.link = "http://192.168.194.228:5000/session/$sessionid/get_details";
+    //Save the session ID to pass to the next function
+    data.sessionid = sessionid;
+    data.link = Constants.CONNECTION_URL + "/session/$sessionid/get_details";
 
     String tempvar = data.link;
     print('Link Created--> $tempvar'); 
@@ -613,9 +619,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
   ShareLinkState({this.data});
 
   Future<List<dynamic>> getMembers() async {
-    int sessID = data.sessionid;
+    String sessID = data.sessionid;
     // http.Response response = await http.get('http://192.168.194.228:5000/session/$sessID');
-    http.Response response = await http.get('http://192.168.194.228:5000/session/123456');
+    http.Response response = await http.get(Constants.CONNECTION_URL + '/session/$sessID');
     int statusCode = response.statusCode;
     String body = response.body;
     print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
@@ -627,6 +633,8 @@ class ShareLinkState extends State<ShareLinkWidget> {
     //extract the list of user detail maps into a list
     List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
     Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
+    print('22222222222222222222222222222222222222');
+    print(memberDatajsonVersion);
     for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
       print(mapcontent);
       if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){

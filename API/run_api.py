@@ -10,6 +10,8 @@ import credentials as creds
 import pandas.io.sql as psql
 import json
 import time
+import uuid
+import datetime
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS------------------------------------------
@@ -55,23 +57,22 @@ def index():
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
     if request.method == "GET":
-        return render_template('Geoloc2.html')
+        return render_template(session_id = session_id,'Geoloc2.html')
     
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
     #Here we create the session
-
-    
-
-    ###Get session details from OAUTH
-    username = 'username'
+    content = request.get_json()
+    if content.get('username') is not None:
+        username = content.get('username')
+    else:
+        username = "username"
 
     #Check that a session for the user does not already exist
     crsr = conn.cursor()
     crsr.execute("SELECT username FROM sessions WHERE username = (%s) LIMIT 1;",(username,))
     exists = crsr.fetchone()
-    content = request.get_json()
 
     #Set the meeting type
     if content.get('meeting_type') is not None:
@@ -79,11 +80,6 @@ def create_session():
     else:
         meeting_type = "food"
 
-    if exists != None:
-        return jsonify({'warning':'session already exists'})
-
-    #Extract the post json details
-    
 
     ###OAUTH REQUIRED HERE, ONLY REGISTERED USERS CAN MAKE SESSION
 
@@ -91,7 +87,7 @@ def create_session():
 
     #After checks, allow the creation of a session
     ###Generate Random Session ID:
-    session_id = '123456'
+    session_id = str(uuid.uuid1())
 
     
 
@@ -103,7 +99,8 @@ def create_session():
                         'metrics':{
                             'speed':int(content.get('speed',5)),
                             'quality':int(content.get('quality',5))
-                        }}
+                        },
+                        'time_created':str(datetime.datetime.now())}
 
     details = {'users':[host_user_details],'meeting_type':meeting_type}
     json_details = json.dumps(details)
@@ -120,7 +117,6 @@ def create_session():
 @app.route('/session/<session_id>', methods=['POST','GET'])
 def manage_details(session_id):
     if request.method == 'POST':
-        print('help la')
         ###Ensure that we have not yet received a message from this ip
         identifier = 'identifier'
 
@@ -161,14 +157,11 @@ def manage_details(session_id):
             return jsonify({'error':'The specified session id does not yet exist'})
 
     elif request.method == 'GET':
-        ###Check the OAuth details
-
-        ###Extract the username
-        username = 'username'
+        print(session_id)
 
         #Get all the meetup details and return it to the user
         crsr = conn.cursor()
-        crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
+        crsr.execute("SELECT info FROM sessions WHERE session_id = '{}'".format(session_id))
         info = crsr.fetchone()
         if info != None:
             return jsonify(info[0])
@@ -179,14 +172,11 @@ def manage_details(session_id):
 def calculate(session_id):
     ###Check the OAuth details
 
-    ###Extract the username
-    username = 'username'
-
     #Get all the meetup details\
     section_start_time = time.time()
 
     crsr = conn.cursor()
-    crsr.execute("SELECT info FROM sessions WHERE session_id = %s and username = %s",(session_id,username))
+    crsr.execute("SELECT info FROM sessions WHERE session_id = '{}'".format(session_id))
     info = crsr.fetchone()
     if info != None:
         ###Calculate the best route for each person and return it
@@ -216,6 +206,7 @@ def calculate(session_id):
         print('Get User Closest Node -', time.time() - section_start_time)
         section_start_time = time.time()
 
+        #Get the driving results
         results = pd.read_sql("with results as (\
                     select \
                         results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1\
