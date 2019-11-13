@@ -1,4 +1,6 @@
 var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
+//Get the session id from the pathname
+var session_id = window.location.pathname.split('/')[2]
 
 function getLocation() {
     navigator.geolocation.getCurrentPosition(success, error, options);
@@ -32,16 +34,18 @@ var options = {
 
 
 function submitButton() {
-    var latituder = document.getElementById('lat').value;
-    var longituder = document.getElementById('lng').value;
     meetupForm = $('#meetupData')
     meetupData = meetupForm.serializeArray()
     console.log(meetupData)
-    newFunction(); //form submission
+    if (meetupData[0]['value'] == '') {
+        alert("Please drag the map to select your location!")
+    } else {
+        newFunction(); //form submission
+    }
     function newFunction() {
         $.ajax({
             type: 'POST',
-            url: host_address_port + '/session/123456',
+            url: host_address_port + '/session/' + session_id,
             data: JSON.stringify(meetupData),
             contentType:'application/json',
             success: function (response_data) {

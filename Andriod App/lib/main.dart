@@ -725,7 +725,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
   Future<List<dynamic>> getMembers() async {
 
-    int sessID = data.sessionid;
+    String sessID = data.sessionid;
     String address = globalurl();
 
     try{
@@ -978,7 +978,7 @@ class MapSampleState extends State<MapSample> {
 
   //Create the get request function
   Future<Map<String, dynamic>> _getCalculate() async {
-    int id = data.sessionid;
+    String id = data.sessionid;
     String address = globalurl();
     // final result = await http.get("$address/session/$id/calculate");
     final result = await http.get("$address/session/123456/calculate");

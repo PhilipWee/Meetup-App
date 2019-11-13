@@ -133,8 +133,12 @@ def manage_details(session_id):
         #Get the content of the POST
         content_unparsed = request.get_json()
         # print(content_unparsed)
-        
-        content = content_unparsed
+        if isinstance(content_unparsed,list):
+            content = {}
+            for dic in content_unparsed:
+                content[dic['name']] = dic['value']
+        else:
+            content = content_unparsed
 
 
 
@@ -392,9 +396,13 @@ def results(session_id):
     results = crsr.fetchone()
     results = results[0]
     ### Check if the user is authorised to see the data
+    if results is None:
+        return jsonify({'info': 'session exists but calculation not done'})
+    else:
+        #return the results
+        return jsonify(results)
 
-    #return the results
-    return jsonify(results)
+    
 
 
 
