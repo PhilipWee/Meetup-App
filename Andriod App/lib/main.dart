@@ -164,7 +164,7 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
   static String name;
-  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '123456');
+  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
   final textController  = TextEditingController();
 
   saveLocation() async{
@@ -458,7 +458,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
       else{
 
-        String body = response.body; //store returned string-map "{sessionid: 123456}"" into String body
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
         print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
         print("SERVER ara ara SAYS: $body");
 
@@ -469,6 +469,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         print("Quality:$quality");
         print("Speed:$speed");
         data.link = "$address/session/$sessionid/get_details";
+        data.sessionid = sessionid;
 
         String tempvar = data.link;
         print('Link Created--> $tempvar'); 
@@ -730,7 +731,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
     try{
 
-      http.Response response = await http.get('$address/session/123456');
+      http.Response response = await http.get('$address/session/$sessID');
       // http.Response response = await http.get('$address/session/$sessID'); //use this when session id can be generated
       int statusCode = response.statusCode;
       String body = response.body;
@@ -981,7 +982,7 @@ class MapSampleState extends State<MapSample> {
     String id = data.sessionid;
     String address = globalurl();
     // final result = await http.get("$address/session/$id/calculate");
-    final result = await http.get("$address/session/123456/calculate");
+    final result = await http.get("$address/session/$id/calculate");
     if (result.statusCode != 200 || result.statusCode != 302) {
       Map<String, dynamic> results = jsonDecode(result.body);
       print(results);

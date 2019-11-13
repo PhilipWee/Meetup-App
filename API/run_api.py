@@ -72,21 +72,11 @@ def create_session():
     else:
         username = "username"
 
-    #Check that a session for the user does not already exist
-    crsr = conn.cursor()
-    crsr.execute("SELECT username FROM sessions WHERE username = (%s) LIMIT 1;",(username,))
-    exists = crsr.fetchone()
-
     #Set the meeting type
     if content.get('meeting_type') is not None:
         meeting_type = content.get('meeting_type')
     else:
         meeting_type = "food"
-
-
-    if exists != None:
-        # return jsonify({'warning':'session already exists','session_id':123456})
-        return jsonify({'session_id':123456})
 
     #Extract the post json details
 
@@ -135,6 +125,7 @@ def manage_details(session_id):
         # print(content_unparsed)
         if isinstance(content_unparsed,list):
             content = {}
+            print(content_unparsed)
             for dic in content_unparsed:
                 content[dic['name']] = dic['value']
         else:

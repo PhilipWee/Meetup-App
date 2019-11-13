@@ -8,8 +8,8 @@ function initMap() {
     });
     map.addListener('center_changed', function () {
         lat = map.getCenter().lat();
-        lng = map.getCenter().lng();
+        long = map.getCenter().lng();
         $("#lat").val(lat);
-        $("#lng").val(lng);
+        $("#long").val(long);
     });
 }

@@ -11,9 +11,9 @@ function getLocation() {
 function success(pos) {
     var crd = pos.coords;
     lat = crd.latitude;
-    lng = crd.longitude;
+    long = crd.longitude;
     $('#lat').val(lat);
-    $('#lng').val(lng);
+    $('#long').val(long);
     LatLng = new google.maps.LatLng(crd.latitude, crd.longitude);
     map.setCenter(LatLng);
 };
