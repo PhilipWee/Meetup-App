@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -334,8 +336,8 @@ class MeetingType extends StatelessWidget {
     "Meeting",
     ];
   final List<String> custImgs = [
-    "images/food.jpg",
     "images/outing.jpg",
+    "images/food.jpg",
     "images/meetingButton.jpg",
     ];
 
@@ -452,7 +454,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
             SnackBar(
-              content: Text("Oops! Server Error 404!"),
+              content: Text("Oops! Server Error 404 on SessionIDPost!"),
               duration: Duration(seconds: 2),
             ));
       }
@@ -741,7 +743,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
             SnackBar(
-              content: Text("Oops! Server Error 404"),
+              content: Text("Oops! Server Error 404 on GetMembers!"),
               duration: Duration(seconds: 2),
             ));
       }
@@ -755,10 +757,11 @@ class ShareLinkState extends State<ShareLinkWidget> {
         //extract the list of user detail maps into a list
         List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
         Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
+        print("PlaceNameMap-> $placeNameMap");
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
           print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
-            List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
+            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
           }
           else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
@@ -873,6 +876,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
                       title: Text(data.username),
                       subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
                       trailing: Text(myMap["username"].toString())
+                      // trailing: Text()
                     );
                   }
                   return ListTile(
@@ -985,6 +989,7 @@ class MapSampleState extends State<MapSample> {
     // final result = await http.get("$address/session/$id/calculate");
     final result = await http.get("$address/session/$id/calculate");
     if (result.statusCode != 200 || result.statusCode != 302) {
+      print("result -> ${result.body} ");
       Map<String, dynamic> results = jsonDecode(result.body);
       print(results);
       print(results['possible_locations']);
