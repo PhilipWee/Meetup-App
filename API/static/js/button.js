@@ -36,8 +36,7 @@ var options = {
 function submitButton() {
     meetupForm = $('#meetupData')
     meetupData = meetupForm.serializeArray()
-    console.log(meetupData)
-    if (meetupData[0]['value'] == '') {
+    if ($('#lat').val() == '') {
         alert("Please drag the map to select your location!")
     } else {
         newFunction(); //form submission
