@@ -11,8 +11,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
 
 String globalurl(){
-  String serverAddress = "http://192.168.194.178:5000";
+  // String serverAddress = "http://192.168.194.178:5000";
   // String serverAddress = "http://169.254.158.154:5000";
+  String serverAddress = "http://192.168.194.228:5000";
   return serverAddress;
 }
 
