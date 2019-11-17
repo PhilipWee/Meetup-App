@@ -1,5 +1,4 @@
-import 'dart:ffi';
-
+// import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,8 +8,10 @@ import 'dart:convert';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart' as prefix0;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
+// import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 String globalurl(){
   // String serverAddress = "http://192.168.194.178:5000";
@@ -494,51 +495,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     return Scaffold(
       body: ListView(
           children: [
-//            Row(
-//              mainAxisAlignment: MainAxisAlignment.spaceAround,
-//              mainAxisSize: MainAxisSize.max,
-//              children: <Widget>[
-//                Container(
-//                  width: 180,
-//                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-//                  child: Row(
-//                    children: <Widget>[
-//                      Icon(Icons.fastfood, color: Colors.black),
-//                      Padding(
-//                        padding: const EdgeInsets.all(8.0),
-//                        child: Text("Activities", style: TextStyle(
-//                            color: Colors.black,
-//                            fontWeight: FontWeight.bold,
-//                            fontSize: 20.0
-//                        ),),
-//                      ),
-//                    ],
-//                  ),
-//                ),
-//                Expanded(
-//                  child: Container(
-//                    child: DropdownButtonHideUnderline(
-//                      child: DropdownButton<String>(
-//                        value: value1,
-//                        onChanged: (String newValue) {
-//                          setState(() {
-//                            value1 = newValue;
-//                            data.activityType = newValue; //ADD TO DATABASE
-//                          });
-//                        },
-//                        items: <String>["Select...", "Lunch/Dinner", "Recreation", "Study"].map<DropdownMenuItem<String>>((String value) {
-//                          return DropdownMenuItem<String>(
-//                            value: value,
-//                            child: Text(value),
-//                          );
-//                        }).toList(),
-//                      ),
-//                    ),
-//                  ) ,
-//                )
-//              ],
-//            ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
@@ -723,11 +679,15 @@ class ShareLinkWidget extends StatefulWidget {
   ShareLinkState createState() => ShareLinkState(data: data);
 }
 
+
+
 class ShareLinkState extends State<ShareLinkWidget> {
   final PrefData data;
   ShareLinkState({this.data});
 
   Future<List<dynamic>> getMembers() async {
+
+    await Future.delayed(Duration(milliseconds: 300));
 
     String sessID = data.sessionid;
     String address = globalurl();
@@ -758,8 +718,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
         List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
         Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
         print("PlaceNameMap-> $placeNameMap");
+        
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
-          print(mapcontent);
+          // print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
             List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
@@ -851,7 +812,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
         future:
         getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
-          print(snapshot);
+          print("THIS IS THE SNAPSHOT: $snapshot");
           if(snapshot.data == null){
             return 
             Expanded(
