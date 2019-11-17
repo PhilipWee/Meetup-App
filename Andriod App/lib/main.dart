@@ -1,3 +1,4 @@
+// import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -334,8 +335,8 @@ class MeetingType extends StatelessWidget {
     "Meeting",
     ];
   final List<String> custImgs = [
-    "images/food.jpg",
     "images/outing.jpg",
+    "images/food.jpg",
     "images/meetingButton.jpg",
     ];
 
@@ -452,7 +453,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
             SnackBar(
-              content: Text("Oops! Server Error 404!"),
+              content: Text("Oops! Server Error 404 on SessionIDPost!"),
               duration: Duration(seconds: 2),
             ));
       }
@@ -492,51 +493,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     return Scaffold(
       body: ListView(
           children: [
-//            Row(
-//              mainAxisAlignment: MainAxisAlignment.spaceAround,
-//              mainAxisSize: MainAxisSize.max,
-//              children: <Widget>[
-//                Container(
-//                  width: 180,
-//                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-//                  child: Row(
-//                    children: <Widget>[
-//                      Icon(Icons.fastfood, color: Colors.black),
-//                      Padding(
-//                        padding: const EdgeInsets.all(8.0),
-//                        child: Text("Activities", style: TextStyle(
-//                            color: Colors.black,
-//                            fontWeight: FontWeight.bold,
-//                            fontSize: 20.0
-//                        ),),
-//                      ),
-//                    ],
-//                  ),
-//                ),
-//                Expanded(
-//                  child: Container(
-//                    child: DropdownButtonHideUnderline(
-//                      child: DropdownButton<String>(
-//                        value: value1,
-//                        onChanged: (String newValue) {
-//                          setState(() {
-//                            value1 = newValue;
-//                            data.activityType = newValue; //ADD TO DATABASE
-//                          });
-//                        },
-//                        items: <String>["Select...", "Lunch/Dinner", "Recreation", "Study"].map<DropdownMenuItem<String>>((String value) {
-//                          return DropdownMenuItem<String>(
-//                            value: value,
-//                            child: Text(value),
-//                          );
-//                        }).toList(),
-//                      ),
-//                    ),
-//                  ) ,
-//                )
-//              ],
-//            ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
@@ -680,7 +636,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         ),
       bottomNavigationBar: BottomAppBar(
         child: FlatButton(
-            child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text('Confirm ', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
               sessionIdPost();                                                   //POST DATABASE TO SERVER
               if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
@@ -721,11 +677,15 @@ class ShareLinkWidget extends StatefulWidget {
   ShareLinkState createState() => ShareLinkState(data: data);
 }
 
+
+
 class ShareLinkState extends State<ShareLinkWidget> {
   final PrefData data;
   ShareLinkState({this.data});
 
   Future<List<dynamic>> getMembers() async {
+
+    await Future.delayed(Duration(milliseconds: 300));
 
     String sessID = data.sessionid;
     String address = globalurl();
@@ -741,7 +701,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
             SnackBar(
-              content: Text("Oops! Server Error 404"),
+              content: Text("Oops! Server Error 404 on GetMembers!"),
               duration: Duration(seconds: 2),
             ));
       }
@@ -755,10 +715,12 @@ class ShareLinkState extends State<ShareLinkWidget> {
         //extract the list of user detail maps into a list
         List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
         Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
+        print("PlaceNameMap-> $placeNameMap");
+        
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
-          print(mapcontent);
+          // print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
-            List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
+            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
           }
           else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
@@ -848,7 +810,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
         future:
         getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
-          print(snapshot);
+          print("THIS IS THE SNAPSHOT: $snapshot");
           if(snapshot.data == null){
             return 
             Expanded(
@@ -873,6 +835,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
                       title: Text(data.username),
                       subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
                       trailing: Text(myMap["username"].toString())
+                      // trailing: Text()
                     );
                   }
                   return ListTile(
@@ -984,18 +947,24 @@ class MapSampleState extends State<MapSample> {
     String address = globalurl();
     // final result = await http.get("$address/session/$id/calculate");
     final result = await http.get("$address/session/$id/calculate");
-    if (result.statusCode != 200 || result.statusCode != 302) {
-      Map<String, dynamic> results = jsonDecode(result.body);
-      print(results);
-      print(results['possible_locations']);
-      return results;
-    } else {
-      // throw ("Error getting results with statusCode " + result.statusCode.toString());
-      Map<String, dynamic> results = jsonDecode(result.body);
-      print(results);
-      print(results['possible_locations']);
-      return results;
-    }
+    print("RESULT: $result");
+    Map<String, dynamic> results = jsonDecode(result.body);
+    print("RESULTS: $results");
+    print(results['possible_locations']);
+    return results;
+    // if (result.statusCode != 200 || result.statusCode != 302) {
+    //   print("result -> ${result.body} ");
+    //   Map<String, dynamic> results = jsonDecode(result.body);
+    //   print(results);
+    //   print(results['possible_locations']);
+    //   return results;
+    // } else {
+    //   // throw ("Error getting results with statusCode " + result.statusCode.toString());
+    //   Map<String, dynamic> results = jsonDecode(result.body);
+    //   print(results);
+    //   print(results['possible_locations']);
+    //   return results;
+    // }
   }
 
   static final CameraPosition _kSingapore = CameraPosition(
@@ -1118,6 +1087,7 @@ class MapSampleState extends State<MapSample> {
         },
         child: ListTile(
           title: Text(locationName.toString())
+          // title: Text("昇❤ใจ는င္ကာحم)")
         )
       )
      
@@ -1137,7 +1107,7 @@ class MapSampleState extends State<MapSample> {
               },
             );
           } else if (snapshot.hasError) {
-            return Text("Error");
+            return Text("ERROR");
           } else {
             return CircularProgressIndicator();
           }
