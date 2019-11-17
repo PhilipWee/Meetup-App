@@ -8,10 +8,8 @@ import 'dart:convert';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart' as prefix0;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
-// import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 String globalurl(){
   // String serverAddress = "http://192.168.194.178:5000";
