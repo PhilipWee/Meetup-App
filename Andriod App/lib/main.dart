@@ -636,7 +636,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         ),
       bottomNavigationBar: BottomAppBar(
         child: FlatButton(
-            child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text('Confirm ', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
               sessionIdPost();                                                   //POST DATABASE TO SERVER
               if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
@@ -947,19 +947,24 @@ class MapSampleState extends State<MapSample> {
     String address = globalurl();
     // final result = await http.get("$address/session/$id/calculate");
     final result = await http.get("$address/session/$id/calculate");
-    if (result.statusCode != 200 || result.statusCode != 302) {
-      print("result -> ${result.body} ");
-      Map<String, dynamic> results = jsonDecode(result.body);
-      print(results);
-      print(results['possible_locations']);
-      return results;
-    } else {
-      // throw ("Error getting results with statusCode " + result.statusCode.toString());
-      Map<String, dynamic> results = jsonDecode(result.body);
-      print(results);
-      print(results['possible_locations']);
-      return results;
-    }
+    print("RESULT: $result");
+    Map<String, dynamic> results = jsonDecode(result.body);
+    print("RESULTS: $results");
+    print(results['possible_locations']);
+    return results;
+    // if (result.statusCode != 200 || result.statusCode != 302) {
+    //   print("result -> ${result.body} ");
+    //   Map<String, dynamic> results = jsonDecode(result.body);
+    //   print(results);
+    //   print(results['possible_locations']);
+    //   return results;
+    // } else {
+    //   // throw ("Error getting results with statusCode " + result.statusCode.toString());
+    //   Map<String, dynamic> results = jsonDecode(result.body);
+    //   print(results);
+    //   print(results['possible_locations']);
+    //   return results;
+    // }
   }
 
   static final CameraPosition _kSingapore = CameraPosition(
@@ -1082,6 +1087,7 @@ class MapSampleState extends State<MapSample> {
         },
         child: ListTile(
           title: Text(locationName.toString())
+          // title: Text("昇❤ใจ는င္ကာحم)")
         )
       )
      
@@ -1101,7 +1107,7 @@ class MapSampleState extends State<MapSample> {
               },
             );
           } else if (snapshot.hasError) {
-            return Text("Error");
+            return Text("ERROR");
           } else {
             return CircularProgressIndicator();
           }
