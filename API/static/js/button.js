@@ -2,11 +2,11 @@ var host_address_port = location.protocol+'//'+location.hostname+(location.port 
 //Get the session id from the pathname
 var session_id = window.location.pathname.split('/')[2]
 
-function getLocation() {
+
     navigator.geolocation.getCurrentPosition(success, error, options);
     console.log('test')
     
-};
+
 
 function success(pos) {
     var crd = pos.coords;
@@ -18,7 +18,7 @@ function success(pos) {
     map.setCenter(LatLng);
 };
 
-document.getElementById ("getlocation").addEventListener ("click", getLocation);
+
 
 
 
@@ -39,7 +39,7 @@ function submitButton() {
     if ($('#lat').val() == '') {
         alert("Please drag the map to select your location!")
     } else {
-        newFunction(); //form submission
+        newFunction();
     }
     function newFunction() {
         $.ajax({
@@ -48,19 +48,18 @@ function submitButton() {
             data: JSON.stringify(meetupData),
             contentType:'application/json',
             success: function (response_data) {
-                alert("success");
+                console.log("running redirect")
+    window.location.href='results_display' //form submission
             }          
         })
+        
     }
-};
 
-document.getElementById ("submitbutton").addEventListener ("click", submitButton);
 
-function redirect() {
-    console.log("running redirect")
-    window.location.href='results_display'
+
+
+
   };
   
+  document.getElementById ("submitbutton").addEventListener ("click", submitButton);
   
-  
-  document.getElementById ("redirect").addEventListener ("click", redirect)
