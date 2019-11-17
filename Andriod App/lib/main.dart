@@ -10,6 +10,8 @@ import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
+//import 'package:flutter_spinkit/flutter_spinkit.dart';
+
 
 String globalurl(){
   // String serverAddress = "http://192.168.194.178:5000";
@@ -497,24 +499,27 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Container(
-                  width: 180,
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.directions_car, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Transport", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.directions_car, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Transport", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0
+                          ),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: Container(
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -541,24 +546,27 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Container(
-                  width: 180,
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.timer, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Speed", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.timer, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Speed", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0
+                          ),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: Container(
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -588,24 +596,27 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Container(
-                  width: 180,
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.star, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Ratings", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Ratings", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0
+                          ),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: Container(
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
