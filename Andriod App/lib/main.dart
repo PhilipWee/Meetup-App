@@ -10,7 +10,7 @@ import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
-//import 'FlutterScreens-master/lib/loaders/color_loader.dart';
+import 'color_loader.dart';
 
 String globalurl(){
   // String serverAddress = "http://192.168.194.178:5000";
@@ -1102,7 +1102,14 @@ class MapSampleState extends State<MapSample> {
       )
      
     );
-    
+
+    List<Color> colorsForLoad = [
+      Colors.red,
+      Colors.green,
+      Colors.indigo,
+      Colors.pinkAccent,
+      Colors.blue
+    ];
 
     return FutureBuilder<Map<String,dynamic>>(
         future: _getCalculate(),
@@ -1120,7 +1127,7 @@ class MapSampleState extends State<MapSample> {
           } else if (snapshot.hasError) {
             return Text("ERROR");
           } else {
-            return CircularProgressIndicator();
+            return ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200));
           }
         }
       );
