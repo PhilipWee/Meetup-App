@@ -10,8 +10,7 @@ import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
-//import 'package:flutter_spinkit/flutter_spinkit.dart';
-
+//import 'FlutterScreens-master/lib/loaders/color_loader.dart';
 
 String globalurl(){
   // String serverAddress = "http://192.168.194.178:5000";
@@ -1103,6 +1102,7 @@ class MapSampleState extends State<MapSample> {
       )
      
     );
+    
 
     return FutureBuilder<Map<String,dynamic>>(
         future: _getCalculate(),
@@ -1155,8 +1155,7 @@ class MapSampleState extends State<MapSample> {
                 child:Text(_locationName, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold))
               )
             ),
-            ButtonTheme.bar(
-              child: ButtonBar(
+            ButtonBar(
                 children: <Widget>[
                   FlatButton(
                     child: Text("SHOW IN MAPS"),
@@ -1166,7 +1165,6 @@ class MapSampleState extends State<MapSample> {
                   )
                 ],
               )
-            )
           ],
         )
       ),
