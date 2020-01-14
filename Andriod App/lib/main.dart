@@ -197,7 +197,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           Padding(
             padding: const EdgeInsets.only(left:20.0, right: 20.0, top:20.0, bottom: 20.0),
             child: Image.asset(
-              'images/Mouse copy.png',
+              'images/Mouse_copy.png',
               scale: 3,
             ),
           ),
