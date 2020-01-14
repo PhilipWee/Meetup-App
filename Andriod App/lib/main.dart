@@ -1205,6 +1205,7 @@ class MapSampleState extends State<MapSample> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+        appBar: AppBar(title: Text("Suggested Locations"),),
         body: SafeArea(
           child: Stack(
             children: <Widget>[
