@@ -1,16 +1,4 @@
-#--------------------------------------CONNECT TO FIREBASE-------------------------------
-print('Connecting to firebase')
-if (not len(firebase_admin._apps)):
-    
-    # Use the application default credentials
-    # Use a service account
-    cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    firebase_admin.initialize_app(cred)
-    db = firestore.client()
-else:
-    db = firestore.client()
-print('Connected!')
-#--------------------------------------CONNECT TO FIREBASE-------------------------------
+
 
 #--------------------------------------REQUIREMENTS--------------------------------------
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
@@ -30,6 +18,20 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 #--------------------------------------REQUIREMENTS--------------------------------------
+
+#--------------------------------------CONNECT TO FIREBASE-------------------------------
+print('Connecting to firebase')
+if (not len(firebase_admin._apps)):
+    
+    # Use the application default credentials
+    # Use a service account
+    cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    firebase_admin.initialize_app(cred)
+    db = firestore.client()
+else:
+    db = firestore.client()
+print('Connected!')
+#--------------------------------------CONNECT TO FIREBASE-------------------------------
 
 #--------------------------------------CONNECT TO DATABASE-------------------------------
 # Set up a connection to the postgres server.
