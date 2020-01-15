@@ -402,19 +402,35 @@ if __name__ == '__main__':
 
     #--------------------------------------CONNECT TO DATABASE-------------------------------
     # Set up a connection to the postgres server.
-    print("Connecting to the postgres server")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr = conn.cursor()
-    #Set up a connection to gisdb, the routing database
-    print("Connecting to routing database")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn_gis=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr_gis = conn_gis.cursor()
+    try:
+        print("Connecting to the postgres server")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr = conn.cursor()
+        #Set up a connection to gisdb, the routing database
+        print("Connecting to routing database")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn_gis=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr_gis = conn_gis.cursor()
+    except:
+        creds.PGHOST = 'journey'
+        print("Connecting to the postgres server")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr = conn.cursor()
+        #Set up a connection to gisdb, the routing database
+        print("Connecting to routing database")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn_gis=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr_gis = conn_gis.cursor()
     #--------------------------------------CONNECT TO DATABASE-------------------------------
 
     #Check if the database exists. If not, create it
