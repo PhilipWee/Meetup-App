@@ -2,7 +2,7 @@
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
-import psycopg2
+# import psycopg2
 import sys, os
 import numpy as np
 import pandas as pd
@@ -60,11 +60,11 @@ def index():
 def get_details(session_id):
     if request.method == "GET":
         return render_template('Geoloc2.html',session_id = session_id)
-    
+
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     if request.method == "GET":
-        return render_template('Geoloc.html',session_id = session_id)    
+        return render_template('Geoloc.html',session_id = session_id)
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
@@ -80,11 +80,11 @@ def create_session():
         meeting_type = content.get('meeting_type')
     else:
         meeting_type = "food"
-        
+
     ###OAUTH REQUIRED HERE, ONLY REGISTERED USERS CAN MAKE SESSION
 
     ###Check that the lat and Long are valid
-    
+
     session_id = create_firebase_session(content,meeting_type,username)
 
     return jsonify({'session_id':session_id})
@@ -119,7 +119,7 @@ def manage_details(session_id):
                                 'speed':int(content.get('speed',5)),
                                 'quality':int(content.get('quality',5))
                             }}
-        
+
         #Upload the details of the new user
         insert_user_details(new_user_details,session_id)
         return jsonify({'updated_info_for_session_id':session_id})
@@ -155,7 +155,7 @@ def results(session_id):
     elif result == False:
         return jsonify({'info': 'session exists but calculation not done'})
     elif result == 'Error':
-        return jsonify({'error':'sesson_id or username is wrong'}) 
+        return jsonify({'error':'sesson_id or username is wrong'})
     elif result == 'not_started':
         return jsonify({'info': 'session exists but calculation not started'})
 
@@ -218,7 +218,7 @@ def get_details_for_session_id(session_id):
     except:
         print('Error getting user details, does session id exist?')
         return 'Error'
-    
+
 #Returns session id
 def create_firebase_session(content,meeting_type,username):
     #Consolidate the session details
@@ -234,9 +234,9 @@ def create_firebase_session(content,meeting_type,username):
 
     details = {'users':[host_user_details],'meeting_type':meeting_type}
 
-    
+
     session_id = str(uuid.uuid1())
-    
+
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
     doc_ref.set({'info':details})
@@ -249,7 +249,7 @@ if __name__ == '__main__':
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
     print('Connecting to firebase')
     if (not len(firebase_admin._apps)):
-        
+
         # Use the application default credentials
         # Use a service account
         cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
@@ -260,52 +260,52 @@ if __name__ == '__main__':
     print('Connected!')
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
 
-    #--------------------------------------CONNECT TO DATABASE-------------------------------
-    # Set up a connection to the postgres server.
-    try:
-        print("Connecting to the postgres server")
-        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-        +" password="+ creds.PGPASSWORD
-        conn=psycopg2.connect(conn_string)
-        print("Connected!")
-        crsr = conn.cursor()
-        #Set up a connection to gisdb, the routing database
-        print("Connecting to routing database")
-        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-        +" password="+ creds.PGPASSWORD
-        conn_gis=psycopg2.connect(conn_string)
-        print("Connected!")
-        crsr_gis = conn_gis.cursor()
-    except:
-        creds.PGHOST = 'journey'
-        print("Connecting to the postgres server")
-        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-        +" password="+ creds.PGPASSWORD
-        conn=psycopg2.connect(conn_string)
-        print("Connected!")
-        crsr = conn.cursor()
-        #Set up a connection to gisdb, the routing database
-        print("Connecting to routing database")
-        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-        +" password="+ creds.PGPASSWORD
-        conn_gis=psycopg2.connect(conn_string)
-        print("Connected!")
-        crsr_gis = conn_gis.cursor()
-    #--------------------------------------CONNECT TO DATABASE-------------------------------
-
-    #Check if the database exists. If not, create it
-    current_tables = pd.read_sql("SELECT * FROM information_schema.tables",conn)
-    exists = False
-    for name in current_tables['table_name']:
-        if name == 'sessions':
-            exists = True
-    if not exists:
-        print('sessions do not exist, creating sessions table')
-        crsr.execute('CREATE TABLE sessions (id SERIAL, session_id CHARACTER(255), username CHARACTER(255), info JSONB, results JSONB, PRIMARY KEY(id));')
-        conn.commit()
-        print('Done')
-    else:
-        print('table "sessions" already exist, moving on')
+    # #--------------------------------------CONNECT TO DATABASE-------------------------------
+    # # Set up a connection to the postgres server.
+    # try:
+    #     print("Connecting to the postgres server")
+    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
+    #     +" password="+ creds.PGPASSWORD
+    #     conn=psycopg2.connect(conn_string)
+    #     print("Connected!")
+    #     crsr = conn.cursor()
+    #     #Set up a connection to gisdb, the routing database
+    #     print("Connecting to routing database")
+    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+    #     +" password="+ creds.PGPASSWORD
+    #     conn_gis=psycopg2.connect(conn_string)
+    #     print("Connected!")
+    #     crsr_gis = conn_gis.cursor()
+    # except:
+    #     creds.PGHOST = 'journey'
+    #     print("Connecting to the postgres server")
+    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
+    #     +" password="+ creds.PGPASSWORD
+    #     conn=psycopg2.connect(conn_string)
+    #     print("Connected!")
+    #     crsr = conn.cursor()
+    #     #Set up a connection to gisdb, the routing database
+    #     print("Connecting to routing database")
+    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+    #     +" password="+ creds.PGPASSWORD
+    #     conn_gis=psycopg2.connect(conn_string)
+    #     print("Connected!")
+    #     crsr_gis = conn_gis.cursor()
+    # #--------------------------------------CONNECT TO DATABASE-------------------------------
+    #
+    # #Check if the database exists. If not, create it
+    # current_tables = pd.read_sql("SELECT * FROM information_schema.tables",conn)
+    # exists = False
+    # for name in current_tables['table_name']:
+    #     if name == 'sessions':
+    #         exists = True
+    # if not exists:
+    #     print('sessions do not exist, creating sessions table')
+    #     crsr.execute('CREATE TABLE sessions (id SERIAL, session_id CHARACTER(255), username CHARACTER(255), info JSONB, results JSONB, PRIMARY KEY(id));')
+    #     conn.commit()
+    #     print('Done')
+    # else:
+    #     print('table "sessions" already exist, moving on')
 
     #Run the App
     app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
