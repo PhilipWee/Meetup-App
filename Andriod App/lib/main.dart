@@ -13,9 +13,9 @@ import 'package:connectivity/connectivity.dart';
 import 'color_loader.dart';
 
 String globalurl(){
-  // String serverAddress = "http://192.168.194.178:5000";
-  // String serverAddress = "http://169.254.158.154:5000";
-  String serverAddress = "http://192.168.194.228:5000";
+//   String serverAddress = "http://192.168.194.178:5000";
+//   String serverAddress = "http://169.254.158.154:5000";
+  String serverAddress = "http://ec2-3-16-181-51.us-east-2.compute.amazonaws.com:5000";
   return serverAddress;
 }
 
@@ -71,7 +71,7 @@ class CheckNetworkPage extends StatelessWidget {
                   return Center(child: Text("No Internet Connection!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:
-                  print("yes net");
+                  print("Connected!");
                   return HomeScreen();
                 default:
                   return Center(child: Text("No Internet Connection!"));
@@ -463,7 +463,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
         print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-        print("SERVER ara ara SAYS: $body");
+        print("SERVER SAYS: $body");
 
         //decode the string-map
         Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
@@ -472,10 +472,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         print("Quality:$quality");
         print("Speed:$speed");
         data.link = "$address/session/$sessionid/get_details";
-        data.sessionid = sessionid;
 
+        data.sessionid = sessionid;
         String tempvar = data.link;
-        print('Link Created--> $tempvar'); 
+        print('Link Created--> $tempvar');
         return jsonpackage;
 
       }
@@ -695,8 +695,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
   Future<List<dynamic>> getMembers() async {
 
-    await Future.delayed(Duration(milliseconds: 300));
-
     String sessID = data.sessionid;
     String address = globalurl();
 
@@ -730,7 +728,8 @@ class ShareLinkState extends State<ShareLinkWidget> {
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
           // print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
-            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
+//            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
+            List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
           }
           else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
@@ -817,8 +816,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     Widget listSection = Container(
       child: 
       FutureBuilder(
-        future:
-        getMembers(),
+        future: getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           print("THIS IS THE SNAPSHOT: $snapshot");
           if(snapshot.data == null){
@@ -894,7 +892,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
                   textColor: Colors.black,
                   onPressed: () {
                     Navigator.push(context,MaterialPageRoute(builder: (context) => MapSample(data:data)),);
-                    print(data.link);
                   },
                   child: Text("Create Meetup!"),
                 ),
@@ -1110,23 +1107,36 @@ class MapSampleState extends State<MapSample> {
       Colors.pinkAccent,
       Colors.blue
     ];
+    List<dynamic> possibleLocations = [];
+    Map<String,dynamic> datacopy = {};
 
     return FutureBuilder<Map<String,dynamic>>(
         future: _getCalculate(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final List<dynamic> possibleLocations = snapshot.data['possible_locations'];
+          if (snapshot.hasData && possibleLocations.length == 0) {  //save data oni
+            possibleLocations = snapshot.data['possible_locations'];
+            datacopy = snapshot.data;
             return ListView.builder(
               itemCount: possibleLocations.length,
               itemBuilder: (BuildContext context, int index) {
                 print(possibleLocations);
                 //Need to add in code to prevent nulls form appearing
-                return _tile(possibleLocations[index], snapshot.data); 
+                return _tile(possibleLocations[index], datacopy);
               },
             );
-          } else if (snapshot.hasError) {
-            return Text("ERROR");
-          } else {
+          }
+          else if (possibleLocations.length != 0) {   //blast saved data
+            return ListView.builder(
+              itemCount: possibleLocations.length,
+              itemBuilder: (BuildContext context, int index) {
+                print(possibleLocations);
+                //Need to add in code to prevent nulls form appearing
+                return _tile(possibleLocations[index], datacopy);
+              },
+            );
+          }
+          else {
+//            final List<dynamic> possibleLocations = snapshot.data['possible_locations'];
             return ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200));
           }
         }
