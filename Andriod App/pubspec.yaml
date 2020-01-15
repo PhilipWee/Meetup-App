@@ -30,6 +30,8 @@ dependencies:
   esys_flutter_share: ^1.0.2
   url_launcher: ^5.1.2
   connectivity: ^0.4.4
+  pull_to_refresh: ^1.5.7
+  loading_indicator: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -52,7 +54,7 @@ flutter:
     - images/outingButton.jpg
     - images/lake.jpg
     - images/mouseAvatar.jpg
-    - images/Mouse copy.png
+    - images/Mouse_copy.png
     - images/food.jpg
     - images/outing.jpg
 

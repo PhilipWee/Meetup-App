@@ -9,11 +9,12 @@ import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
+import 'color_loader.dart';
 
 String globalurl(){
-  // String serverAddress = "http://192.168.194.178:5000";
-  // String serverAddress = "http://169.254.158.154:5000";
-  String serverAddress = "http://192.168.194.228:5000";
+//   String serverAddress = "http://192.168.194.178:5000";
+//   String serverAddress = "http://169.254.158.154:5000";
+  String serverAddress = "http://ec2-3-16-181-51.us-east-2.compute.amazonaws.com:5000";
   return serverAddress;
 }
 
@@ -69,7 +70,7 @@ class CheckNetworkPage extends StatelessWidget {
                   return Center(child: Text("No Internet Connection!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:
-                  print("yes net");
+                  print("Connected!");
                   return HomeScreen();
                 default:
                   return Center(child: Text("No Internet Connection!"));
@@ -195,7 +196,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           Padding(
             padding: const EdgeInsets.only(left:20.0, right: 20.0, top:20.0, bottom: 20.0),
             child: Image.asset(
-              'images/Mouse copy.png',
+              'images/Mouse_copy.png',
               scale: 3,
             ),
           ),
@@ -461,7 +462,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
         print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-        print("SERVER ara ara SAYS: $body");
+        print("SERVER SAYS: $body");
 
         //decode the string-map
         Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
@@ -470,10 +471,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         print("Quality:$quality");
         print("Speed:$speed");
         data.link = "$address/session/$sessionid/get_details";
-        data.sessionid = sessionid;
 
+        data.sessionid = sessionid;
         String tempvar = data.link;
-        print('Link Created--> $tempvar'); 
+        print('Link Created--> $tempvar');
         return jsonpackage;
 
       }
@@ -541,24 +542,27 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Container(
-                  width: 180,
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.directions_car, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Transport", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.directions_car, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Transport", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0
+                          ),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: Container(
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -585,24 +589,27 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Container(
-                  width: 180,
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.timer, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Speed", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.timer, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Speed", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0
+                          ),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: Container(
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -632,24 +639,27 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
-                Container(
-                  width: 180,
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.star, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Ratings", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Ratings", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0
+                          ),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
+                  flex: 5,
                   child: Container(
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
@@ -758,6 +768,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
           print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
+
+//            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
+
             List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
           }
@@ -845,8 +858,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     Widget listSection = Container(
       child: 
       FutureBuilder(
-        future:
-        getMembers(),
+        future: getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           print(snapshot);
           if(snapshot.data == null){
@@ -921,7 +933,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
                   textColor: Colors.black,
                   onPressed: () {
                     Navigator.push(context,MaterialPageRoute(builder: (context) => MapSample(data:data)),);
-                    print(data.link);
                   },
                   child: Text("Create Meetup!"),
                 ),
@@ -1123,23 +1134,44 @@ class MapSampleState extends State<MapSample> {
      
     );
 
+    List<Color> colorsForLoad = [
+      Colors.red,
+      Colors.green,
+      Colors.indigo,
+      Colors.pinkAccent,
+      Colors.blue
+    ];
+    List<dynamic> possibleLocations = [];
+    Map<String,dynamic> datacopy = {};
+
     return FutureBuilder<Map<String,dynamic>>(
         future: _getCalculate(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final List<dynamic> possibleLocations = snapshot.data['possible_locations'];
+          if (snapshot.hasData && possibleLocations.length == 0) {  //save data oni
+            possibleLocations = snapshot.data['possible_locations'];
+            datacopy = snapshot.data;
             return ListView.builder(
               itemCount: possibleLocations.length,
               itemBuilder: (BuildContext context, int index) {
                 print(possibleLocations);
                 //Need to add in code to prevent nulls form appearing
-                return _tile(possibleLocations[index], snapshot.data); 
+                return _tile(possibleLocations[index], datacopy);
               },
             );
-          } else if (snapshot.hasError) {
-            return Text("Error");
-          } else {
-            return CircularProgressIndicator();
+          }
+          else if (possibleLocations.length != 0) {   //blast saved data
+            return ListView.builder(
+              itemCount: possibleLocations.length,
+              itemBuilder: (BuildContext context, int index) {
+                print(possibleLocations);
+                //Need to add in code to prevent nulls form appearing
+                return _tile(possibleLocations[index], datacopy);
+              },
+            );
+          }
+          else {
+//            final List<dynamic> possibleLocations = snapshot.data['possible_locations'];
+            return ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200));
           }
         }
       );
@@ -1174,8 +1206,7 @@ class MapSampleState extends State<MapSample> {
                 child:Text(_locationName, style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold))
               )
             ),
-            ButtonTheme.bar(
-              child: ButtonBar(
+            ButtonBar(
                 children: <Widget>[
                   FlatButton(
                     child: Text("SHOW IN MAPS"),
@@ -1185,7 +1216,6 @@ class MapSampleState extends State<MapSample> {
                   )
                 ],
               )
-            )
           ],
         )
       ),
@@ -1219,6 +1249,7 @@ class MapSampleState extends State<MapSample> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+        appBar: AppBar(title: Text("Suggested Locations"),),
         body: SafeArea(
           child: Stack(
             children: <Widget>[
