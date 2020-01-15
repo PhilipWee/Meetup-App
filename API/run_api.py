@@ -12,6 +12,9 @@ import json
 import time
 import uuid
 import datetime
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS------------------------------------------
@@ -393,12 +396,43 @@ def results(session_id):
         #return the results
         return jsonify(results)
 
+def get_doc_ref_for_id(session_id):
+    session_id = str(session_id)
+    return db.collection(u'sessions').document(session_id)
+
+#Returns session id
+def create_session():
     
 
 
-
-
 if __name__ == '__main__':
+    #--------------------------------------CONNECT TO FIREBASE-------------------------------
+    print('Connecting to firebase')
+    if (not len(firebase_admin._apps)):
+        
+        # Use the application default credentials
+        # Use a service account
+        cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+        firebase_admin.initialize_app(cred)
+        db = firestore.client()
+    else:
+        db = firestore.client()
+    print('Connected!')
+    
+    #Testing code here
+    doc_ref = get_doc_ref_for_id(123456)
+#    doc_ref.set({
+#    u'first': u'Ada',
+#    u'last': u'Lovelace',
+#    u'born': 1815
+#    })
+    print(doc_ref.get().to_dict())
+    
+    
+    
+    
+    
+    #--------------------------------------CONNECT TO FIREBASE-------------------------------
 
     #--------------------------------------CONNECT TO DATABASE-------------------------------
     # Set up a connection to the postgres server.
