@@ -103,21 +103,21 @@ class ShareLinkState extends State<ShareLinkWidget> {
     catch(e){print("Session Create Failed with Error: $e");}
   }
 
-  Future<List<dynamic>> getMembers() async {
+//  Stream<Future<List<dynamic>>> stream = Stream<Future<List<dynamic>>>.periodic(Duration(seconds:2), getMembers)
 
-//    await Future.delayed(Duration(milliseconds: 1500));
+  Future<List<dynamic>> getMembers() async {
 
     String sessID = data.sessionid;
     String address = globalurl();
 
     try{
-
       http.Response response = await http.get('$address/session/$sessID');
-      // http.Response response = await http.get('$address/session/$sessID'); //use this when session id can be generated
+      print("COCK");
+      await Future.delayed(Duration(milliseconds: 1500));
       int statusCode = response.statusCode;
       String body = response.body;
       print(response.statusCode);
-      await Future.delayed(Duration(milliseconds: 1000));
+
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
             SnackBar(
@@ -136,8 +136,8 @@ class ShareLinkState extends State<ShareLinkWidget> {
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
           print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
-//            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
-            List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
+            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
+//            List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
           }
           else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
@@ -147,9 +147,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
         return membersData;
       }
     }
-
     catch(e){print("Get-session-details Failed with error: $e");}
-
   }
 
   Future<List<Map<String, dynamic>>> getMembersFAKE() async {
@@ -219,58 +217,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
   @override
   Widget build(BuildContext context) {
 
-//    Future<Null> _refreshMemberList() async{
-//      print("refreshing list");
-//      return null;
-//    }
-
-    Widget listSection = Container(
-      child:
-      FutureBuilder(
-        future: getMembers(),
-        builder: (BuildContext context, AsyncSnapshot snapshot){
-          print(snapshot);
-          listofmembers = snapshot.data;
-          if(listofmembers == null){
-            return
-              Flexible(
-                  child:
-                  Container(
-                      child: Center(
-                          child: Text("Loading...")
-                      )
-                  )
-              );
-          }
-          else {
-            return
-              Flexible (child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: listofmembers.length-1,
-                    itemBuilder: (BuildContext context, int index) {
-                      Map<String,dynamic> myMap = snapshot.data[snapshot.data.length-1];
-                      if (index == 0){
-                        return ListTile(
-                            leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                            title: Text(data.username),
-                            subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
-                            trailing: Text(myMap["username"].toString())
-                        );
-                      }
-                      return ListTile(
-                        leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                        title: Text(snapshot.data[index]["identifier"].toString()),
-                        subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
-                        trailing: Text(myMap[snapshot.data[index]["identifier"]].toString()),
-                      );
-                    },
-                  )
-              );
-          }
-        },
-      ),
-    );
-
     Widget linkSection = Container(
       child:
       FutureBuilder(
@@ -334,6 +280,56 @@ class ShareLinkState extends State<ShareLinkWidget> {
           )
         ],
       ) ,
+    );
+
+    Future<Null> _refresh() async {
+      setState((){});
+      return await Future.delayed(Duration(milliseconds: 1500));
+    }
+
+    Widget listSection = Container(
+      child:
+      FutureBuilder(
+        future: getMembers(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          print(snapshot);
+          listofmembers = snapshot.data;
+          if(listofmembers == null){
+            return
+              Expanded(
+                  child:
+                  Container(
+                      child: Center(
+                          child: Text("Loading...")
+                      )
+                  )
+              );
+          }
+          else {
+            return Expanded (child: RefreshIndicator(child: ListView.builder(
+              itemCount: listofmembers.length-1,
+              itemBuilder: (BuildContext context, int index) {
+                Map<String,dynamic> myMap = snapshot.data[snapshot.data.length-1];
+                if (index == 0){
+                  return ListTile(
+                      leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                      title: Text(data.username),
+                      subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
+                      trailing: Text(myMap["username"].toString())
+                  );
+                }
+                return ListTile(
+                  leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                  title: Text(snapshot.data[index]["identifier"].toString()),
+                  subtitle: Text(snapshot.data[index]["transport_mode"].toString()),
+                  trailing: Text(myMap[snapshot.data[index]["identifier"]].toString()),
+                );
+              },
+            ) , onRefresh: _refresh,
+            ));
+          }
+        },
+      ),
     );
 
     return Scaffold(
