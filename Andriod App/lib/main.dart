@@ -16,10 +16,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
 import 'color_loader.dart';
 
-
-
-//import 'package:pull_to_refresh/pull_to_refresh.dart';
-
 String globalurl(){
 //   String serverAddress = "http://192.168.194.178:5000";
 //   String serverAddress = "http://169.254.158.154:5000";
@@ -39,9 +35,9 @@ class PrefData {
   int speed;
   int quality;
   String sessionid;
-  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid});
+  int price;
+  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid,this.price});
 }
-
 
 class MyApp extends StatelessWidget {
   
@@ -89,18 +85,17 @@ class CheckNetworkPage extends StatelessWidget {
   }
 }
 
-
-  refreshServer() async {
-    String address = globalurl();
-    try{
-      http.Response response = await http.get('$address/refresh');
-      int statusCode = response.statusCode;
-      String body = response.body;
-      print("SERVER REFRESHED WITH STATUSCODE: $statusCode");
-      print("SERVER SAYS: $body");
-      }
-    catch(e){print(e);}
-  }
+refreshServer() async {
+  String address = globalurl();
+  try{
+    http.Response response = await http.get('$address/refresh');
+    int statusCode = response.statusCode;
+    String body = response.body;
+    print("SERVER REFRESHED WITH STATUSCODE: $statusCode");
+    print("SERVER SAYS: $body");
+    }
+  catch(e){print(e);}
+}
 
 class HomeScreen extends StatelessWidget {
   static final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();

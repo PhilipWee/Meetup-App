@@ -248,6 +248,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       value: value5,
                       onChanged: (newValue) => setState(() {
                         value5 = newValue;
+                        if (value5==1){data.price=1;}
+                        else if (value5==2){data.price=2;}
+                        else if (value5==3){data.price=3;}  //ADD TO DATABASE
+                        else{data.price=0;}
                       }),
                       max: 4,
                       min: 0,

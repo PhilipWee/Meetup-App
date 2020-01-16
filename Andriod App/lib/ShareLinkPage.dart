@@ -38,9 +38,12 @@ class ShareLinkWidget extends StatefulWidget {
   ShareLinkState createState() => ShareLinkState(data: data);
 }
 
+
+
 class ShareLinkState extends State<ShareLinkWidget> {
   final PrefData data;
   ShareLinkState({this.data});
+  List listofmembers = [];
 
   Future<String> sessionIdPost() async {
 
@@ -50,6 +53,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     int quality = data.quality;
     int speed = data.speed;
     String transportmode = data.transportMode;
+    int price_level  = data.price;
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
@@ -58,6 +62,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     String url = '$address/session/create';
 
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$price_level"}';
     print("jsonpackage $jsonpackage");
     try{
 
@@ -84,6 +89,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
         print("Transport Mode:$transportmode");
         print("Quality:$quality");
         print("Speed:$speed");
+        print("Price: $price_level");
         data.link = "$address/session/$sessionid/get_details";
 
         data.sessionid = sessionid;
@@ -99,7 +105,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
   Future<List<dynamic>> getMembers() async {
 
-    await Future.delayed(Duration(milliseconds: 1200));
+//    await Future.delayed(Duration(milliseconds: 1500));
 
     String sessID = data.sessionid;
     String address = globalurl();
@@ -111,7 +117,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
       int statusCode = response.statusCode;
       String body = response.body;
       print(response.statusCode);
-
+      await Future.delayed(Duration(milliseconds: 1000));
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
             SnackBar(
@@ -119,9 +125,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
               duration: Duration(seconds: 2),
             ));
       }
-
       else{
-
         print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
         print("SERVER SAYS: $body");
         Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
@@ -132,7 +136,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
           print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
-
 //            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
             List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
@@ -213,22 +216,24 @@ class ShareLinkState extends State<ShareLinkWidget> {
     return membersData;
   }
 
-  Future<void> _refreshMemberList() async{
-    print("refreshing list");
-  }
-
   @override
   Widget build(BuildContext context) {
-    //Share and make meet up buttons section
+
+//    Future<Null> _refreshMemberList() async{
+//      print("refreshing list");
+//      return null;
+//    }
+
     Widget listSection = Container(
       child:
       FutureBuilder(
         future: getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           print(snapshot);
-          if(snapshot.data == null){
+          listofmembers = snapshot.data;
+          if(listofmembers == null){
             return
-              Expanded(
+              Flexible(
                   child:
                   Container(
                       child: Center(
@@ -239,10 +244,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
           }
           else {
             return
-              Expanded(
-                  child:
-                  ListView.builder(
-                    itemCount: snapshot.data.length-1,
+              Flexible (child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: listofmembers.length-1,
                     itemBuilder: (BuildContext context, int index) {
                       Map<String,dynamic> myMap = snapshot.data[snapshot.data.length-1];
                       if (index == 0){
@@ -337,11 +341,12 @@ class ShareLinkState extends State<ShareLinkWidget> {
         children:[
           linkSection,
           buttonSection,
-          RefreshIndicator(child: listSection, onRefresh: getMembers)
+          listSection,
         ],
       ),
     );
   }
+
 
   Future<void> _shareText() async {
     try {
