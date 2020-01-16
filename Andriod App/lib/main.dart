@@ -540,7 +540,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                             else {data.speed=0;}
                           });
                         },
-                        items: <String>["Select...", "Fast", "Regular", "No Preference"].map<DropdownMenuItem<String>>((String value) {
+                        items: <String>["Select...", "No Preference", "Regular", "Fast"].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -590,7 +590,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                             else{data.quality=0;}
                           });
                         },
-                        items: <String>["Select...", "Best", "Regular", "No Preference"]
+                        items: <String>["Select...", "No Preference", "Regular", "Best"]
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
