@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
 import 'color_loader.dart';
+//import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 String globalurl(){
 //   String serverAddress = "http://192.168.194.178:5000";
@@ -66,11 +67,11 @@ class CheckNetworkPage extends StatelessWidget {
               var result = snapShot.data;
               switch (result) {
                 case ConnectivityResult.none:
-                  print("no net");
+                  print("Internet servie unavailable");
                   return Center(child: Text("No Internet Connection!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:
-                  print("Connected!");
+                  print("Connected to Internet!");
                   return HomeScreen();
                 default:
                   return Center(child: Text("No Internet Connection!"));
@@ -428,61 +429,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
   CustomizationPageState({this.data});
 
-  sessionIdPost() async {
-
-    //extract data from PrefData to add to json package
-    double lat = data.lat;
-    double long = data.long;
-    int quality = data.quality;
-    int speed = data.speed;
-    String transportmode = data.transportMode;
-
-    //send json package to server as POST
-    Map<String, String> headers = {"Content-type": "application/json"};
-    String address = globalurl();
-
-    String url = '$address/session/create';
-
-    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
-    print("jsonpackage $jsonpackage");
-    try{
-
-      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
-      int statusCode = response.statusCode;
-
-      if (statusCode != 200){
-        Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Oops! Server Error 404!"),
-              duration: Duration(seconds: 2),
-            ));
-      }
-
-      else{
-
-        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
-        print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-        print("SERVER SAYS: $body");
-
-        //decode the string-map
-        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
-        var sessionid = sessionidjsonversion['session_id'];
-        print("Transport Mode:$transportmode");
-        print("Quality:$quality");
-        print("Speed:$speed");
-        data.link = "$address/session/$sessionid/get_details";
-
-        data.sessionid = sessionid;
-        String tempvar = data.link;
-        print('Link Created--> $tempvar');
-        return jsonpackage;
-
-      }
-    }
-
-    catch(e){print("Session Create Failed with Error: $e");}
-    }
-
 //  String value1 = "Select...";
   String value2 = "Select...";
   String value3 = "Select...";
@@ -493,51 +439,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     return Scaffold(
       body: ListView(
           children: [
-//            Row(
-//              mainAxisAlignment: MainAxisAlignment.spaceAround,
-//              mainAxisSize: MainAxisSize.max,
-//              children: <Widget>[
-//                Container(
-//                  width: 180,
-//                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-//                  child: Row(
-//                    children: <Widget>[
-//                      Icon(Icons.fastfood, color: Colors.black),
-//                      Padding(
-//                        padding: const EdgeInsets.all(8.0),
-//                        child: Text("Activities", style: TextStyle(
-//                            color: Colors.black,
-//                            fontWeight: FontWeight.bold,
-//                            fontSize: 20.0
-//                        ),),
-//                      ),
-//                    ],
-//                  ),
-//                ),
-//                Expanded(
-//                  child: Container(
-//                    child: DropdownButtonHideUnderline(
-//                      child: DropdownButton<String>(
-//                        value: value1,
-//                        onChanged: (String newValue) {
-//                          setState(() {
-//                            value1 = newValue;
-//                            data.activityType = newValue; //ADD TO DATABASE
-//                          });
-//                        },
-//                        items: <String>["Select...", "Lunch/Dinner", "Recreation", "Study"].map<DropdownMenuItem<String>>((String value) {
-//                          return DropdownMenuItem<String>(
-//                            value: value,
-//                            child: Text(value),
-//                          );
-//                        }).toList(),
-//                      ),
-//                    ),
-//                  ) ,
-//                )
-//              ],
-//            ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
@@ -692,7 +593,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () {
-              sessionIdPost();                                                   //POST DATABASE TO SERVER
               if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
               } else {
@@ -735,7 +635,64 @@ class ShareLinkState extends State<ShareLinkWidget> {
   final PrefData data;
   ShareLinkState({this.data});
 
+  Future<String> sessionIdPost() async {
+
+    //extract data from PrefData to add to json package
+    double lat = data.lat;
+    double long = data.long;
+    int quality = data.quality;
+    int speed = data.speed;
+    String transportmode = data.transportMode;
+
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String address = globalurl();
+
+    String url = '$address/session/create';
+
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+    print("jsonpackage $jsonpackage");
+    try{
+
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+
+      if (statusCode != 200){
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error 404! Can"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+
+      else{
+
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+        print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+        print("SERVER SAYS: $body");
+
+        //decode the string-map
+        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
+        var sessionid = sessionidjsonversion['session_id'];
+        print("Transport Mode:$transportmode");
+        print("Quality:$quality");
+        print("Speed:$speed");
+        data.link = "$address/session/$sessionid/get_details";
+
+        data.sessionid = sessionid;
+        String tempvar = data.link;
+        print('Link Created--> $tempvar');
+        return data.link;
+
+      }
+    }
+
+    catch(e){print("Session Create Failed with Error: $e");}
+  }
+
   Future<List<dynamic>> getMembers() async {
+
+    await Future.delayed(Duration(milliseconds: 1200));
 
     String sessID = data.sessionid;
     String address = globalurl();
@@ -770,7 +727,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
 
 //            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
-
             List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
           }
@@ -787,8 +743,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
   }
 
   Future<List<Map<String, dynamic>>> getMembersFAKE() async {
-
-    await Future.delayed(Duration(milliseconds: 1000));
 
     List<Map<String, dynamic>> membersData = [
       {
@@ -852,6 +806,10 @@ class ShareLinkState extends State<ShareLinkWidget> {
     return membersData;
   }
 
+  Future<void> _refreshMemberList() async{
+    print("refreshing list");
+  }
+
   @override
   Widget build(BuildContext context) {
     //Share and make meet up buttons section
@@ -871,8 +829,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
                 )
               )
             );
-          } else {
-            return 
+          }
+          else {
+            return
             Expanded(
               child:
               ListView.builder(
@@ -898,6 +857,29 @@ class ShareLinkState extends State<ShareLinkWidget> {
             );
           }
         },
+      ),
+    );
+
+    Widget linkSection = Container(
+      child:
+      FutureBuilder(
+        future: sessionIdPost(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          print(snapshot);
+          if(snapshot.data == null){
+            return Text("Unable to retrieve link");
+          }
+          else {
+            return
+                Padding(
+                  padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
+                  child: TextField(
+                    controller: TextEditingController(text:data.link),
+                    decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                  ),
+                );
+          }
+        }
       ),
     );
 
@@ -946,18 +928,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
     return Scaffold(
       body: Column(
         children:[
-          Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
-            child: TextField(
-              controller: TextEditingController(text:data.link),
-              decoration: InputDecoration(
-                  labelText: "Tap here for link",
-                  border: OutlineInputBorder()
-              ),
-            ),
-          ),
+          linkSection,
           buttonSection,
-          listSection
+          RefreshIndicator(child: listSection, onRefresh: getMembers)
         ],
       ),
     );
