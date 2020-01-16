@@ -22,7 +22,7 @@ from firebase_admin import firestore
 #--------------------------------------CONNECT TO FIREBASE-------------------------------
 print('Connecting to firebase')
 if (not len(firebase_admin._apps)):
-    
+
     # Use the application default credentials
     # Use a service account
     cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
@@ -96,7 +96,7 @@ def check_requires_calculation():
         except:
             continue
     return ids_that_need_calc
-    
+
 
 def check_calculate_done(session_id):
     try:
@@ -118,7 +118,7 @@ def calculate(sess_id,info):
 
     #Get all the meetup details\
     section_start_time = time.time()
-    
+
     info = [info]
 
     if info != None:
@@ -186,8 +186,57 @@ def calculate(sess_id,info):
                     best_places\
                     on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid",conn_gis)
 
+# Sub queries required:
+# 1. Get Within ratings range
+# 2. Get within price range
+#select * from singapore_restaurants_2 where cost = '3' or cost ='2' or cost = '1' or cost = '4' and rating > 3
+
+# 3. Make speeds equal
+# 4. Transport Mode
+
+# with results as (
+# 	select
+# 		results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1
+# 	from
+# 			(SELECT *,singapore_restaurants_2.cost as price FROM (SELECT
+# 				 *
+# 			FROM pgr_dijkstra(
+# 			'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',
+# 			ARRAY[425482381, 4488019045, 243213958]::bigint[],
+# 			ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants_2)))
+# 		as results
+# 	join singapore_restaurants_2
+# 		on results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) as results
+# 	join
+# 		osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id
+# ), best_places as (
+# 	select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality(ARRAY[425482381, 4488019045, 243213958]::bigint[])
+# )
+#
+# select
+# 	path_seq,
+# 	results.start_vid as start_user,
+# 	agg_cost as cost_for_user,
+# 	total_cost,
+# 	name,
+# 	results.end_vid,
+# 	geom_way as location,
+# 	x1 as longtitude,
+# 	y1 as latitude,
+# 	ST_X(way) as restaurant_x,
+# 	ST_Y(way) as restaurant_y,
+# 	results.price,
+# 	results.rating,
+# 	results.place_id
+# from
+# 	results
+# 	inner join
+# 	best_places
+# 	on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid
+
         print('Perform optimisation -', time.time() - section_start_time)
         section_start_time = time.time()
+        # print(results.columns)
 
 
         osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
@@ -231,12 +280,12 @@ def calculate(sess_id,info):
                     results_dict[location][user]['restaurant_y'] = relevant_df['restaurant_y'].iloc[0]
                 except:
                     print('WARNING: exception on location',location,'user',user)
-            
+
         return(results_dict)
     else:
         return 'Error' #Session id or username is wrong
-    
-    
+
+
 def upload_calculated_route(sess_id,result):
 #    try:
     doc_ref = get_doc_ref_for_id(sess_id)

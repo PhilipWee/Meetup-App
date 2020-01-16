@@ -36,20 +36,43 @@ class MapSampleState extends State<MapSample> {
   Future<Map<String, dynamic>> _getCalculate() async {
     String id = data.sessionid;
     String address = globalurl();
-    // final result = await http.get("$address/session/$id/calculate");
-    final result = await http.get("$address/session/$id/calculate");
-    if (result.statusCode != 200 || result.statusCode != 302) {
-      Map<String, dynamic> results = jsonDecode(result.body);
-      print(results);
-      print(results['possible_locations']);
-      return results;
-    } else {
-      // throw ("Error getting results with statusCode " + result.statusCode.toString());
-      Map<String, dynamic> results = jsonDecode(result.body);
-      print(results);
-      print(results['possible_locations']);
-      return results;
+    // final result = await http.get("$address/session/$id/calculate")
+    var _ = await http.get("$address/session/$id/calculate");
+    while (true) {
+      print('111111111111111111111');
+      var result = await http.get("$address/session/$id/results");
+      if (result.statusCode != 200 || result.statusCode != 302) {
+        print('211111111111111111111');
+        Map<String, dynamic> results = jsonDecode(result.body);
+        //Check if its still info or not
+        print(results);
+        if (results.containsKey('info')) {
+          //Still Calculating
+          await Future.delayed(Duration(milliseconds: 1000));
+          continue;
+        } else if (results.containsKey('error')){
+          //There is an error
+          print(results);
+        } else {
+          //The results are out
+          return results;
+        }
+      }
+      //Do a time sleep of 1 second and wait to ping again
+
     }
+//    if (result.statusCode != 200 || result.statusCode != 302) {
+//      Map<String, dynamic> results = jsonDecode(result.body);
+//      print(results);
+//      print(results['possible_locations']);
+//      return results;
+//    } else {
+//      // throw ("Error getting results with statusCode " + result.statusCode.toString());
+//      Map<String, dynamic> results = jsonDecode(result.body);
+//      print(results);
+//      print(results['possible_locations']);
+//      return results;
+//    }
   }
 
   static final CameraPosition _kSingapore = CameraPosition(
@@ -190,8 +213,15 @@ class MapSampleState extends State<MapSample> {
     return FutureBuilder<Map<String,dynamic>>(
         future: _getCalculate(),
         builder: (context, snapshot) {
-          if (snapshot.hasData && possibleLocations.length == 0) {  //save data oni
+//          print(possibleLocations)
+//          && possibleLocations.length == 0
+          if (snapshot.hasData) {//save data oni
+            if (snapshot.data.containsKey('info')) {
+              //Not yet done processing
+              print('warning the snapshot is still at the info stage!');
+            }
             possibleLocations = snapshot.data['possible_locations'];
+            print(snapshot.data);
             datacopy = snapshot.data;
             return ListView.builder(
               itemCount: possibleLocations.length,
@@ -202,16 +232,18 @@ class MapSampleState extends State<MapSample> {
               },
             );
           }
-          else if (possibleLocations.length != 0) {   //blast saved data
-            return ListView.builder(
-              itemCount: possibleLocations.length,
-              itemBuilder: (BuildContext context, int index) {
-                print(possibleLocations);
-                //Need to add in code to prevent nulls form appearing
-                return _tile(possibleLocations[index], datacopy);
-              },
-            );
-          }
+//          if (possibleLocations.length != 0)
+          // ignore: missing_return
+//          else if (true) {   //blast saved data
+//            return ListView.builder(
+//              itemCount: possibleLocations.length,
+//              itemBuilder: (BuildContext context, int index) {
+//                print(possibleLocations);
+//                //Need to add in code to prevent nulls form appearing
+//                return _tile(possibleLocations[index], datacopy);
+//              },
+//            );
+//          }
           else {
 //            final List<dynamic> possibleLocations = snapshot.data['possible_locations'];
             return ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200));
