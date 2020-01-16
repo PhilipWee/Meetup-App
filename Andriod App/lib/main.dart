@@ -336,8 +336,8 @@ class MeetingType extends StatelessWidget {
     "Meeting",
     ];
   final List<String> custImgs = [
-    "images/food.jpg",
     "images/outing.jpg",
+    "images/food.jpg",
     "images/meetingButton.jpg",
     ];
 
@@ -429,10 +429,26 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
   CustomizationPageState({this.data});
 
-//  String value1 = "Select...";
   String value2 = "Select...";
   String value3 = "Select...";
   String value4 = "Select...";
+  double value5 = 0;
+  //Method for the labels on the slider
+  String labels() {
+    switch (value5.floor()) {
+      case 0:
+        return "No Pref.";
+      case 1:
+        return "\$";
+      case 2:
+        return "\$\$";
+      case 3:
+        return "\$\$\$";
+      case 4:
+        return "\$\$\$\$";
+    }
+    return "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -474,7 +490,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                             data.transportMode = newValue; //ADD TO DATABASE
                           });
                         },
-                        items: <String>["Select...", "Driving", "Public Transit", "Walk"].map<DropdownMenuItem<String>>((String value) {
+                        items: <String>["Select...", "Driving", "Public Transit", "Walk", "Riding"].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -485,7 +501,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   ),
                 )
               ],
-            ),
+            ),//for transport
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
@@ -535,7 +551,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   ),
                 )
               ],
-            ),
+            ),//for speed
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
@@ -586,8 +602,49 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   ),
                 )
               ],
+            ),//for ratings
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.attach_money, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Price", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0
+                          ),),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                    child: Slider(
+                        value: value5,
+                        onChanged: (newValue) => setState(() {
+                          value5 = newValue;
+                        }),
+                        max: 4,
+                        min: 0,
+                        divisions: 4,
+                        label: labels(),
+                    )
+                  ),
+                )
+              ],
             ),
-          ],
+
+          ], //children of ListView
         ),
       bottomNavigationBar: BottomAppBar(
         child: FlatButton(
