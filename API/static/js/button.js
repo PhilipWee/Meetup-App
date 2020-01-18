@@ -1,10 +1,12 @@
+
+//get details
 var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
 //Get the session id from the pathname
 var session_id = window.location.pathname.split('/')[2]
 
 
-    navigator.geolocation.getCurrentPosition(success, error, options);
-    console.log('test')
+navigator.geolocation.getCurrentPosition(success, error, options);
+console.log('geolocation works')
     
 
 
@@ -14,7 +16,7 @@ function success(pos) {
     long = crd.longitude;
     $('#lat').val(lat);
     $('#long').val(long);
-    LatLng = new google.maps.LatLng(crd.latitude, crd.longitude);
+    LatLng = new google.maps.LatLng(lat, long);
     map.setCenter(LatLng);
 };
 
@@ -33,7 +35,9 @@ var options = {
 };
 
 
+
 function submitButton() {
+
     meetupForm = $('#meetupData')
     meetupData = meetupForm.serializeArray()
     if ($('#lat').val() == '') {
@@ -42,24 +46,24 @@ function submitButton() {
         newFunction();
     }
     function newFunction() {
+
         $.ajax({
             type: 'POST',
             url: host_address_port + '/session/' + session_id,
             data: JSON.stringify(meetupData),
             contentType:'application/json',
             success: function (response_data) {
-                console.log("running redirect")
-    window.location.href='results_display' //form submission
+                console.log(JSON.stringify(meetupData))
+                window.location.href='results_display' //form submission
             }          
         })
         
     }
-
+document.getElementById('jayson').addEventListener("onclick", jayson)
 
 
 
 
   };
   
-  document.getElementById ("submitbutton").addEventListener ("click", submitButton);
-  
+  document.getElementById ('submitbutton').addEventListener ("click", submitButton);
