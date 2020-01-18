@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Idk what these are just copy pasting START -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"></script>
+    <!-- Idk what these are just copy pasting END -->
+    <style>
+
+    </style>
+  </head>
+
+  <body>
+    <button onclick='createMeetup()'>Create New Meetup</button><br>
+    <button onclick='joinMeetup()'>Join Meetup</button><br>
+    <input type="text" id="inputSessionId" placeholder="Enter session id" style="display: none">
+    <button id="enter" onclick='submitButton()' style="display:none">Enter</button>
+    <br>
+    <button onclick='reportBug()'>Report a bug</button>
+  </body>
+
+  <script type="text/javascript">
+    function createMeetup() {
+      window.location.href = '/session/create';
+    }
+
+    function joinMeetup() {
+      document.getElementById("inputSessionId").style.display = "inline";
+      document.getElementById("enter").style.display = "inline";
+    }
+
+    function submitButton() {
+      var sessionId = document.getElementById("inputSessionId").value;
+
+      /* TO DO - Check if session id is valid from Database */
+
+      window.location.href = '/session/' + sessionId + '/get_details';
+    }
+  </script>
+</html>
