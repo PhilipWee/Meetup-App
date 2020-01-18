@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
@@ -11,6 +10,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <!-- Idk what these are just copy pasting END -->
     <style>
 
@@ -19,29 +22,13 @@
 
   <body>
     <button onclick='createMeetup()'>Create New Meetup</button><br>
-    <button onclick='joinMeetup()'>Join Meetup</button><br>
+    <button onclick='joinMeetup()'>Join Meetup</button>
     <input type="text" id="inputSessionId" placeholder="Enter session id" style="display: none">
-    <button id="enter" onclick='submitButton()' style="display:none">Enter</button>
-    <br>
-    <button onclick='reportBug()'>Report a bug</button>
+    <button id="enterSessionId" onclick='submitButton()' style="display:none">Enter</button>
+    <br><button onclick='reportBug()'>Feedback / Report a bug</button>
+    <input type="text" id="inputReport" placeholder="What bugs did you meet?" style="display: none">
+    <button id="enterBugReport" onclick='submitBugReport()' style="display:none">Submit</button>
   </body>
 
-  <script type="text/javascript">
-    function createMeetup() {
-      window.location.href = '/session/create';
-    }
-
-    function joinMeetup() {
-      document.getElementById("inputSessionId").style.display = "inline";
-      document.getElementById("enter").style.display = "inline";
-    }
-
-    function submitButton() {
-      var sessionId = document.getElementById("inputSessionId").value;
-
-      /* TO DO - Check if session id is valid from Database */
-
-      window.location.href = '/session/' + sessionId + '/get_details';
-    }
-  </script>
+  <script src="{{url_for('static', filename='js/mainpage.js')}}"></script>
 </html>

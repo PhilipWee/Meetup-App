@@ -128,7 +128,7 @@
   <div class="container-fluid" style="margin-top:20px;">
     <div class="row">
       <div class="col col-3" style='align-content: center;align-items: center;justify-content: center;'>
-        
+
         <div class="row ">
           <p><img style="height:90%;width:60%;margin-left:50px;" align=left src="/static/Map.png" alt="Map"
               width="220px" height="200px"></p>
@@ -137,34 +137,53 @@
       <div class="col col-5 ">
         <form id='meetupData' method='POST'>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw; " class="row">
-           
+
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row ">
             <p>What is your mode of transport?</p>
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="row">
-            <p><input type='radio' name='transport_mode' value='Driving'> Driving </input>
-              <input type='radio' name='transport_mode' value='Public Transit'> Public Transport </input>
-              <input type='radio' name='transport_mode' value='Walk'> Walk </input>
-              <input type='radio' name='transport_mode' value='Public Transit'> MotorCycle </input></p>
+            <!-- MADE CHANGES START -->
+            <p><select name="transportMode" id="transportPreference"></p>
+              <option value='driving'> Driving </option>
+              <option value='publicTransport'> Public Transport </option>
+              <option value='walk'> Walk </option>
+              <option value='motorcycle'> Riding </option>
+            </select>
+            <!-- MADE CHANGES END -->
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row ">
             <p>How important is speed to you?</p>
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slider">
-            <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange"></p>Least Important to Most Important
+            <!-- MADE CHANGES START -->
+            <p><select name="speed" id="speedPreference"></p>
+              <option value="noPreference">No Preference</option>
+              <option value="regular">Regular</option>
+              <option value="fast">Fast</option>
+            </select>
+            <!-- MADE CHANGES END -->
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row">
             <p>What about the quality of the transport?</p>
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slider">
-            <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange2"></p>Least Important to Most Important
+            <!-- MADE CHANGES START -->
+            <p><select name='ratings' id="ratingsPreference"></p>
+              <option value="noPreference">No Preference</option>
+              <option value="regular">Regular</option>
+              <option value="best">Best</option>
+            </select>
+            <!-- MADE CHANGES END -->
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row">
             <p>What about the price?</p>
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slider">
-            <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange3"></p>Least Important to Most Important
+            <!-- MADE CHANGES START -->
+            <input name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
+            <span>No Preference</span>
+            <!-- MADE CHANGES END -->
           </div>
 
           <div style="font-family: 'Patrick Hand SC';font-size:2.2vw;" class="row ">
@@ -173,7 +192,7 @@
             </div>
             <div class="col"><button type='button' id='submitbutton'>Submit</button></div>
           </div>
-          
+
 
       </div>
       <div class='col col-4' style="margin-top:7%;">

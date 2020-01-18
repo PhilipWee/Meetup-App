@@ -90,20 +90,31 @@
               <input type="radio" name="meetupPurpose" value="Food"> Food </input>
               <input type="radio" name="meetupPurpose" value="Meeting"> Meeting </input></p>
 
-          <p>What is your mode of transport?</p>
-          <p><input type='radio' name='transport_mode' value='Driving'> Driving </input>
-            <input type='radio' name='transport_mode' value='Public Transit'> Public Transport </input>
-            <input type='radio' name='transport_mode' value='Walk'> Walk </input>
-            <input type='radio' name='transport_mode' value='Public Transit'> MotorCycle </input></p>
+          <p>Transport mode</p>
+          <p><select name="transportMode" id="transportPreference"></p>
+            <option value='driving'> Driving </option>
+            <option value='publicTransport'> Public Transport </option>
+            <option value='walk'> Walk </option>
+            <option value='motorcycle'> Riding </option>
+          </select>
 
-          <p>How important is speed to you?</p>
-          <p><input type="range" name='speed' min="1" max="100" value="50" class="slider" id="myRange"></p>Least Important to Most Important
+          <p>Speed</p>
+          <p><select name="speed" id="speedPreference"></p>
+            <option value="noPreference">No Preference</option>
+            <option value="regular">Regular</option>
+            <option value="fast">Fast</option>
+          </select>
 
-          <p>What about the quality of the transport?</p>
-          <p><input type="range" name='quality' min="1" max="100" value="50" class="slider" id="myRange2"></p>Least Important to Most Important
+          <p>Ratings</p>
+          <p><select name='ratings' id="ratingsPreference"></p>
+            <option value="noPreference">No Preference</option>
+            <option value="regular">Regular</option>
+            <option value="best">Best</option>
+          </select>
 
-          <p>What about the price?</p>
-          <p><input type="range" name='price' min="1" max="100" value="50" class="slider" id="myRange3"></p>Least Important to Most Important
+          <p>Price</p>
+          <input name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
+          <span id='priceValue'>No Preference</span>
 
           <br>  <!-- Just a page break -->
           <button type='button' id='submitbutton'>Submit</button>

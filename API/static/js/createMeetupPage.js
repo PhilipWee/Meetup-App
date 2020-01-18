@@ -4,6 +4,12 @@ var host_address_port = location.protocol+'//'+location.hostname+(location.port 
 navigator.geolocation.getCurrentPosition(success, error, options);
 console.log('test');
 
+// Scipt for price preference slider
+ var values = ['No Preference', '$', '$$', '$$$', '$$$$'];
+$('#pricePreference').change(function() {
+    $('#priceValue').text(values[this.value]);
+});
+
   function success(pos) {
       var crd = pos.coords;
       lat = crd.latitude;
@@ -27,8 +33,8 @@ var options = {
 function submitbutton() {
   meetupForm = $('#createMeetup')
   //console.log(meetupForm);
-  meetupData = meetupForm.serializeArray()
-  //console.log(meetupData)
+  meetupData = meetupForm.serializeArray();
+  console.log(meetupData);
 
   if ($('#lat').val() == '') {
       alert("Please drag the map to select your location!")
@@ -48,7 +54,7 @@ function submitbutton() {
           }
       })
 
-      //console.log(JSON.stringify(meetupData));
+      console.log(JSON.stringify(meetupData));
 
   }
 }
@@ -70,7 +76,7 @@ function submitbutton() {
 
   function createMeetupButton() {
     //console.log(window.session_id);
-    window.location.href = window.session_id + '/results_display';
+    window.location.href = window.session_id + '/results_display' + '?isHost=true';
   }
 
 document.getElementById ("submitbutton").addEventListener ("click", submitbutton);

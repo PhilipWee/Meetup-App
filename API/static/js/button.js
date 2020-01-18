@@ -4,9 +4,13 @@ var session_id = window.location.pathname.split('/')[2]
 
 
     navigator.geolocation.getCurrentPosition(success, error, options);
-    console.log('test')
-    
+    console.log('test');
 
+// Scipt for price preference slider
+var values = ['No Preference', '$', '$$', '$$$', '$$$$'];
+$('#pricePreference').change(function() {
+    $('span').text(values[this.value]);
+});
 
 function success(pos) {
     var crd = pos.coords;
@@ -35,6 +39,7 @@ var options = {
 
 function submitButton() {
     meetupForm = $('#meetupData')
+    console.log(meetupForm);
     meetupData = meetupForm.serializeArray()
     if ($('#lat').val() == '') {
         alert("Please drag the map to select your location!")
@@ -49,10 +54,10 @@ function submitButton() {
             contentType:'application/json',
             success: function (response_data) {
                 console.log("running redirect")
-    window.location.href='results_display' //form submission
-            }          
+    window.location.href='results_display' + '?isHost=false' //form submission
+            }
         })
-        
+
     }
 
 
@@ -60,6 +65,5 @@ function submitButton() {
 
 
   };
-  
+
   document.getElementById ("submitbutton").addEventListener ("click", submitButton);
-  

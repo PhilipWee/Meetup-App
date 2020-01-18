@@ -60,11 +60,11 @@ def index():
 def get_details(session_id):
     if request.method == "GET":
         return render_template('Geoloc2.html',session_id = session_id)
-    
+
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     if request.method == "GET":
-        return render_template('Geoloc.html',session_id = session_id)    
+        return render_template('Geoloc.html',session_id = session_id)
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
@@ -92,7 +92,7 @@ def create_session():
     ###Generate Random Session ID:
     session_id = str(uuid.uuid1())
 
-    
+
 
     #Consolidate the session details
     host_user_details = {'username':username,
@@ -368,11 +368,11 @@ def calculate(session_id):
                     results_dict[location][user]['restaurant_y'] = relevant_df['restaurant_y'].iloc[0]
                 except:
                     print('WARNING: exception on location',location,'user',user)
-            
 
-        
+
+
         #Split dataframe by user
-        
+
         results = json.dumps(results_dict)
         crsr = conn.cursor()
         crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(results,session_id))
@@ -396,9 +396,14 @@ def results(session_id):
         #return the results
         return jsonify(results)
 
+<<<<<<< Updated upstream
 def get_doc_ref_for_id(session_id):
     session_id = str(session_id)
     return db.collection(u'sessions').document(session_id)
+=======
+
+
+>>>>>>> Stashed changes
 
 #Returns session id
 def create_session():
