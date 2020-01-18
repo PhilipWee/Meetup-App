@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
-
+<!--Results_Display-->
 <head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
@@ -61,6 +62,7 @@
 </head>
 
 <body>
+
   <div>
     <div style='position:absolute;' class='row pl-2'>
       <div class='col col-10'>
@@ -88,8 +90,10 @@
       class="round3" id="map">
     </div>
     <script src="{{url_for('static', filename='js/application.js') }}"></script>
+    <button id='jayson' onclick=jayson()>Get JSON data</button>
   </div>
-
+<p>See who's in the session!</p>
+  <div></div>
   <div class="container-fluid" style='height:10%;margin-left:2%; font-family:Patrick Hand SC;'>
     <div class='row' style='margin-left:3.5%;align-items: center;justify-content: space-evenly;'>
       <div style='font-family: Patrick Hand SC;' id='buttons_div'>

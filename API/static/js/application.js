@@ -1,3 +1,5 @@
+// results_display
+
 const xhr = new XMLHttpRequest();
 var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
 var session_id = window.location.pathname.split('/')[2]
@@ -140,3 +142,38 @@ xhr.onreadystatechange = (e) => {
 
   }
 }
+
+
+function jayson() {
+$(document).ready(function(){
+
+    $.getJSON(host_address_port + '/session/' + session_id, function(data) {
+
+      var allUsers = data["users"];
+      for (i in allUsers) {
+        console.log(Object.keys(allUsers[i]));
+        user_details = Object.keys(allUsers[i])
+
+if (user_details.includes('identifier')) {
+
+  user = document.createElement("div")
+  user.class = 'row'
+  user.id = 'row_num'
+  // document.body.appendChild(user)
+
+  user.append((String(allUsers[i]['identifier'] + ', the mouse is travelling by ')))
+  user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
+  }
+else {
+  host = document.createElement("div")
+  host.class = 'row'
+  host.id = 'row_num'
+  host.append((String(allUsers[i]['username'] + ', the host mouse is travelling by ')))
+  host.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
+
+
+  }
+  $('#map').append(user)
+
+          }
+})})}
