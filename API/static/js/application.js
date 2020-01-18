@@ -165,11 +165,11 @@ if (user_details.includes('identifier')) {
   user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
   }
 else {
-  host = document.createElement("div")
-  host.class = 'row'
-  host.id = 'row_num'
-  host.append((String(allUsers[i]['username'] + ', the host mouse is travelling by ')))
-  host.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
+  user = document.createElement("div")
+  user.class = 'row'
+  user.id = 'row_num'
+  user.append((String(allUsers[i]['username'] + ', the host mouse is travelling by ')))
+  user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
 
 
   }
