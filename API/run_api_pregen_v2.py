@@ -10,12 +10,15 @@ import pandas as pd
 import credentials as creds
 import pandas.io.sql as psql
 import json
+import uuid
+import datetime
+import firebase_upload_bugs # import module firebase_upload_bugs.py
 # --------------------------------------REQUIREMENTS--------------------------------------
 
 """
 API important links explanation:
 /refresh (GET)
--> Refreshes the session, removing the cookies and allowing you to start 
+-> Refreshes the session, removing the cookies and allowing you to start
 from the original create session again
 
 /session/create (POST)
@@ -47,11 +50,18 @@ app = Flask(__name__)
 #The secret key is necessary for session to work
 app.secret_key = 'super dsagbrjuyki64y5tg4fd key'
 
-
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
     #A placeholder to check if the website is working
-    return 'Main Site Goes Here'
+    if request.method == 'GET':
+        return render_template('mainpage.html')
+    if request.method == 'POST':
+        content = request.get_json()
+
+        firebase = firebase_upload_bugs.firebase_data()
+        firebase.send_bug_report(content)
+        print("SENT!")
+        return content
 
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
@@ -60,13 +70,36 @@ def get_details(session_id):
 
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
-    if request.method == "GET":
-        return render_template('Geoloc.html') 
+    checkHost = request.args['isHost']
+    if checkHost == 'true':
+        return render_template('Geoloc.html', ifHost=True)
+    else:
+        return render_template('Geoloc.html', ifHost=False)
 
-@app.route('/session/create', methods=['POST'])
+@app.route('/session/create', methods=['POST', 'GET'])
 def create_session():
-    result = '{"session_id":"123456"}'
-    return result
+    #result = '{"session_id":"123456"}'
+    if request.method == "GET":
+        return render_template('createMeetupPage.html')
+    if request.method == "POST":
+        content = request.get_json()
+        session_id = str(uuid.uuid1())
+
+        # Example of content list
+        # [{"name":"meetupPurpose","value":"Food"},{"name":"transport_mode","value":"Walk"},{"name":"lat","value":"1.33518"},{"name":"long","value":"103.97242539999999"}]
+        host_user_details = {'lat':content[5].get('value'),
+                            'long':content[6].get('value'),
+                            'transport_mode':content[1].get('value'),
+                            'speed':content[2].get('value'),
+                            'quality':content[3].get('value'),
+                            'price':content[4].get('value'),
+                            'time_created':str(datetime.datetime.now())}
+
+        details = {'users':host_user_details,'meeting_type':content[0].get('value')}
+        json_details = json.dumps(details)
+        #print(json_details)
+        return(session_id)
+
 #Create a function to refresh the data if necessary
 @app.route('/refresh', methods=['GET'])
 def refresh():
@@ -82,33 +115,33 @@ def manage_details(session_id):
 
     elif request.method == 'GET':
         results = """
-                { 
-        "users":[ 
-            { 
+                {
+        "users":[
+            {
                 "lat":1.3672154,
                 "long":103.8674763,
-                "metrics":{ 
+                "metrics":{
                     "quality":5,
                     "speed":5
                 },
                 "transport_mode":"public",
                 "username":"Philip"
             },
-            { 
+            {
                 "identifier":"Stephen",
                 "lat":1.2848664,
                 "long":103.8244263,
-                "metrics":{ 
+                "metrics":{
                     "quality":5,
                     "speed":5
                 },
                 "transport_mode":"public"
             },
-            { 
+            {
                 "identifier":"Julia",
                 "lat":1.333489,
                 "long":103.865812,
-                "metrics":{ 
+                "metrics":{
                     "quality":5,
                     "speed":5
                 },
@@ -1654,7 +1687,7 @@ def results(session_id):
   }
 }
     """
-    
+
 
     # return the results
     return results

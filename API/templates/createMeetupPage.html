@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
+
+    <style>
+      #basicMap {
+        width: 400px;
+        height: 400px;
+      }
+
+      #basicMap:after {
+        width: 22px;
+        height: 40px;
+        display: block;
+        content: ' ';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -40px 0 0 -11px;
+        background: url('https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi_hdpi.png');
+        background-size: 22px 40px;
+        pointer-events: none;
+
+        .round3 {
+          border: 5px dotted rgb(214, 129, 137);
+          border-radius: 12px;
+          top: 20%;
+          bottom: 0;
+
+          padding: 2px;
+          margin-bottom: 2px;
+        }
+    </style>
+
+    <!-- Idk what these are just copy pasting START -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+      crossorigin="anonymous"></script>
+    <!-- Idk what these are END -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+      crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='js/maps.js')}}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g&callback=initMap"
+      async defer></script>
+</head>
+
+<body>
+    <!-- Copy Pasted for visual appeal -->
+    <div>
+      <div style='position:absolute;' class='row pl-2'>
+        <div class='col col-10'>
+
+        </div>
+        <div class='col col-2'>
+<!--          <img style="height:103%;width:220%;margin-right:0px;" align=right src="/static/Mouse.png" alt="Mouse"
+            width="500" height="500">
+            -->
+
+        </div>
+
+      </div>
+      <div class='row pl-2' style='background-color:Tomato;height:100%;'>
+        <h1>MeetUp Mouse</h1>
+      </div>
+      <div class='row pl-2' style="background-color:White;">
+        <h2>Allow meetup mouse to access your location and squeak away!</h2>
+      </div>
+    </div>
+
+    <!-- Form for user to submit and create meeting type,
+    Choose preferences and share link -->
+    <div class="container-fluid" style="margin-top:20px;">
+      <div class="row">
+        <div class="col col-5 ">
+        <form id='createMeetup' method='POST'>
+          <p>What is the purpose of your meetup?</p>
+          <p><input type="radio" name="meetupPurpose" value="Recreation"> Recreation </input>
+              <input type="radio" name="meetupPurpose" value="Food"> Food </input>
+              <input type="radio" name="meetupPurpose" value="Meeting"> Meeting </input></p>
+
+          <p>Transport mode</p>
+          <p><select name="transportMode" id="transportPreference"></p>
+            <option value='driving'> Driving </option>
+            <option value='publicTransport'> Public Transport </option>
+            <option value='walk'> Walk </option>
+            <option value='motorcycle'> Riding </option>
+          </select>
+
+          <p>Speed</p>
+          <p><select name="speed" id="speedPreference"></p>
+            <option value="noPreference">No Preference</option>
+            <option value="regular">Regular</option>
+            <option value="fast">Fast</option>
+          </select>
+
+          <p>Ratings</p>
+          <p><select name='ratings' id="ratingsPreference"></p>
+            <option value="noPreference">No Preference</option>
+            <option value="regular">Regular</option>
+            <option value="best">Best</option>
+          </select>
+
+          <p>Price</p>
+          <input name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
+          <span id='priceValue'>No Preference</span>
+
+          <br>  <!-- Just a page break -->
+          <button type='button' id='submitbutton'>Submit</button>
+        </div>
+
+        <!-- Map for user info -->
+        <div class='col col-4' style="margin-top:7%;">
+          <div
+            style="padding-top:0%;border:5px dotted rgb(214,129,137);border-radius:12px;padding:2px;height:100%;width:100%;vertical-align:top;"
+            class="round3" id='basicMap'></div>
+
+          <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
+          <input style="margin-right:0%;margin-top:0%;" type='hidden' name='long' id='long' />
+
+        </div>
+
+        </form>
+      </div>
+    </div>
+
+    <h3>Generate and share the link!</h3>
+    <!-- I don't know how to do, copy pasted from google
+         drive sharing html element
+         Come back later -->
+    <input id='shareLink' style="" aria-label="Link to share">
+    <textarea rows="3" type="text" aria-label="Link to share" style="display: none;"></textarea>
+
+    <button type='button' onclick='copyLinkFunction()'>Copy Link</button>
+    <button type='button' onclick='createMeetupButton()'>Create Meetup</button>
+
+    <!-- Edit this -->
+     <script src="{{url_for('static', filename='js/createMeetupPage.js')}}"></script>
+</body>
+
+</html>

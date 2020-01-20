@@ -12,6 +12,9 @@ import json
 import time
 import uuid
 import datetime
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import firestore
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS------------------------------------------
@@ -57,11 +60,11 @@ def index():
 def get_details(session_id):
     if request.method == "GET":
         return render_template('Geoloc2.html',session_id = session_id)
-    
+
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     if request.method == "GET":
-        return render_template('Geoloc.html',session_id = session_id)    
+        return render_template('Geoloc.html',session_id = session_id)
 
 @app.route('/session/create', methods=['POST'])
 def create_session():
@@ -89,7 +92,7 @@ def create_session():
     ###Generate Random Session ID:
     session_id = str(uuid.uuid1())
 
-    
+
 
     #Consolidate the session details
     host_user_details = {'username':username,
@@ -365,11 +368,11 @@ def calculate(session_id):
                     results_dict[location][user]['restaurant_y'] = relevant_df['restaurant_y'].iloc[0]
                 except:
                     print('WARNING: exception on location',location,'user',user)
-            
 
-        
+
+
         #Split dataframe by user
-        
+
         results = json.dumps(results_dict)
         crsr = conn.cursor()
         crsr.execute("UPDATE sessions SET results=%s WHERE session_id =%s",(results,session_id))
@@ -393,28 +396,80 @@ def results(session_id):
         #return the results
         return jsonify(results)
 
+<<<<<<< Updated upstream
+def get_doc_ref_for_id(session_id):
+    session_id = str(session_id)
+    return db.collection(u'sessions').document(session_id)
+=======
+
+
+>>>>>>> Stashed changes
+
+#Returns session id
+def create_session():
     
 
 
-
-
 if __name__ == '__main__':
+    #--------------------------------------CONNECT TO FIREBASE-------------------------------
+    print('Connecting to firebase')
+    if (not len(firebase_admin._apps)):
+        
+        # Use the application default credentials
+        # Use a service account
+        cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+        firebase_admin.initialize_app(cred)
+        db = firestore.client()
+    else:
+        db = firestore.client()
+    print('Connected!')
+    
+    #Testing code here
+    doc_ref = get_doc_ref_for_id(123456)
+#    doc_ref.set({
+#    u'first': u'Ada',
+#    u'last': u'Lovelace',
+#    u'born': 1815
+#    })
+    print(doc_ref.get().to_dict())
+    
+    
+    
+    
+    
+    #--------------------------------------CONNECT TO FIREBASE-------------------------------
 
     #--------------------------------------CONNECT TO DATABASE-------------------------------
     # Set up a connection to the postgres server.
-    print("Connecting to the postgres server")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr = conn.cursor()
-    #Set up a connection to gisdb, the routing database
-    print("Connecting to routing database")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn_gis=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr_gis = conn_gis.cursor()
+    try:
+        print("Connecting to the postgres server")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr = conn.cursor()
+        #Set up a connection to gisdb, the routing database
+        print("Connecting to routing database")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn_gis=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr_gis = conn_gis.cursor()
+    except:
+        creds.PGHOST = 'journey'
+        print("Connecting to the postgres server")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr = conn.cursor()
+        #Set up a connection to gisdb, the routing database
+        print("Connecting to routing database")
+        conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        conn_gis=psycopg2.connect(conn_string)
+        print("Connected!")
+        crsr_gis = conn_gis.cursor()
     #--------------------------------------CONNECT TO DATABASE-------------------------------
 
     #Check if the database exists. If not, create it

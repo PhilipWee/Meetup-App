@@ -1,3 +1,5 @@
+// results_display
+
 const xhr = new XMLHttpRequest();
 var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
 var session_id = window.location.pathname.split('/')[2]
@@ -11,8 +13,8 @@ xhr.onreadystatechange = (e) => {
     var list_of_restaurant_names = result['possible_locations']
     for (i in list_of_restaurant_names) (function(i){
       // debugger
-      btn = document.createElement("BUTTON")
-      btn.innerHTML = String(list_of_restaurant_names[i]);    
+      btn = document.createElement("BUTTON");
+      btn.innerHTML = String(list_of_restaurant_names[i]);
       btn.id = "location_modifier" + String(list_of_restaurant_names[i])
       // btn.addEventListener('click', function(i) {return {location_modifier}(i)});
       btn.onclick = function() {
@@ -30,15 +32,50 @@ xhr.onreadystatechange = (e) => {
       //   console.log(btn_arr[i].innerHTML)
       // }
       })(i);
+
+      // MADE CHANGES
+      //retrieveUsers();
+      var checkHost = document.getElementById('checkIfHost').textContent;
+      if (displayCalculateButton(checkHost) == true) {
+        calcButton = document.createElement("BUTTON");
+        calcButton.innerHTML = "Everyone's here, Calculate Results!";
+        calcButton.id = "calculateButton";
+
+        document.getElementById('calculateButton_div').appendChild(calcButton);
+      }
+
     //var y;
     // for (y in list_of_restaurant_names) {
-    //   var btn = document.createElement("BUTTON");              
-    //   btn.innerHTML = String(list_of_restaurant_names[y]);       
+    //   var btn = document.createElement("BUTTON");
+    //   btn.innerHTML = String(list_of_restaurant_names[y]);
     //   btn.id = "location_modifier" + String(list_of_restaurant_names[y])
     //   document.getElementById('buttons_div').appendChild(btn)
     //   document.getElementById(btn.id).addEventListener("click", function () {
     //     location_modifier(), false
     //   });}
+
+    // MADE CHANGES START
+    function retrieveUsers() {
+      jQuery.getJSON(
+          host_address_port + '/session/' + session_id,
+          function (data) {
+            var allUsers = data["users"];
+            for (i in allUsers) {
+              console.log(allUsers[i]);
+
+            }
+          })
+    }
+
+    function displayCalculateButton(check_host) {
+      if (check_host == 'True') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    // MADE CHANGES END
+
     function location_modifier(location_name) {
       console.log(location_name)
 
@@ -55,7 +92,7 @@ xhr.onreadystatechange = (e) => {
         path_arr.push(path)
       })
 
-    
+
 
       var map;
 
@@ -99,9 +136,44 @@ xhr.onreadystatechange = (e) => {
     }
 
 
-  
+
 
     //google.maps.event.addDomListener(window, 'load', initialize);//
 
   }
 }
+
+
+function jayson() {
+$(document).ready(function(){
+
+    $.getJSON(host_address_port + '/session/' + session_id, function(data) {
+
+      var allUsers = data["users"];
+      for (i in allUsers) {
+        console.log(Object.keys(allUsers[i]));
+        user_details = Object.keys(allUsers[i])
+
+if (user_details.includes('identifier')) {
+
+  user = document.createElement("div")
+  user.class = 'row'
+  user.id = 'row_num'
+  // document.body.appendChild(user)
+
+  user.append((String(allUsers[i]['identifier'] + ', the mouse is travelling by ')))
+  user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
+  }
+else {
+  user = document.createElement("div")
+  user.class = 'row'
+  user.id = 'row_num'
+  user.append((String(allUsers[i]['username'] + ', the host mouse is travelling by ')))
+  user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
+
+
+  }
+  $('#map').append(user)
+
+          }
+})})}

@@ -1,0 +1,18 @@
+version: "3.3"
+services:
+  meetup-app:
+    image: philipandrewweedewang/meetupapp
+    ports:
+        - "5000:5000"
+    networks:
+      - webnet
+    links:
+      - "journey:pg-sql"
+  pg-sql:
+    image: pgrouting/pgrouting:v2.6.3-postgresql_10
+    ports:
+        - "5432:5432"
+    volumes:
+        - $HOME/Desktop/Meetup-Data/postgresdatadir:/var/lib/postgresql/data
+networks:
+  webnet:

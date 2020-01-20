@@ -1,12 +1,19 @@
+
+//get details
 var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '')
 //Get the session id from the pathname
 var session_id = window.location.pathname.split('/')[2]
 
 
-    navigator.geolocation.getCurrentPosition(success, error, options);
-    console.log('test')
-    
+navigator.geolocation.getCurrentPosition(success, error, options);
+console.log('geolocation works')
 
+
+// Scipt for price preference slider
+var values = ['No Preference', '$', '$$', '$$$', '$$$$'];
+$('#pricePreference').change(function() {
+    $('span').text(values[this.value]);
+});
 
 function success(pos) {
     var crd = pos.coords;
@@ -14,7 +21,7 @@ function success(pos) {
     long = crd.longitude;
     $('#lat').val(lat);
     $('#long').val(long);
-    LatLng = new google.maps.LatLng(crd.latitude, crd.longitude);
+    LatLng = new google.maps.LatLng(lat, long);
     map.setCenter(LatLng);
 };
 
@@ -33,8 +40,11 @@ var options = {
 };
 
 
+
 function submitButton() {
+
     meetupForm = $('#meetupData')
+    console.log(meetupForm);
     meetupData = meetupForm.serializeArray()
     if ($('#lat').val() == '') {
         alert("Please drag the map to select your location!")
@@ -42,6 +52,7 @@ function submitButton() {
         newFunction();
     }
     function newFunction() {
+
         $.ajax({
             type: 'POST',
             url: host_address_port + '/session/' + session_id,
@@ -49,17 +60,16 @@ function submitButton() {
             contentType:'application/json',
             success: function (response_data) {
                 console.log("running redirect")
-    window.location.href='results_display' //form submission
-            }          
+    window.location.href='results_display' + '?isHost=false' //form submission
+            }
         })
-        
-    }
 
+    }
+document.getElementById('jayson').addEventListener("onclick", jayson)
 
 
 
 
   };
-  
+
   document.getElementById ("submitbutton").addEventListener ("click", submitButton);
-  

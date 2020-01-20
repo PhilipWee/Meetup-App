@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+<!-- Get Details -->
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -11,8 +11,8 @@
 
     
     #basicMap {
-      width: 400px;
-      height: 400px;
+      width: 800px;
+      height: 500px;
     }
 
     #basicMap:after {
@@ -123,27 +123,34 @@
   cursor: pointer;
 }
   </style>
+  
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
+    
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
     integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
     crossorigin="anonymous"></script>
+    
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
+  
   <!-- Load the google maps api stuff -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="{{url_for('static', filename='js/maps.js')}}"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g&callback=initMap"
+  
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g&callback=initMap&libraries=places"
     async defer></script>
-
+  
+  <script src="{{url_for('static', filename='js/maps.js')}}"></script>
+    
+  
 </head>
 
 <body>
 
-  <div>
-
+    <div>
+        
 
     <div style='position:absolute;' class='row pl-2'>
       <div class='col col-10'>
@@ -164,47 +171,81 @@
     </div>
   </div>
   </div>
-
   <div class="container-fluid" style="margin-top:20px;">
     <div class="row">
       <div class="col col-3" style='align-content: center;align-items: center;justify-content: center;'>
-        
+
         <div class="row ">
           <p><img style="height:90%;width:60%;margin-left:50px;" align=left src="/static/Map.png" alt="Map"
               width="220px" height="200px"></p>
         </div>
+        
       </div>
       <div class="col col-5 ">
         <form id='meetupData' method='POST'>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw; " class="row">
-           
+
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row ">
             <p>What is your mode of transport?</p>
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="row">
-            <p><input type='radio' name='transport_mode' value='Driving'> Driving </input>
-              <input type='radio' name='transport_mode' value='Public Transit'> Public Transport </input>
-              <input type='radio' name='transport_mode' value='Walk'> Walk </input>
-              <input type='radio' name='transport_mode' value='Public Transit'> MotorCycle </input></p>
+            <!-- MADE CHANGES START -->
+            <p><select name="transportMode" id="transportPreference"></p>
+              <option value='driving'> Driving </option>
+              <option value='publicTransport'> Public Transport </option>
+              <option value='walk'> Walk </option>
+              <option value='motorcycle'> Riding </option>
+            </select>
+            <!-- MADE CHANGES END -->
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row ">
             <p>How important is speed to you?</p>
           </div>
+<<<<<<< HEAD
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slidecontainer">
             <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange"></p>Least Important to Most Important
+=======
+          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slider">
+            <!-- MADE CHANGES START -->
+            <p><select name="speed" id="speedPreference"></p>
+              <option value="noPreference">No Preference</option>
+              <option value="regular">Regular</option>
+              <option value="fast">Fast</option>
+            </select>
+            <!-- MADE CHANGES END -->
+>>>>>>> 755f2f6dad86f77156acbed00d171db45416eda6
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row">
             <p>What about the quality of the transport?</p>
           </div>
+<<<<<<< HEAD
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slidercontainer">
             <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange2"></p>Least Important to Most Important
+=======
+          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slider">
+            <!-- MADE CHANGES START -->
+            <p><select name='ratings' id="ratingsPreference"></p>
+              <option value="noPreference">No Preference</option>
+              <option value="regular">Regular</option>
+              <option value="best">Best</option>
+            </select>
+            <!-- MADE CHANGES END -->
+>>>>>>> 755f2f6dad86f77156acbed00d171db45416eda6
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row">
             <p>What about the price?</p>
           </div>
+<<<<<<< HEAD
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slidercontainer">
             <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange3"></p>Least Important to Most Important
+=======
+          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slider">
+            <!-- MADE CHANGES START -->
+            <input name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
+            <span>No Preference</span>
+            <!-- MADE CHANGES END -->
+>>>>>>> 755f2f6dad86f77156acbed00d171db45416eda6
           </div>
 
           <div style="font-family: 'Patrick Hand SC';font-size:2.2vw;" class="row ">
@@ -213,19 +254,21 @@
             </div>
             <div class="col"><button type='button' id='submitbutton'>Submit</button></div>
           </div>
-          
+
 
       </div>
+      <input id="pac-input" style="padding-top:0%;border:5px dotted rgb(214,129,137);border-radius:12px;padding:2px;height:100%;width:80%;vertical-align:center;" class="controls" type="text" placeholder="Search Location">
       <div class='col col-4' style="margin-top:7%;">
-        <div
-          style="padding-top:0%;border:5px dotted rgb(214,129,137);border-radius:12px;padding:2px;height:100%;width:100%;vertical-align:top;"
-          class="round3" id='basicMap'></div>
+        <div class="round3" id='basicMap'>
+        </div>
+          
 
         <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
         <input style="margin-right:0%;margin-top:0%;" type='hidden' name='long' id='long' />
 
 
       </div>
+    
       </form>
 
 
@@ -233,6 +276,7 @@
   </div>
 
 
+<<<<<<< HEAD
   <script src="{{url_for('static', filename='js/button.js')}}">
   var slider = document.getElementById("myRange");
 var output = document.getElementById("demo");
@@ -242,8 +286,11 @@ slider.oninput = function() {
   output.innerHTML = this.value;
 }
   </script>
+=======
+>>>>>>> 755f2f6dad86f77156acbed00d171db45416eda6
 
+  
 </body>
-
+<script src="{{url_for('static', filename='js/button.js')}}"></script>
 
 </html>
