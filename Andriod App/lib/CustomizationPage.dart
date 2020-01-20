@@ -65,6 +65,63 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     return "";
   }
 
+  Future<String> postDataGetID() async {
+
+    //extract data from PrefData to add to json package
+    double lat = data.lat;
+    double long = data.long;
+    int quality = data.quality;
+    int speed = data.speed;
+    String transportmode = data.transportMode;
+    int priceLevel  = data.price;
+
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String address = globalurl();
+
+    String url = '$address/session/create';
+
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$priceLevel"}';
+    print("jsonpackage $jsonpackage");
+    try{
+
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+
+      if (statusCode != 200){
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error 404! Can"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+
+      else{
+
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+        print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
+        print("SERVER SAYS: $body");
+
+        //decode the string-map
+        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
+        var sessionid = sessionidjsonversion['session_id'];
+        data.sessionid = sessionid;
+        print("Transport Mode:$transportmode");
+        print("Quality:$quality");
+        print("Speed:$speed");
+        print("Price: $priceLevel");
+        data.link = "$address/session/$sessionid/get_details";
+        String theLink = data.link;
+        print('Link Created--> $theLink');
+        return theLink;
+
+      }
+    }
+
+    catch(e){print("Session Create Failed with Error: $e");}
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -268,8 +325,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       bottomNavigationBar: BottomAppBar(
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: () {
+            onPressed: () async {
               if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
+                postDataGetID();
+                await Future.delayed(Duration(milliseconds: 2000));
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
               } else {
                 Scaffold.of(context).showSnackBar(
