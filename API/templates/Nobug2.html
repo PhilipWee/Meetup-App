@@ -8,8 +8,6 @@
   <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-
-    
     #basicMap {
       width: 400px;
       height: 400px;
@@ -84,44 +82,6 @@
       width: 100%;
       margin: 0 20px 0 0;
     }
-
-    .slidecontainer {
-  width: 100%;
-}
-
-.slider {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 15px;
-  border-radius: 5px;
-  background: #d3d3d3;
-  outline: none;
-  opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-}
-
-.slider:hover {
-  opacity: 1;
-}
-
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 25px;
-  height: 25px;
-  background: url("http://127.0.0.1:5000/static/Cheese.png");
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
-
-.slider::-moz-range-thumb {
-  width: 25px;
-  height: 25px;
-  background: url("http://127.0.0.1:5000/static/Cheese.png");
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
   </style>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -168,80 +128,88 @@
   <div class="container-fluid" style="margin-top:20px;">
     <div class="row">
       <div class="col col-3" style='align-content: center;align-items: center;justify-content: center;'>
-        
+        <div style='margin-top:5px;' class="row ">
+          <button style='margin-left: 80px;height:90%;width:40%;' id='getlocation' align=left>Get my location</button>
+          <p id='geoloc' style="font-size: 2vw"></p>
+        </div>
         <div class="row ">
           <p><img style="height:90%;width:60%;margin-left:50px;" align=left src="/static/Map.png" alt="Map"
               width="220px" height="200px"></p>
         </div>
       </div>
       <div class="col col-5 ">
-        <form id='meetupData' method='POST'>
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw; " class="row">
-           
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row ">
-            <p>What is your mode of transport?</p>
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="row">
-            <p><input type='radio' name='transport_mode' value='Driving'> Driving </input>
-              <input type='radio' name='transport_mode' value='Public Transit'> Public Transport </input>
-              <input type='radio' name='transport_mode' value='Walk'> Walk </input>
-              <input type='radio' name='transport_mode' value='Public Transit'> MotorCycle </input></p>
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row ">
-            <p>How important is speed to you?</p>
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slidecontainer">
-            <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange"></p>Least Important to Most Important
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row">
-            <p>What about the quality of the transport?</p>
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slidercontainer">
-            <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange2"></p>Least Important to Most Important
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row">
-            <p>What about the price?</p>
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="slidercontainer">
-            <p><input type="range" min="1" max="100" value="50" class="slider" id="myRange3"></p>Least Important to Most Important
-          </div>
-
-          <div style="font-family: 'Patrick Hand SC';font-size:2.2vw;" class="row ">
-            <div class="col">
-              <input style='font-size: 2.2vw' type='reset' value='CLEAR' />
+        <div style="font-family: 'Patrick Hand SC';font-size:1.7vw; " class="row">
+          <div style='width:95%; height:120px;' class="outer">
+            <div class="row">
+              <div class="col" style='width:100%; height:100%;'>
+                <div class="float">Locator not working?</div>
+              </div>
+              <div class="col" style='width:100%; height:20px;margin-left:0%;' align=left>
+                <p>Enter your postal code:
+                  <input type='postal' name='postal'> </p>
+              </div>
             </div>
-            <div class="col"><button type='button' id='submitbutton'>Submit</button></div>
+
+
           </div>
-          
+        </div>
+        <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row ">
+          <p>How important is speed to you?</p>
+
+        </div>
+        <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="row">
+          <p><input type='radio' name='speed' value='1'> Least important </input>
+            <input type='radio' name='speed' value='2'> Somewhat important </input>
+            <input type='radio' name='speed' value='3'> Most important </input></p>
+        </div>
+        <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;" class="row">
+          <p>What about the quality of the transport?</p>
+        </div>
+        <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;" class="row">
+          <p><input type="radio" name="quality" value="1"> Least important </input>  
+            <input type="radio" name="quality" value="2"> Somewhat important </input>
+            <input type="radio" name="quality" value="3"> Most important </input></p>
+        </div>
+
+        <div style="font-family: 'Patrick Hand SC';font-size:2.2vw;" class="row ">
+          <div class="col">
+            <input style='font-size: 2.2vw' type='reset' value='CLEAR' />
+          </div>
+          <div class="col"><button type='button' id='submitbutton'>Submit</button></div>
+        </div>
+        <div><button type='button' style='margin-top:4%' id='redirect'>I confirm that my details are correct! Display my
+            Route!</button></div>
 
       </div>
       <div class='col col-4' style="margin-top:7%;">
+
+
+
         <div
           style="padding-top:0%;border:5px dotted rgb(214,129,137);border-radius:12px;padding:2px;height:100%;width:100%;vertical-align:top;"
           class="round3" id='basicMap'></div>
+        <form id='meetupData' method='POST'>
+          <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
+          <input style="margin-right:0%;margin-top:0%;" type='hidden' name='long' id='long' />
 
-        <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
-        <input style="margin-right:0%;margin-top:0%;" type='hidden' name='long' id='long' />
+        </form>
+
+
+
+
+
+
+
+
 
 
       </div>
-      </form>
-
 
     </div>
   </div>
 
 
-  <script src="{{url_for('static', filename='js/button.js')}}">
-  var slider = document.getElementById("myRange");
-var output = document.getElementById("demo");
-output.innerHTML = slider.value;
-
-slider.oninput = function() {
-  output.innerHTML = this.value;
-}
-  </script>
+  <script src="{{url_for('static', filename='js/button.js')}}"></script>
 
 </body>
 
