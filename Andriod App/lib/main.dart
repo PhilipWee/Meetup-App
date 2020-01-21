@@ -37,7 +37,8 @@ class PrefData {
   int quality;
   String sessionid;
   int price;
-  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid,this.price});
+  String userplace;
+  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid,this.price,this.userplace});
 }
 
 class MyApp extends StatelessWidget {
@@ -85,6 +86,7 @@ class CheckNetworkPage extends StatelessWidget {
       );
   }
 }
+
 
 refreshServer() async {
   String address = globalurl();
@@ -177,6 +179,23 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   final idTextController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
+  saveMyLocation() async{
+    var location = Location();
+    LocationData currentLocation = await location.getLocation();
+    data.lat = currentLocation.latitude;
+    data.long = currentLocation.longitude;
+    print("My Own Location");
+    print(data.lat);
+    print(data.long);
+    Map<String,double> mycoordinates = {"mylat":data.lat, "mylong":data.long};
+    List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(data.lat,data.long);
+    Placemark placeMark = myplacemark[0];
+    String name = myplacemark[0].thoroughfare.toString();
+    String locality = placeMark.locality;
+    data.userplace = "${name}, ${locality}";
+    print(data.userplace);
+  }
+
   @override
   void dispose() {
     textController.dispose();
@@ -222,7 +241,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               Expanded(
                 child: FlatButton(
                   onPressed: () {
-//                refreshServer();
+                    saveMyLocation();
                     if (textController.text != "") {
                       name = textController.text;
                       data.username = name;

@@ -128,8 +128,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
         Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
         List membersData = memberDatajsonVersion["users"];
         //extract the list of user detail maps into a list
-        List<Placemark> myplace = await Geolocator().placemarkFromCoordinates(data.lat,data.long); //get the name of the place where user is at right now
-        Map<String,String> placeNameMap = {"username": myplace[0].thoroughfare.toString() }; //add the place name as a value to the key "username" to a new map
+        Map<String,String> placeNameMap = {"username": data.userplace }; //add the place name as a value to the key "username" to a new map
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
           print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){

@@ -45,17 +45,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
   CustomizationPageState({this.data});
 
-  Future<Map<String,double>> saveMyLocation() async{
-    // Get user's current location
-    var location = Location();
-    LocationData currentLocation = await location.getLocation();
-    data.lat = currentLocation.latitude;
-    data.long = currentLocation.longitude;
-    print(data.lat);
-    print(data.long);
-    Map<String,double> mycoordinates = {"mylat":data.lat, "mylong":data.long};
-    return mycoordinates;
-  }
+//  Future<Map<String,double>> saveMyLocation() async{
 
   String value2 = "Select...";
   String value3 = "Select...";
@@ -146,24 +136,36 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             children: <Widget>[
               Expanded(
                 flex: 1,
-                child:Padding(
-                  padding:const EdgeInsets.only(left: 10, top: 8, right: 5, bottom: 8),
-                  child: TextField(
-                    decoration: InputDecoration(labelText: "Enter Location Manually", border: OutlineInputBorder())
+                child: Container(
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 10, bottom: 8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.home, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Location", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0
+                        ),),
+                      ),
+                    ],
                   ),
                 ),
               ),
               Expanded(
-                flex:0,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 5, top: 8, right: 8, bottom: 8),
-                  child: FlatButton(
-                    child: Text('Use My Location', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.6) ),
-                    color: Colors.amber,
-                    onPressed: saveMyLocation,
-                  ),
+                flex: 1,
+                child:Padding(
+                  padding:const EdgeInsets.only(left: 0, top: 8, right: 8, bottom: 8),
+                  child: PlacesAutocompleteField(
+                    controller: TextEditingController(text:data.userplace),
+                    apiKey: 'AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g',
+                    leading: Icon(Icons.search, color: Colors.black),
+                    hint: "Manually enter location",
+                    mode: Mode.overlay
+                  )
                 ),
-              )
+              ),
             ],
           ), //for location
           Row(
@@ -171,9 +173,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Expanded(
-                flex: 5,
                 child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30, bottom: 8.0),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.directions_car, color: Colors.black),
@@ -190,7 +191,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 ),
               ),
               Expanded(
-                flex: 5,
                 child: Container(
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
@@ -314,7 +314,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () async {
-              if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
+              if (value2 != "Select..." && value4 != "Select...") {
                 data.speed = 3;
                 postDataGetID();
                 await Future.delayed(Duration(milliseconds: 2000));
