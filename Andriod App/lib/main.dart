@@ -170,7 +170,7 @@ class HomeUsernameWidget extends StatefulWidget {
 }
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
-  static String name = "Host";
+  static String name;
   static String sessionID;
   final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
   final textController  = TextEditingController();
@@ -229,6 +229,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
 //                      dispose();
                     } else {
+                      name = "Host";
                       data.username = name;
                       Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
 //                      Scaffold.of(context).showSnackBar(

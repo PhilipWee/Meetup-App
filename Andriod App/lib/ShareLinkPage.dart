@@ -1,3 +1,5 @@
+import 'package:flutter/services.dart';
+
 import 'main.dart';
 import 'MapPage.dart';
 import 'CustomizationPage.dart';
@@ -24,7 +26,7 @@ class ShareLinkPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Share the Link!"),
+        title: Text("Share Meetup!"),
 //        backgroundColor: Colors.black,
       ),
       body: ShareLinkWidget(data: data),
@@ -174,12 +176,53 @@ class ShareLinkState extends State<ShareLinkWidget> {
 //    );
 
     Widget linkSection = Container(
-      child:
-      Padding(
-        padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
-        child: TextField(
-          controller: TextEditingController(text:data.link),
-          decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+      child: Padding(
+        padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                      controller: TextEditingController(text:data.sessionid),
+                      decoration: InputDecoration(labelText: "Tap here for Session ID", border: OutlineInputBorder())
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(left: 5, right: 5),
+                  child: Text(""),
+                ),
+                IconButton(
+                    icon: Icon(Icons.content_copy),
+                    onPressed: () {Clipboard.setData(ClipboardData(text: data.sessionid));}
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.only(top: 5, bottom: 5),
+              child: Text(""),
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  flex: 2,
+                  child: TextField(
+                    controller: TextEditingController(text:data.link),
+                    decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(left: 5, right: 5),
+                  child: Text(""),
+                ),
+                IconButton(
+                  icon: Icon(Icons.share),
+                  onPressed: () async => await _shareText()
+                ),
+              ],
+            ),
+          ],
         )
       )
     );
@@ -187,31 +230,31 @@ class ShareLinkState extends State<ShareLinkWidget> {
     Widget buttonSection = Container(
       height: 50.0,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 15.0, right: 5.0),
-                child: ButtonTheme(
-                  height: 35,
-                  child: FlatButton(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
-                    color: Colors.amber,
-                    textColor: Colors.black,
-                    onPressed: () async => await _shareText(),
-                    child: Text("Share"),
-                  ),
-                ),
-              )
-          ),
+//          Expanded(
+//              child: Padding(
+//                padding: const EdgeInsets.only(left: 15.0, right: 5.0),
+//                child: ButtonTheme(
+//                  height: 35,
+//                  child: FlatButton(
+//                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+//                    color: Colors.amber,
+//                    textColor: Colors.black,
+//                    onPressed: () async => await _shareText(),
+//                    child: Text("Share"),
+//                  ),
+//                ),
+//              )
+//          ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(left: 5.0, right: 15.0),
+              padding: const EdgeInsets.only(left: 15, right: 15.0),
               child: ButtonTheme(
                 minWidth: 180,
                 height: 35,
                 child: FlatButton(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.amber,
                   textColor: Colors.black,
                   onPressed: () {
@@ -280,9 +323,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
       body: Column(
         children:[
           linkSection,
-          buttonSection,
           Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
           listSection,
+          buttonSection,
         ],
       ),
     );
