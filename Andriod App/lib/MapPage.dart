@@ -140,21 +140,35 @@ class MapSampleState extends State<MapSample> {
     double destinationLat = 0;
     double destinationLong = 0;
     LatLng destinationLatLng;
+
     for (String key in data[locationName].keys) {
+      //Continue the loop for the banned keys
+      var banned_names = ['price','rating','place_id'];
+      if (banned_names.contains(key)) {
+        continue;
+      }
+      print('111111111111111111111111');
+      print(data);
+      print(data[locationName]);
+      print(data[locationName][key]);
       var latitude = data[locationName][key]['latitude'];
+      print('211111111111111111111111');
       var longtitude = data[locationName][key]['longtitude'];
+
       // print(latitude);
       // print(longtitude);
       polylineContainer.add(_makeLine(latitude,longtitude,lineIterator));
       lineIterator++;
-
+      print('311111111111111111111111');
       destinationLong = data[locationName][key]['restaurant_x'];
       destinationLat = data[locationName][key]['restaurant_y'];
 
       destinationLatLng = LatLng(destinationLat,destinationLong);
-
+      print('411111111111111111111111');
       print(destinationLatLng);
+
       markerContainer.add(_makeMarker(destinationLatLng, lineIterator));
+
 
     }
     //Draw routes
