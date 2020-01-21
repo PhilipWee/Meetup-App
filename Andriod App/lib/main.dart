@@ -173,16 +173,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
   final textController  = TextEditingController();
 
-  saveLocation() async{
-    // Get user's current location
-    var location = Location(); 
-    LocationData currentLocation = await location.getLocation();
-    data.lat = currentLocation.latitude;
-    data.long = currentLocation.longitude;
-    print(data.lat);
-    print(data.long);
-  }
-
   @override
   void dispose() {
     textController.dispose();
@@ -226,7 +216,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
             FlatButton(
               onPressed: () {
 //                refreshServer();
-                saveLocation();
+//                saveLocation();
                 if (textController.text != "") {
                   name = textController.text;
                   data.username = name;
