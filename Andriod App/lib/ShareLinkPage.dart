@@ -38,14 +38,12 @@ class ShareLinkWidget extends StatefulWidget {
   ShareLinkState createState() => ShareLinkState(data: data);
 }
 
-
-
 class ShareLinkState extends State<ShareLinkWidget> {
   final PrefData data;
   ShareLinkState({this.data});
   List listofmembers = [];
 
-  Future<String> sessionIdPost() async {
+  Future<String> postDataGetID() async {
 
     //extract data from PrefData to add to json package
     double lat = data.lat;
@@ -53,7 +51,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     int quality = data.quality;
     int speed = data.speed;
     String transportmode = data.transportMode;
-    int price_level  = data.price;
+    int priceLevel  = data.price;
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
@@ -62,7 +60,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     String url = '$address/session/create';
 
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
-//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$price_level"}';
+//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$priceLevel"}';
     print("jsonpackage $jsonpackage");
     try{
 
@@ -89,7 +87,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
         print("Transport Mode:$transportmode");
         print("Quality:$quality");
         print("Speed:$speed");
-        print("Price: $price_level");
+        print("Price: $priceLevel");
         data.link = "$address/session/$sessionid/get_details";
 
         data.sessionid = sessionid;
@@ -102,8 +100,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
     catch(e){print("Session Create Failed with Error: $e");}
   }
-
-//  Stream<Future<List<dynamic>>> stream = Stream<Future<List<dynamic>>>.periodic(Duration(seconds:2), getMembers)
 
   Future<List<dynamic>> getMembers() async {
 
@@ -150,94 +146,41 @@ class ShareLinkState extends State<ShareLinkWidget> {
     catch(e){print("Get-session-details Failed with error: $e");}
   }
 
-  Future<List<Map<String, dynamic>>> getMembersFAKE() async {
-
-    List<Map<String, dynamic>> membersData = [
-      {
-        "lat": 37.4219983,
-        "long": -122.084,
-        "metrics": {
-          "quality": 3,
-          "speed": 3
-        },
-        "transport_mode": "Driving",
-        "username": "username"
-      },
-      {
-        "identifier": "Philip",
-        "lat": 1.2848664,
-        "long": 103.8244263,
-        "metrics": {
-          "quality": 5,
-          "speed": 5
-        },
-        "transport_mode": "Driving"
-      },
-      {
-        "identifier": "Julia",
-        "lat": 1.2848664,
-        "long": 103.8244263,
-        "metrics": {
-          "quality": 5,
-          "speed": 5
-        },
-        "transport_mode": "Public Transport"
-      },
-      {
-        "identifier": "Joel",
-        "lat": 1.2848664,
-        "long": 103.8244263,
-        "metrics": {
-          "quality": 5,
-          "speed": 5
-        },
-        "transport_mode": "Public Transport"
-      },
-      {
-        "identifier": "Veda",
-        "lat": 1.2848664,
-        "long": 103.8244263,
-        "metrics": {
-          "quality": 5,
-          "speed": 5
-        },
-        "transport_mode": "Walking"
-      },
-      {
-        "username" : "Jalan Bukit Merah",
-        "Philip" : "Serangoon Gardens",
-        "Julia" : "Potong Pasir",
-        "Joel" : "Hougang",
-        "Veda" : "Upper Changi",
-      },
-    ];
-    return membersData;
-  }
-
   @override
   Widget build(BuildContext context) {
 
+//    Widget linkSection = Container(
+//      child:
+//      FutureBuilder(
+//          future: postDataGetID(),
+//          builder: (BuildContext context, AsyncSnapshot snapshot){
+//            print(snapshot);
+//            if(snapshot.data == null){
+//              return Text("Creating Link");
+//            }
+//            else {
+//              return
+//                Padding(
+//                  padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
+//                  child: TextField(
+//                      controller: TextEditingController(text:data.link),
+//                      decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+//                  ),
+//                );
+//            }
+//          }
+//      ),
+//    );
+
     Widget linkSection = Container(
       child:
-      FutureBuilder(
-          future: sessionIdPost(),
-          builder: (BuildContext context, AsyncSnapshot snapshot){
-            print(snapshot);
-            if(snapshot.data == null){
-              return Text("Unable to retrieve link");
-            }
-            else {
-              return
-                Padding(
-                  padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
-                  child: TextField(
-                      controller: TextEditingController(text:data.link),
-                      decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-                  ),
-                );
-            }
-          }
-      ),
+      Padding(
+        padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
+        child: TextField(
+          controller: TextEditingController(text:data.link),
+          decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+        )
+      )
     );
 
     Widget buttonSection = Container(
@@ -337,6 +280,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
         children:[
           linkSection,
           buttonSection,
+          Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
           listSection,
         ],
       ),
