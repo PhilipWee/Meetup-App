@@ -174,11 +174,12 @@ class HomeUsernameWidget extends StatefulWidget {
 }
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
-  static String name;
+  static String name = "Host";
   static String sessionID;
   final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
   final textController  = TextEditingController();
   final idTextController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
   saveLocation() async{
     // Get user's current location
@@ -243,11 +244,13 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
 //                      dispose();
                     } else {
-                      Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Please enter your username!"),
-                            duration: Duration(seconds: 2),
-                          ));
+                      data.username = name;
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+//                      Scaffold.of(context).showSnackBar(
+//                          SnackBar(
+//                            content: Text("Please enter your username!"),
+//                            duration: Duration(seconds: 2),
+//                          ));
                     }},
                   child: _buildButtonColumn(Colors.black, Icons.arrow_right, 'Get Started!'),
                   color: Colors.amber,
@@ -265,21 +268,35 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               Expanded(
                   child: FlatButton(
                     onPressed: () {
-                      if (textController.text != "") {
                         showDialog(
                           context: context,
                           barrierDismissible: true,
                           builder: (BuildContext context) {
-                            return _buildEnterID();
+                            if (textController.text != "") {
+                              name = textController.text;
+                              return _buildEnterID(name);
+                            } else {
+                              name = "Anonymouse";
+                              return _buildEnterID(name);
+                            }
                           }
                         );
-                      } else {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Please enter your username!"),
-                              duration: Duration(seconds: 2),
-                            ));
-                      }},
+                    },
+//                      if (textController.text != "") {
+//                        showDialog(
+//                          context: context,
+//                          barrierDismissible: true,
+//                          builder: (BuildContext context) {
+//                            return _buildEnterID();
+//                          }
+//                        );
+//                      } else {
+//                        Scaffold.of(context).showSnackBar(
+//                            SnackBar(
+//                              content: Text("Please enter your username!"),
+//                              duration: Duration(seconds: 2),
+//                            ));
+//                      }},
                     child: _buildButtonColumn(Colors.black, Icons.add, 'Join a Meetup'),
                     color: Colors.orange,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
@@ -324,7 +341,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               child: TextFormField(
                 controller: textController,
                 decoration: InputDecoration(
-                    labelText: "Username"
+//                    labelText: "Name (Optional)",
+                    hintText: "Name (Optional)"
                 ),
               ),
             ),
@@ -357,22 +375,31 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   }
 
   //Helper method to build AlertDialog for entering Session ID
-  AlertDialog _buildEnterID() {
+  AlertDialog _buildEnterID(String name) {
     return AlertDialog(
       title: Text("Enter Session ID"),
       content: Row(
         children: <Widget>[
           Expanded(
-            child: TextFormField(
-//              controller: idTextController,
-              autofocus: true,
-              decoration: InputDecoration(
-                  labelText: "Session ID"
-              ),
-              onChanged: (value) {
-                sessionID = value;
-              },
-            ),
+            child: Form(
+              key: formKey,
+              child: TextFormField(
+                  controller: idTextController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      labelText: "Session ID"
+                  ),
+                  onChanged: (value) {
+                    sessionID = value;
+                  },
+                  validator: (value) {
+                    if (value.isEmpty){
+                      return "Invalid ID";
+                    }
+                    return null;
+                  },
+                ),
+            )
           ),
         ],
       ),
@@ -380,12 +407,11 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         FlatButton(
           child: Text("Join!"),
           onPressed: () {
-            if (sessionID == "" || sessionID == null) {
-              //TODO: show invalid id message
-            } else {
-              name = textController.text;
+            if (formKey.currentState.validate()) {
               data.username = name;
               Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data : data)),);
+            } else {
+              print(formKey.currentState.validate());
             }
           },
         )
