@@ -169,13 +169,17 @@ class HomeUsernameWidget extends StatefulWidget {
 }
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
-  static String name;
+  static String name = "Host";
+  static String sessionID;
   final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
   final textController  = TextEditingController();
+  final idTextController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     textController.dispose();
+    idTextController.dispose();
     super.dispose();
   }
 
@@ -210,67 +214,105 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     Widget buttonSection =  Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FlatButton(
-              onPressed: () {
-//                refreshServer();
-//                saveLocation();
-                if (textController.text != "") {
-                  name = textController.text;
-                  data.username = name;
-                  Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
-                } else {
-                  Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Please enter your username!"),
-                        duration: Duration(seconds: 2),
-                      ));
-                }},
-              child: _buildButtonColumn(Colors.black, Icons.arrow_forward, 'Get Started!'),
-              color: Colors.amber,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-            )
-          ],
-        ) ,
-        Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        Padding(
+          padding: const EdgeInsets.only(left: 33.0, right: 33.0),
+          child: Row(
             children: <Widget>[
-              Container(
-                  child: Text( "OR", style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 20.0
-                  ),
-                  )
-              ),
-              ButtonBar(
-                alignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    onPressed: () {
-                      if (textController.text != "") {
-                        Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data : data)),);
-                      } else {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("There is no ongoing session!"),
-                              duration: Duration(seconds: 2),
-                            ));
-                      }
-                    },
-                    child: _buildButtonColumn(Colors.black, Icons.autorenew, 'Go to My Meetup!'),
-                    color: Colors.lightBlue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                  )
-                ],
-              ),
-              Container(
-                child: Text("       "),
-              ),
+              Expanded(
+                child: FlatButton(
+                  onPressed: () {
+//                refreshServer();
+                    saveLocation();
+                    if (textController.text != "") {
+                      name = textController.text;
+                      data.username = name;
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+//                      dispose();
+                    } else {
+                      data.username = name;
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+//                      Scaffold.of(context).showSnackBar(
+//                          SnackBar(
+//                            content: Text("Please enter your username!"),
+//                            duration: Duration(seconds: 2),
+//                          ));
+                    }},
+                  child: _buildButtonColumn(Colors.black, Icons.arrow_right, 'Get Started!'),
+                  color: Colors.amber,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                ),
+              )
             ],
-          )
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 33.0, right: 33.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                  child: FlatButton(
+                    onPressed: () {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (BuildContext context) {
+                            if (textController.text != "") {
+                              name = textController.text;
+                              return _buildEnterID(name);
+                            } else {
+                              name = "Anonymouse";
+                              return _buildEnterID(name);
+                            }
+                          }
+                        );
+                    },
+//                      if (textController.text != "") {
+//                        showDialog(
+//                          context: context,
+//                          barrierDismissible: true,
+//                          builder: (BuildContext context) {
+//                            return _buildEnterID();
+//                          }
+//                        );
+//                      } else {
+//                        Scaffold.of(context).showSnackBar(
+//                            SnackBar(
+//                              content: Text("Please enter your username!"),
+//                              duration: Duration(seconds: 2),
+//                            ));
+//                      }},
+                    child: _buildButtonColumn(Colors.black, Icons.add, 'Join a Meetup'),
+                    color: Colors.orange,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(left: 3, right: 3),
+                child: Text(""),
+              ),
+              Expanded(
+                child: FlatButton(
+                  onPressed: () {
+                    if (textController.text != "") {
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data : data)),);
+//                      dispose();
+                    } else {
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("There is no ongoing session!"),
+                            duration: Duration(seconds: 2),
+                          ));
+                    }},
+                  child: _buildButtonColumn(Colors.black, Icons.autorenew, 'My Meetup'),
+                  color: Colors.lightBlue,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                )
+              )
+            ],
+          ),
+        ),
+
       ],
     );
 
@@ -284,7 +326,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               child: TextFormField(
                 controller: textController,
                 decoration: InputDecoration(
-                    labelText: "Username"
+//                    labelText: "Name (Optional)",
+                    hintText: "Name (Optional)"
                 ),
               ),
             ),
@@ -297,15 +340,15 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   //Helper method to create button icons with text
   Row _buildButtonColumn(Color color, IconData icon, String label) {
     return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          margin: const EdgeInsets.only(right: 8),
+          margin: const EdgeInsets.only(right: 3),
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -315,6 +358,52 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       ],
     );
   }
+
+  //Helper method to build AlertDialog for entering Session ID
+  AlertDialog _buildEnterID(String name) {
+    return AlertDialog(
+      title: Text("Enter Session ID"),
+      content: Row(
+        children: <Widget>[
+          Expanded(
+            child: Form(
+              key: formKey,
+              child: TextFormField(
+                  controller: idTextController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      labelText: "Session ID"
+                  ),
+                  onChanged: (value) {
+                    sessionID = value;
+                  },
+                  validator: (value) {
+                    if (value.isEmpty){
+                      return "Invalid ID";
+                    }
+                    return null;
+                  },
+                ),
+            )
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text("Join!"),
+          onPressed: () {
+            if (formKey.currentState.validate()) {
+              data.username = name;
+              Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data : data)),);
+            } else {
+              print(formKey.currentState.validate());
+            }
+          },
+        )
+      ],
+    );
+  }
+  
 
 }
 

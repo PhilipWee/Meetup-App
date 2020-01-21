@@ -32,6 +32,7 @@ dependencies:
   connectivity: ^0.4.4
   pull_to_refresh: ^1.5.7
   loading_indicator: ^1.0.0
+  dropdown_banner: ^1.4.0
 
 dev_dependencies:
   flutter_test:
