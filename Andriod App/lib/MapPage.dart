@@ -147,7 +147,7 @@ class MapSampleState extends State<MapSample> {
       }
       var latitude = data[locationName][key]['latitude'];
       var longtitude = data[locationName][key]['longtitude'];
-      var transport_type = data[locationName][key];
+      var transport_type = data[locationName][key]['transport_type'];
       var transport_type_id = data[locationName][key]['transport_type_id'];
       print('111111111111111111111111111111111111111111');
       print(transport_type);
