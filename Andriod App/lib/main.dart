@@ -267,7 +267,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           }
                         );
                     },
-                    child: _buildButtonColumn(Colors.black, Icons.add, 'Join a Meetup'),
+                    child: _buildButtonColumn(Colors.black, Icons.add, 'Join Meetup'),
                     color: Colors.orange,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                   ),
@@ -329,11 +329,10 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-//          margin: const EdgeInsets.only(right: 3),
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 14.9,
               fontWeight: FontWeight.bold,
               color: color,
             ),
