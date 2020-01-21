@@ -148,7 +148,8 @@ def calculate(sess_id,info):
 
         print('Get User Closest Node -', time.time() - section_start_time)
         section_start_time = time.time()
-
+        
+        
         #Get the driving results
         results = pd.read_sql("with results as (\
                     select \
