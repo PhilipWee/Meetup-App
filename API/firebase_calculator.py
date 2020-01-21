@@ -164,7 +164,7 @@ def calculate(sess_id,info):
         user_driving_osms = [user_detail_key for user_detail_key in user_details.keys() if user_details[user_detail_key]['transport_mode'] == 'Driving' or user_details[user_detail_key]['transport_mode'] == 'driving']
         user_driving_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_driving_osms)+"]::bigint[]"
         
-        user_walking_osms = [user_detail_key for user_detail_key in user_details.keys() if user_details[user_detail_key]['transport_mode'] == 'Walking' or user_details[user_detail_key]['transport_mode'] == 'walking']
+        user_walking_osms = [user_detail_key for user_detail_key in user_details.keys() if user_details[user_detail_key]['transport_mode'] == 'Walking' or user_details[user_detail_key]['transport_mode'] == 'walking' or user_details[user_detail_key]['transport_mode'] == 'Walk']
         user_walking_array = "ARRAY["+','.join(str(user_osm) for user_osm in user_walking_osms)+"]::bigint[]"
         
         # set the meeting type
@@ -232,7 +232,7 @@ def calculate(sess_id,info):
                             {location_db}.cost AS price
                      FROM   (
                                    SELECT *
-                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost*kmh/5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2,closest_outing_node,closest_restaurant_node  FROM osm_2po_4pgr where clazz!=11', {user_walking_array}, array
+                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost*kmh/6.5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2,closest_outing_node,closest_restaurant_node  FROM osm_2po_4pgr where clazz!=11', {user_walking_array}, array
                                           (
                                                  SELECT nearest_road_neighbour_osm_id
                                                  FROM   {location_db}))) AS results
@@ -349,9 +349,11 @@ ON		   results.place_id = best_places.place_id""".format(**params_dict),conn_gis
         osm_id_to_name_dict = dict(zip(user_osms,user_identifiers))
         #Replace the osm ids in results with the user's names
         results['start_user_name'] = pd.Series(osm_id_to_name_dict[row['start_user']] for index,row in results.iterrows())
+    
         #Format the results in dictionaries
         results_dict = {}
-        results_dict['possible_locations'] = results['name'].unique().tolist()
+        results_dict['possible_locations'] = results.sort_values('total_cost')['name'].unique().tolist()
+#        print(results_dict['possible_locations'])
         results_dict['users'] = user_details
         # print('results_dict:')
         # print(results_dict)
@@ -377,7 +379,7 @@ ON		   results.place_id = best_places.place_id""".format(**params_dict),conn_gis
                     results_dict[location]['price'] = str(relevant_df['price'].iloc[0])
                     results_dict[location]['rating'] = str(relevant_df['rating'].iloc[0])
                     results_dict[location]['place_id'] = str(relevant_df['place_id'].iloc[0])
-
+                    results_dict[location]['total_cost'] = str(max([int(relevant_df['total_cost'].iloc[0] * 60),5*number_of_users]))
                     #Make a dictionary for each use
                 
                     results_dict[location][user] = {}
@@ -385,7 +387,7 @@ ON		   results.place_id = best_places.place_id""".format(**params_dict),conn_gis
                     results_dict[location][user]['latitude'] = relevant_df['latitude'].values.tolist()
                     results_dict[location][user]['longtitude'] = relevant_df['longtitude'].values.tolist()
                     # results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
-                    results_dict[location][user]['total_cost'] = str(relevant_df['total_cost'].iloc[0])
+                    
                     results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'].iloc[0])
                     results_dict[location][user]['start_user'] = str(relevant_df['start_user'].iloc[0])
                     results_dict[location][user]['start_user_name'] = str(relevant_df['start_user_name'].iloc[0])
@@ -411,6 +413,9 @@ def upload_calculated_route(sess_id,result):
 #    except:
 #        print('Error inserting user details, does session id exist?')
 
+#sess_id = 'f8893f7c-38fc-11ea-bf52-06b6ade4a06c'
+#info = get_details_for_session_id(sess_id)
+#results = calculate(sess_id,info)
 
 while True:
     print('Checking')
