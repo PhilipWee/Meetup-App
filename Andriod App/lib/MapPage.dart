@@ -147,7 +147,10 @@ class MapSampleState extends State<MapSample> {
       }
       var latitude = data[locationName][key]['latitude'];
       var longtitude = data[locationName][key]['longtitude'];
-
+      var transport_type = data[locationName][key]['transport_type'];
+      var transport_type_id = data[locationName][key]['transport_type_id'];
+      print('111111111111111111111111111111111111111111');
+      print(transport_type);
       // print(latitude);
       // print(longtitude);
       polylineContainer.add(_makeLine(latitude,longtitude,lineIterator));
@@ -156,7 +159,7 @@ class MapSampleState extends State<MapSample> {
       destinationLat = data[locationName][key]['restaurant_y'];
 
       destinationLatLng = LatLng(destinationLat,destinationLong);
-      print(destinationLatLng);
+//      print(destinationLatLng);
 
       markerContainer.add(_makeMarker(destinationLatLng, lineIterator));
 
@@ -164,7 +167,7 @@ class MapSampleState extends State<MapSample> {
     }
     //Draw routes
     setState(() {
-      print(markerContainer.length.toString());
+//      print(markerContainer.length.toString());
       _locationName = locationName;
       _destinationLat = destinationLat;
       _destinationLong = destinationLong;
@@ -229,7 +232,7 @@ class MapSampleState extends State<MapSample> {
               print('warning the snapshot is still at the info stage!');
             }
             possibleLocations = snapshot.data['possible_locations'];
-            print(snapshot.data);
+//            print(snapshot.data);
             datacopy = snapshot.data;
             return ListView.builder(
               itemCount: possibleLocations.length,

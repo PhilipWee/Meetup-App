@@ -195,7 +195,10 @@ def calculate(sess_id,info):
         #Create the string for public, driving and walking
         dijkstra_string = ""
         if len(user_public_osms) > 0:
-            dijkstra_string += """SELECT *,
+            dijkstra_string += """
+            SELECT public_result.*,public_edges_2.transport_type,public_edges_2.type_id as transport_type_id
+                     FROM   (
+                                   SELECT *,
                             {location_db}.cost AS price
                      FROM   (
                                    SELECT *
@@ -205,14 +208,19 @@ def calculate(sess_id,info):
                                                  SELECT nearest_road_neighbour_osm_id
                                                  FROM   {location_db}))) AS results
                      JOIN   {location_db}
-                     ON     results.end_vid = {location_db}.nearest_road_neighbour_osm_id""".format(**params_dict)
+                     ON     results.end_vid = {location_db}.nearest_road_neighbour_osm_id) public_result
+                     
+                     JOIN   public_edges_2
+                     ON     public_result.edge = public_edges_2.id
+            
+            
+            """.format(**params_dict)
         
         if len(user_public_osms) > 0 and len(user_driving_osms) > 0:
             dijkstra_string += " UNION \n"
             
         if len(user_driving_osms) > 0:
-            dijkstra_string += """SELECT *,
-                            {location_db}.cost AS price
+            dijkstra_string += """SELECT *,singapore_restaurants_2.cost AS price, 'driving' as transport_type, 'nil' as transport_type_id
                      FROM   (
                                    SELECT *
 						 --driving
@@ -227,9 +235,7 @@ def calculate(sess_id,info):
             dijkstra_string += " UNION \n"
         
         if len(user_walking_osms) > 0:
-            dijkstra_string += """SELECT *,
-		   				--walking
-                            {location_db}.cost AS price
+            dijkstra_string += """SELECT *,singapore_restaurants_2.cost AS price, 'walking' as transport_type, 'nil' as transport_type_id
                      FROM   (
                                    SELECT *
                                    FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost*kmh/6.5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2,closest_outing_node,closest_restaurant_node  FROM osm_2po_4pgr where clazz!=11', {user_walking_array}, array
@@ -291,7 +297,7 @@ def calculate(sess_id,info):
 #ON		   results.place_id = best_places.place_id""".format(**params_dict))
         
         #Get the driving results
-        results = pd.read_sql("""WITH results AS
+        sql_string = """WITH results AS
 (
        SELECT results.*,
               osm_2po_4pgr.geom_way,
@@ -309,36 +315,42 @@ def calculate(sess_id,info):
          SELECT   *
          FROM    (
                          SELECT place_id,
+                                path_seq,
                                 sum(agg_cost) OVER (partition BY end_vid) AS total_cost,
                                 max(agg_cost) OVER (partition BY end_vid) AS max_travel_time,
-                                min(agg_cost) OVER (partition BY end_vid) AS min_travel_time
+                                min(agg_cost) OVER (partition BY end_vid) AS min_travel_time,
+                                max(path_seq) OVER (partition BY end_vid,start_vid) AS max_path_seq 
                          FROM   (
                                        SELECT *
                                        FROM   results
                                        WHERE  price != 'None') results
-                         WHERE  edge = -1
-                         AND    cast (price AS integer) <= {max_price}
+                         WHERE  cast (price AS integer) <= {max_price}
                          AND    cast (price AS integer) >= {min_price}
                          AND    rating > {min_rating} ) results
          WHERE    max_travel_time   - min_travel_time < {max_travel_time_diff}
+         AND path_seq = max_path_seq
          ORDER BY total_cost limit {number_of_results}*{number_of_users} )
-SELECT     path_seq,
-           results.start_vid AS start_user,
-           agg_cost          AS cost_for_user,
-           total_cost,
-           NAME,
-           results.end_vid,
-           geom_way  AS location,
-           x1        AS longtitude,
-           y1        AS latitude,
-           st_x(way) AS restaurant_x,
-           st_y(way) AS restaurant_y,
-           results.price,
-           results.rating,
-           results.place_id
+SELECT    results.path_seq,
+          results.start_vid AS start_user,
+          agg_cost          AS cost_for_user,
+          total_cost,
+          NAME,
+          results.end_vid,
+          geom_way  AS location,
+          x1        AS longtitude,
+          y1        AS latitude,
+          st_x(way) AS restaurant_x,
+          st_y(way) AS restaurant_y,
+          results.price,
+          results.rating,
+          results.place_id,
+          transport_type,
+          transport_type_id
 FROM       results
 INNER JOIN best_places
-ON		   results.place_id = best_places.place_id""".format(**params_dict),conn_gis)
+ON		   results.place_id = best_places.place_id""".format(**params_dict)
+        print(sql_string)
+        results = pd.read_sql(sql_string,conn_gis)
 
 
         print('Perform optimisation -', time.time() - section_start_time)
@@ -386,6 +398,8 @@ ON		   results.place_id = best_places.place_id""".format(**params_dict),conn_gis
                     results_dict[location][user]['cost_for_user'] = str(relevant_df['cost_for_user'].max() * 60)
                     results_dict[location][user]['latitude'] = relevant_df['latitude'].values.tolist()
                     results_dict[location][user]['longtitude'] = relevant_df['longtitude'].values.tolist()
+                    results_dict[location][user]['transport_type'] = relevant_df['transport_type'].values.tolist()
+                    results_dict[location][user]['transport_type_id'] = relevant_df['transport_type_id'].values.tolist()
                     # results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
                     
                     results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'].iloc[0])
@@ -413,7 +427,7 @@ def upload_calculated_route(sess_id,result):
 #    except:
 #        print('Error inserting user details, does session id exist?')
 
-#sess_id = 'f8893f7c-38fc-11ea-bf52-06b6ade4a06c'
+#sess_id = '7fbd69c4-3c2b-11ea-bf52-06b6ade4a06c'
 #info = get_details_for_session_id(sess_id)
 #results = calculate(sess_id,info)
 
