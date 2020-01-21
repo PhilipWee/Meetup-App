@@ -44,6 +44,18 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
   CustomizationPageState({this.data});
 
+  Future<Map<String,double>> saveMyLocation() async{
+    // Get user's current location
+    var location = Location();
+    LocationData currentLocation = await location.getLocation();
+    data.lat = currentLocation.latitude;
+    data.long = currentLocation.longitude;
+    print(data.lat);
+    print(data.long);
+    Map<String,double> mycoordinates = {"mylat":data.lat, "mylong":data.long};
+    return mycoordinates;
+  }
+
   String value2 = "Select...";
   String value3 = "Select...";
   String value4 = "Select...";
@@ -128,6 +140,32 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       body: ListView(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child:Padding(
+                  padding:const EdgeInsets.only(left: 10, top: 8, right: 5, bottom: 8),
+                  child: TextField(
+                    decoration: InputDecoration(labelText: "Enter Location Manually", border: OutlineInputBorder())
+                  ),
+                ),
+              ),
+              Expanded(
+                flex:0,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5, top: 8, right: 8, bottom: 8),
+                  child: FlatButton(
+                    child: Text('Use My Location', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.6) ),
+                    color: Colors.amber,
+                    onPressed: saveMyLocation,
+                  ),
+                ),
+              )
+            ],
+          ), //for location
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
@@ -174,56 +212,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               )
             ],
           ),//for transport
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.timer, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Speed", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: Container(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value3,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value3 = newValue;
-                          if (value3=="Fast"){data.speed = 3;}
-                          else if (value3=="Regular"){data.speed=2;}
-                          else if (value3=="No Preference"){data.speed=1;}  //ADD TO DATABASE
-                          else {data.speed=0;}
-                        });
-                      },
-                      items: <String>["Select...", "No Preference", "Regular", "Fast"].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),//for speed
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
@@ -318,8 +306,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 ),
               )
             ],
-          ),
-
+          ), //for price
         ], //children of ListView
       ),
       bottomNavigationBar: BottomAppBar(
@@ -327,6 +314,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () async {
               if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
+                data.speed = 3;
                 postDataGetID();
                 await Future.delayed(Duration(milliseconds: 2000));
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);

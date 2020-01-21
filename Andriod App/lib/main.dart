@@ -176,16 +176,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   final idTextController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  saveLocation() async{
-    // Get user's current location
-    var location = Location(); 
-    LocationData currentLocation = await location.getLocation();
-    data.lat = currentLocation.latitude;
-    data.long = currentLocation.longitude;
-    print(data.lat);
-    print(data.long);
-  }
-
   @override
   void dispose() {
     textController.dispose();
@@ -195,7 +185,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   @override
   Widget build(BuildContext context) {
-    //Logo and start message
+    //Logo and start messages
     Widget welcomeSection = Container(
       margin: const EdgeInsets.only(left: 50.0, top: 20.0, right: 50.0),
       alignment: Alignment.center,
@@ -232,7 +222,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                 child: FlatButton(
                   onPressed: () {
 //                refreshServer();
-                    saveLocation();
                     if (textController.text != "") {
                       name = textController.text;
                       data.username = name;
