@@ -62,9 +62,6 @@ class CheckNetworkPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   title: Text(""),
-        // ),
         body: StreamBuilder(
             stream: Connectivity().onConnectivityChanged,
             builder: (BuildContext ctxt,
@@ -77,7 +74,6 @@ class CheckNetworkPage extends StatelessWidget {
                   return Center(child: Text("No Internet Connection!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:
-                  print("Connected to Internet!");
                   return HomeScreen();
                 default:
                   return Center(child: Text("No Internet Connection!"));
@@ -184,9 +180,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     LocationData currentLocation = await location.getLocation();
     data.lat = currentLocation.latitude;
     data.long = currentLocation.longitude;
-    print("My Own Location");
-    print(data.lat);
-    print(data.long);
+    print("User Location Data");
+    print("${data.lat},${data.long}");
     Map<String,double> mycoordinates = {"mylat":data.lat, "mylong":data.long};
     List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(data.lat,data.long);
     Placemark placeMark = myplacemark[0];

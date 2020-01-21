@@ -46,64 +46,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
   ShareLinkState({this.data});
   List listofmembers = [];
 
-  Future<String> postDataGetID() async {
-
-    //extract data from PrefData to add to json package
-    double lat = data.lat;
-    double long = data.long;
-    int quality = data.quality;
-    int speed = data.speed;
-    String transportmode = data.transportMode;
-    int priceLevel  = data.price;
-
-    //send json package to server as POST
-    Map<String, String> headers = {"Content-type": "application/json"};
-    String address = globalurl();
-
-    String url = '$address/session/create';
-
-    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
-//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$priceLevel"}';
-    print("jsonpackage $jsonpackage");
-    try{
-
-      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
-      int statusCode = response.statusCode;
-
-      if (statusCode != 200){
-        Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Oops! Server Error 404! Can"),
-              duration: Duration(seconds: 2),
-            ));
-      }
-
-      else{
-
-        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
-        print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-        print("SERVER SAYS: $body");
-
-        //decode the string-map
-        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
-        var sessionid = sessionidjsonversion['session_id'];
-        print("Transport Mode:$transportmode");
-        print("Quality:$quality");
-        print("Speed:$speed");
-        print("Price: $priceLevel");
-        data.link = "$address/session/$sessionid/get_details";
-
-        data.sessionid = sessionid;
-        String tempvar = data.link;
-        print('Link Created--> $tempvar');
-        return data.link;
-
-      }
-    }
-
-    catch(e){print("Session Create Failed with Error: $e");}
-  }
-
   Future<List<dynamic>> getMembers() async {
 
     String sessID = data.sessionid;
@@ -111,11 +53,10 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
     try{
       http.Response response = await http.get('$address/session/$sessID');
-      print("COCK");
       await Future.delayed(Duration(milliseconds: 1500));
       int statusCode = response.statusCode;
       String body = response.body;
-      print(response.statusCode);
+      print("GetMembere Request Successful/Failed With Status: $statusCode");
 
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
@@ -125,23 +66,20 @@ class ShareLinkState extends State<ShareLinkWidget> {
             ));
       }
       else{
-        print("GET REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-        print("SERVER SAYS: $body");
+        print("Members List: $body");
         Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
         List membersData = memberDatajsonVersion["users"];
         //extract the list of user detail maps into a list
         Map<String,String> placeNameMap = {"username": data.userplace }; //add the place name as a value to the key "username" to a new map
         for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
-          print(mapcontent);
           if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
             List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
-//            List<Placemark> place = await Geolocator().placemarkFromCoordinates(mapcontent["lat"], mapcontent["long"]); //use the lat long values to find the placename
             placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
           }
           else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
         }
         membersData.add(placeNameMap);
-        print("membersData-> $membersData");
+//        print("membersData-> $membersData");
         return membersData;
       }
     }
@@ -150,29 +88,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
 
   @override
   Widget build(BuildContext context) {
-
-//    Widget linkSection = Container(
-//      child:
-//      FutureBuilder(
-//          future: postDataGetID(),
-//          builder: (BuildContext context, AsyncSnapshot snapshot){
-//            print(snapshot);
-//            if(snapshot.data == null){
-//              return Text("Creating Link");
-//            }
-//            else {
-//              return
-//                Padding(
-//                  padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 5.0),
-//                  child: TextField(
-//                      controller: TextEditingController(text:data.link),
-//                      decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-//                  ),
-//                );
-//            }
-//          }
-//      ),
-//    );
 
     Widget linkSection = Container(
       child: Padding(
@@ -278,7 +193,6 @@ class ShareLinkState extends State<ShareLinkWidget> {
       FutureBuilder(
         future: getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
-          print(snapshot);
           listofmembers = snapshot.data;
           if(listofmembers == null){
             return

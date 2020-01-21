@@ -86,7 +86,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
 //    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
     String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$price"}';
-    print("jsonpackage $jsonpackage");
+    print("Sending Jsonpackage To Server >>> $jsonpackage");
     try{
 
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
@@ -103,26 +103,21 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       else{
 
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
-        print("POST REQUEST SUCCESSFUL/FAILED WITH STATUSCODE: $statusCode");
-        print("SERVER SAYS: $body");
+        print("PostData successfull with statuscode: $statusCode");
+        print("Get Session ID successfull with body : $body");
 
         //decode the string-map
         Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
         var sessionid = sessionidjsonversion['session_id'];
         data.sessionid = sessionid;
-        print("Transport Mode:$transportmode");
-        print("Quality:$quality");
-        print("Speed:$speed");
-        print("Price: $price");
         data.link = "$address/session/$sessionid/get_details";
         String theLink = data.link;
-        print('Link Created--> $theLink');
+        print('Link Created[ $theLink ]');
         return theLink;
 
       }
     }
-
-    catch(e){print("Session Create Failed with Error: $e");}
+    catch(e){print("Error caught at PostDataGetID(): $e");}
   }
 
   @override
