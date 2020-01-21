@@ -73,7 +73,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     int quality = data.quality;
     int speed = data.speed;
     String transportmode = data.transportMode;
-    int priceLevel  = data.price;
+    int price  = data.price;
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
@@ -81,8 +81,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
     String url = '$address/session/create';
 
-    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
-//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$priceLevel"}';
+//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$price"}';
     print("jsonpackage $jsonpackage");
     try{
 
@@ -110,7 +110,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         print("Transport Mode:$transportmode");
         print("Quality:$quality");
         print("Speed:$speed");
-        print("Price: $priceLevel");
+        print("Price: $price");
         data.link = "$address/session/$sessionid/get_details";
         String theLink = data.link;
         print('Link Created--> $theLink');
