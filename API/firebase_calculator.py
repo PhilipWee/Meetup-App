@@ -386,6 +386,8 @@ ON		   results.place_id = best_places.place_id""".format(**params_dict),conn_gis
                     results_dict[location][user]['cost_for_user'] = str(relevant_df['cost_for_user'].max() * 60)
                     results_dict[location][user]['latitude'] = relevant_df['latitude'].values.tolist()
                     results_dict[location][user]['longtitude'] = relevant_df['longtitude'].values.tolist()
+                    results_dict[location][user]['transport_type'] = relevant_df['transport_type'].values.tolist()
+                    results_dict[location][user]['transport_type_id'] = relevant_df['transport_type_id'].values.tolist()
                     # results_dict[location][user] = relevant_df[['latitude','longtitude']].to_dict()
                     
                     results_dict[location][user]['end_vid'] = str(relevant_df['end_vid'].iloc[0])
