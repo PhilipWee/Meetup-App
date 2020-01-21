@@ -277,21 +277,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           }
                         );
                     },
-//                      if (textController.text != "") {
-//                        showDialog(
-//                          context: context,
-//                          barrierDismissible: true,
-//                          builder: (BuildContext context) {
-//                            return _buildEnterID();
-//                          }
-//                        );
-//                      } else {
-//                        Scaffold.of(context).showSnackBar(
-//                            SnackBar(
-//                              content: Text("Please enter your username!"),
-//                              duration: Duration(seconds: 2),
-//                            ));
-//                      }},
                     child: _buildButtonColumn(Colors.black, Icons.add, 'Join a Meetup'),
                     color: Colors.orange,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
@@ -354,11 +339,11 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          margin: const EdgeInsets.only(right: 3),
+//          margin: const EdgeInsets.only(right: 3),
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: color,
             ),
