@@ -57,9 +57,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     return mycoordinates;
   }
 
-  String value2 = "Select...";
-  String value3 = "Select...";
-  String value4 = "Select...";
+  String value2 = "Public Transit";
+//  String value3 = "Select...";  //originally used for speed
+  String value4 = "No Preference";
   double value5 = 0;
   //Method for the labels on the slider
   String labels() {
@@ -201,7 +201,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           data.transportMode = newValue; //ADD TO DATABASE
                         });
                       },
-                      items: <String>["Select...", "Driving", "Public Transit", "Walk", "Riding"].map<DropdownMenuItem<String>>((String value) {
+                      items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -251,7 +251,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           else{data.quality=0;}
                         });
                       },
-                      items: <String>["Select...", "No Preference", "Regular", "Best"]
+                      items: <String>["No Preference", "Regular", "Best"]
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -314,7 +314,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () async {
-              if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
+              if (value2.isNotEmpty && value4.isNotEmpty) {
                 data.speed = 3;
                 postDataGetID();
                 await Future.delayed(Duration(milliseconds: 2000));
