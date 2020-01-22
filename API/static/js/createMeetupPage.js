@@ -33,29 +33,32 @@ function submitbutton() {
   meetupForm = $('#createMeetup')
   //console.log(meetupForm);
   meetupData = meetupForm.serializeArray();
-  console.log(meetupData);
-  if ($('#lat').val() == '') {
-      alert("Please drag the map to select your location!")
+  //console.log(meetupData.length);
+  if (meetupData.length != 8) {
+    alert("Please choose the purpose of your meetup!");
   } else {
-      newFunction();
-  }
-  function newFunction() {
-      $.ajax({
-          type: 'POST',
-          url: host_address_port + '/session/create',
-          data: JSON.stringify(meetupData),
-          contentType:'application/json',
-          success: function (response_data) {
-              response = response_data['session_id'];
-              window.session_id = response;
-              document.getElementById('shareLink').value = host_address_port + '/session/' + response + '/get_details';
-  //window.location.href='results_display' //form submission
-          }
-      })
+      if ($('#lat').val() == '') {
+          alert("Please drag the map to select your location!");
+      } else {
+          newFunction();
+      }
+      function newFunction() {
+          $.ajax({
+              type: 'POST',
+              url: host_address_port + '/session/create',
+              data: JSON.stringify(meetupData),
+              contentType:'application/json',
+              success: function (response_data) {
+                  response = response_data['session_id'];
+                  window.session_id = response;
+                  document.getElementById('shareLink').value = host_address_port + '/session/' + response + '/get_details';
+      //window.location.href='results_display' //form submission
+              }
+          })
 
-      //console.log(JSON.stringify(meetupData));
-
-  }
+          //console.log(JSON.stringify(meetupData));
+        }
+    }
 }
 
 
