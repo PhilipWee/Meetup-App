@@ -2,7 +2,7 @@
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
-# import psycopg2
+#import psycopg2
 import sys, os
 import numpy as np
 import pandas as pd
@@ -53,41 +53,70 @@ API important links explanation:
 app = Flask(__name__)
 CORS(app)
 
+#The secret key is necessary for session to work
+app.secret_key = 'super dsagbrjuyki64y5tg4fd key'
+
+@app.route('/', methods=['POST', 'GET'])
 def index():
-    return('Main Site Goes Here')
+    #A placeholder to check if the website is working
+    if request.method == 'GET':
+        return render_template('mainpage.html')
+    if request.method == 'POST':
+        content = request.get_json()
+
+        firebase = firebase_upload_bugs.firebase_data()
+        firebase.send_bug_report(content)
+        print("SENT!")
+        return content
 
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
     if request.method == "GET":
-        return render_template('Geoloc2.html',session_id = session_id)
+        return render_template('Geoloc2.html', session_id = session_id)
 
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
-    if request.method == "GET":
-        return render_template('Geoloc.html',session_id = session_id)
+    checkHost = request.args['isHost']
+    if checkHost == 'true':
+        return render_template('Geoloc.html', session_id = session_id, ifHost=True)
+    else:
+        return render_template('Geoloc.html', session_id = session_id, ifHost=False)
 
-@app.route('/session/create', methods=['POST'])
+@app.route('/session/create', methods=['POST', 'GET'])
 def create_session():
     #Here we create the session
-    content = request.get_json()
-    if content.get('username') is not None:
-        username = content.get('username')
-    else:
-        username = "username"
+    if request.method == "GET":
+        return render_template('createMeetupPage.html')
+    if request.method == "POST":
+        content_unparsed = request.get_json()
 
-    #Set the meeting type
-    if content.get('meeting_type') is not None:
-        meeting_type = content.get('meeting_type')
-    else:
-        meeting_type = "food"
+        # Sort between web content and mobile content
+        if isinstance(content_unparsed, list):
+            content = {}
+            #print(content_unparsed)
+            for dic in content_unparsed:
+                content[dic['name']] = dic['value']
+        else:
+            content = content_unparsed
 
-    ###OAUTH REQUIRED HERE, ONLY REGISTERED USERS CAN MAKE SESSION
+        # Retrieve username and meeting_type, set both if none
+        if content.get('username') is not None:
+            username = content.get('username')
+        else:
+            username = "username"
 
-    ###Check that the lat and Long are valid
+        #Set the meeting type
+        if content.get('meeting_type') is not None:
+            meeting_type = content.get('meeting_type')
+        else:
+            meeting_type = "food"
 
-    session_id = create_firebase_session(content,meeting_type,username)
+        # Create new firebase document for new meeting
+        session_id = create_firebase_session(content,meeting_type,username)
 
-    return jsonify({'session_id':session_id})
+        response = jsonify({'session_id':session_id})
+
+        return response
 
 @app.route('/session/<session_id>', methods=['POST','GET'])
 def manage_details(session_id):
@@ -97,33 +126,32 @@ def manage_details(session_id):
 
         #Get the content of the POST
         content_unparsed = request.get_json()
-        # print(content_unparsed)
-        if isinstance(content_unparsed,list):
+        # Sort between web content and mobile content
+        if isinstance(content_unparsed, list):
             content = {}
-            print(content_unparsed)
+            #print(content_unparsed)
             for dic in content_unparsed:
                 content[dic['name']] = dic['value']
         else:
             content = content_unparsed
 
 
-
         ###Make sure the lat and long are provided and valid
 
-        #Consolidate the session details
+        #Consolidate new user details
         new_user_details = {'identifier':identifier,
                             'lat':content.get('lat'),
                             'long':content.get('long'),
                             'transport_mode':content.get('transport_mode','public'),
                             'metrics':{
                                 'speed':int(content.get('speed',5)),
-                                'quality':int(content.get('quality',5))
+                                'quality':int(content.get('quality',5)),
+                                'price':int(content.get('price', 0))
                             }}
 
         #Upload the details of the new user
         insert_user_details(new_user_details,session_id)
         return jsonify({'updated_info_for_session_id':session_id})
-
 
     elif request.method == 'GET':
 
@@ -138,7 +166,7 @@ def manage_details(session_id):
 def calculate(session_id):
     ###Check the OAuth details
 
-    #Get all the meetup details\
+    #Get all the meetup details
     result = set_calculate_flag(session_id)
     if result != 'Error':
         return redirect("/session/"+session_id+"/results", code=302)
@@ -159,15 +187,49 @@ def results(session_id):
     elif result == 'not_started':
         return jsonify({'info': 'session exists but calculation not started'})
 
-def get_calculate_done_details(session_id):
+def create_firebase_session(content,meeting_type,username):
+    # Consolidate the session details
+    host_user_details = {'username':username,
+                        'lat':content.get('lat'),
+                        'long':content.get('long'),
+                        'transport_mode':content.get('transport_mode','public'),
+                        'metrics':{
+                            'speed':int(content.get('speed',5)),
+                            'quality':int(content.get('quality',5)),
+                            'price':int(content.get('price', 0))
+                        },
+                        'time_created':str(datetime.datetime.now())}
+
+    details = {'users':[host_user_details],'meeting_type':meeting_type}
+
+    #Generate session id
+    session_id = str(uuid.uuid1())
+
+    #Upload the user's details
+    doc_ref = get_doc_ref_for_id(session_id)
+    doc_ref.set({'info':details})
+
+    #Return the session id
+    return session_id
+
+def insert_user_details(details,session_id):
     try:
         doc_ref = get_doc_ref_for_id(session_id)
         doc_dict = doc_ref.get().to_dict()
-        if doc_dict['results'] is not None:
-            return doc_dict['results']
-        else:
-            return 'no_results'
+        doc_dict['info']['users'].append(details)
+        doc_ref.set(doc_dict)
     except:
+        print('Error inserting user details, does session id exist?')
+
+def set_calculate_flag(session_id):
+#    try:
+    doc_ref = get_doc_ref_for_id(session_id)
+    doc_dict = doc_ref.get().to_dict()
+    if 'calculate' not in doc_dict.keys():
+        doc_dict['calculate'] = 'True'
+        doc_ref.set(doc_dict)
+        return 'Calculating'
+    else:
         return 'Error'
 
 def check_calculate_done(session_id):
@@ -184,32 +246,16 @@ def check_calculate_done(session_id):
     except:
         return 'Error'
 
-def set_calculate_flag(session_id):
-#    try:
-    doc_ref = get_doc_ref_for_id(session_id)
-    doc_dict = doc_ref.get().to_dict()
-    if 'calculate' not in doc_dict.keys():
-        doc_dict['calculate'] = 'True'
-        doc_ref.set(doc_dict)
-        return 'Calculating'
-    else:
-        return 'Error'
-#    except:
-#        print('Error inserting user details, does session id exist?')
-#        return 'Error'
-
-def get_doc_ref_for_id(session_id):
-    session_id = str(session_id)
-    return db.collection(u'sessions').document(session_id)
-
-def insert_user_details(details,session_id):
+def get_calculate_done_details(session_id):
     try:
         doc_ref = get_doc_ref_for_id(session_id)
         doc_dict = doc_ref.get().to_dict()
-        doc_dict['info']['users'].append(details)
-        doc_ref.set(doc_dict)
+        if doc_dict['results'] is not None:
+            return doc_dict['results']
+        else:
+            return 'no_results'
     except:
-        print('Error inserting user details, does session id exist?')
+        return 'Error'
 
 def get_details_for_session_id(session_id):
     try:
@@ -219,30 +265,10 @@ def get_details_for_session_id(session_id):
         print('Error getting user details, does session id exist?')
         return 'Error'
 
-#Returns session id
-def create_firebase_session(content,meeting_type,username):
-    #Consolidate the session details
-    host_user_details = {'username':username,
-                        'lat':content.get('lat'),
-                        'long':content.get('long'),
-                        'transport_mode':content.get('transport_mode','public'),
-                        'metrics':{
-                            'speed':int(content.get('speed',5)),
-                            'quality':int(content.get('quality',5))
-                        },
-                        'time_created':str(datetime.datetime.now())}
+def get_doc_ref_for_id(session_id):
+    session_id = str(session_id)
+    return db.collection(u'sessions').document(session_id)
 
-    details = {'users':[host_user_details],'meeting_type':meeting_type}
-
-
-    session_id = str(uuid.uuid1())
-
-    #Upload the user's details
-    doc_ref = get_doc_ref_for_id(session_id)
-    doc_ref.set({'info':details})
-
-    #Return the session id
-    return session_id
 
 
 if __name__ == '__main__':
@@ -260,54 +286,8 @@ if __name__ == '__main__':
     print('Connected!')
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
 
-    # #--------------------------------------CONNECT TO DATABASE-------------------------------
-    # # Set up a connection to the postgres server.
-    # try:
-    #     print("Connecting to the postgres server")
-    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-    #     +" password="+ creds.PGPASSWORD
-    #     conn=psycopg2.connect(conn_string)
-    #     print("Connected!")
-    #     crsr = conn.cursor()
-    #     #Set up a connection to gisdb, the routing database
-    #     print("Connecting to routing database")
-    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-    #     +" password="+ creds.PGPASSWORD
-    #     conn_gis=psycopg2.connect(conn_string)
-    #     print("Connected!")
-    #     crsr_gis = conn_gis.cursor()
-    # except:
-    #     creds.PGHOST = 'journey'
-    #     print("Connecting to the postgres server")
-    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-    #     +" password="+ creds.PGPASSWORD
-    #     conn=psycopg2.connect(conn_string)
-    #     print("Connected!")
-    #     crsr = conn.cursor()
-    #     #Set up a connection to gisdb, the routing database
-    #     print("Connecting to routing database")
-    #     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-    #     +" password="+ creds.PGPASSWORD
-    #     conn_gis=psycopg2.connect(conn_string)
-    #     print("Connected!")
-    #     crsr_gis = conn_gis.cursor()
-    # #--------------------------------------CONNECT TO DATABASE-------------------------------
-    #
-    # #Check if the database exists. If not, create it
-    # current_tables = pd.read_sql("SELECT * FROM information_schema.tables",conn)
-    # exists = False
-    # for name in current_tables['table_name']:
-    #     if name == 'sessions':
-    #         exists = True
-    # if not exists:
-    #     print('sessions do not exist, creating sessions table')
-    #     crsr.execute('CREATE TABLE sessions (id SERIAL, session_id CHARACTER(255), username CHARACTER(255), info JSONB, results JSONB, PRIMARY KEY(id));')
-    #     conn.commit()
-    #     print('Done')
-    # else:
-    #     print('table "sessions" already exist, moving on')
-
-    #Run the App
-    app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
-    # app.run(host='0.0.0.0', debug=True, use_reloader=False)
-    crsr.close()
+# #--------------------------------------CONNECT TO DATABASE-------------------------------
+#Run the App
+app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5001)
+# app.run(host='0.0.0.0', debug=True, use_reloader=False)
+crsr.close()

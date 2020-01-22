@@ -44,10 +44,13 @@ xhr.onreadystatechange = (e) => {
         calcButton = document.createElement("BUTTON");
         calcButton.innerHTML = "Everyone's here, Calculate Results!";
         calcButton.onclick = "calculateButton()";
+        calcButton.id = "calcButton";
 
         document.getElementById('calculateButton_div').appendChild(calcButton);
         $('#jayson').remove();
         $('#loader').remove();
+
+        document.getElementById('calcButton').addEventListener("click", calculateButton);
 
       }
 
@@ -83,7 +86,7 @@ xhr.onreadystatechange = (e) => {
     }
 
     function calculateButton() {
-      window.location.href = session_id + "/calculate";
+      window.location.href = "calculate";
     }
     // MADE CHANGES END
 
@@ -189,7 +192,7 @@ if (user_details.includes('identifier')) {
   user.append(pic)
   }
 
-  
+
 else {
   user = document.createElement("div")
   user.class = 'row'
