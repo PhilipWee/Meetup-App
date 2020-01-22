@@ -73,6 +73,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     int speed = data.speed;
     String transportmode = data.transportMode;
     int price  = data.price;
+    String name = data.username;
 
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
@@ -81,7 +82,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     String url = '$address/session/create';
 
 //    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
-    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,   "transport_mode":"$transportmode",  "price_level":"$price"}';
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,   "transport_mode":"$transportmode",  "price_level":$price, "username": "$name"}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     try{
 
@@ -91,7 +92,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
             SnackBar(
-              content: Text("Oops! Server Error 404! Can"),
+              content: Text("Oops! Server Error 404!"),
               duration: Duration(seconds: 2),
             ));
       }
@@ -110,6 +111,68 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         String theLink = data.link;
         print('Link Created[ $theLink ]');
         return theLink;
+
+      }
+    }
+    catch(e){print("Error caught at PostDataGetID(): $e");}
+  }
+
+  Future<String> postDataUpdateSess() async {
+
+    //extract data from PrefData to add to json package
+    data.transportMode = value2;
+    data.price = value5.floor();
+    data.quality = 1;
+    data.speed = 3; //hidden for now
+
+    double lat = data.lat;
+    double long = data.long;
+    int quality = data.quality;
+    int speed = data.speed;
+    String transportmode = data.transportMode;
+    int price  = data.price;
+    String name = data.username;
+
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String address = globalurl();
+
+    String url = '$address/session/${data.sessionid}';
+
+//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+//    String jsonpackage = '{lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,   "transport_mode":"$transportmode",  "price_level":"$price","identifier":"$name"}';
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,   "transport_mode":"$transportmode",  "price_level":$price, "identifier":"$name"}';
+
+    print("Sending Jsonpackage To Server >>> $jsonpackage");
+    try{
+
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+
+      if (statusCode != 200){
+        print("1: $statusCode");
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error 404!"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+
+      else{
+        print("2: $statusCode");
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+        print("Update Session successful with statuscode: $statusCode");
+        print("Update Session successful with body : $body");
+
+        //decode the string-map
+//        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
+////        var sessionid = sessionidjsonversion['session_id'];
+////        data.sessionid = sessionid;
+////        data.link = "$address/session/$sessionid/get_details";
+////        String theLink = data.link;
+////        print('Link Created[ $theLink ]');
+
+        return data.link;
 
       }
     }
@@ -289,7 +352,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                         value5 = newValue;
                         if (value5==1){data.price=1;}
                         else if (value5==2){data.price=2;}
-                        else if (value5==3){data.price=3;}  //ADD TO DATABASE
+                        else if (value5==3){data.price=3;}
+                        else if (value5==4){data.price=4;}
                         else{data.price=0;}
                       }),
                       max: 4,
@@ -307,12 +371,23 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () async {
-              if (value2.isNotEmpty && value4.isNotEmpty) {
-                data.speed = 3; // For future work, fixed at 3 for now
-                if (data.sessionid.isEmpty && data.link.isEmpty) {postDataGetID();} //TODO
-                await Future.delayed(Duration(milliseconds: 1000));
+              if (value2.isNotEmpty && value4.isNotEmpty) {  //CHECK IF PREFERENCES HAS BEEN FILLED IN
+                data.speed = 3; // fix at 3
+
+                if (data.sessionid.isEmpty) {
+                  print("Running PostDataGetID");
+                  postDataGetID();
+                }  //IF THERE IS NO ID
+
+                else if (data.sessionid.isNotEmpty) {
+                  print("Running PostDataUpdateSess");
+                  postDataUpdateSess();
+                }  //IF THERE IS ID
+
+                await Future.delayed(Duration(milliseconds: 2000));
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
                 print("TEST: ${data.dataMap}");
+
               } else {
                 Scaffold.of(context).showSnackBar(
                     SnackBar(
