@@ -39,7 +39,7 @@ xhr.onreadystatechange = (e) => {
       if (displayCalculateButton(checkHost) == true) {
         calcButton = document.createElement("BUTTON");
         calcButton.innerHTML = "Everyone's here, Calculate Results!";
-        calcButton.id = "calculateButton";
+        calcButton.onclick = "calculateButton()";
 
         document.getElementById('calculateButton_div').appendChild(calcButton);
       }
@@ -73,6 +73,10 @@ xhr.onreadystatechange = (e) => {
       } else {
         return false;
       }
+    }
+
+    function calculateButton() {
+      window.location.href = session_id + "/calculate";
     }
     // MADE CHANGES END
 
