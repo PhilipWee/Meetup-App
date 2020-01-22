@@ -79,7 +79,12 @@ xhr.onreadystatechange = (e) => {
     }
 
     function calculateButton() {
-      window.location.href = "calculate";
+      jQuery.getJSON(
+        host_address_port + '/session/' + session_id + '/calculate',
+        function(data) {
+            console.log(data);
+            alert("Calculation in Progress");
+        });
     }
     // MADE CHANGES END
 
