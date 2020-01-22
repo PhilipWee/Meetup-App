@@ -1,21 +1,15 @@
-import 'MapPage.dart';
+import 'dart:convert';
+
 import 'ShareLinkPage.dart';
 import 'CustomizationPage.dart';
 import 'Meetingtype.dart';
-import 'color_loader.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:connectivity/connectivity.dart';
-import 'color_loader.dart';
+import 'Data.dart';
+import 'package:http/http.dart' as http;
 
 String globalurl(){
 //   String serverAddress = "http://192.168.194.178:5000";
@@ -26,22 +20,6 @@ String globalurl(){
 
 void main() => runApp(MyApp());
 
-class PrefData {
-  String username;
-  String activityType;
-  double lat;
-  double long;
-  String link;
-  String transportMode;
-  int speed;
-  int quality;
-  String sessionid;
-  int price;
-  String userplace;
-
-  //PrefData Constructor
-  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid,this.price,this.userplace});
-}
 
 class MyApp extends StatelessWidget {
   
@@ -157,6 +135,7 @@ class HomeUsernameWidget extends StatefulWidget {
 }
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
+  bool invalidLink = false;
   static String name;
   static String sessionlink;
   final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
@@ -178,44 +157,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     String locality = placeMark.locality;
     data.userplace = "${name}, ${locality}";
     print(data.userplace);
-  }
-
-  Future<List<dynamic>> getMembers(sessLink) async {
-
-    String address = globalurl();
-    try{
-      http.Response response = await http.get(sessLink);
-      await Future.delayed(Duration(milliseconds: 1500));
-      int statusCode = response.statusCode;
-      String body = response.body;
-      print("GetMembere Request Successful/Failed With Status: $statusCode");
-
-      if (statusCode != 200){
-        Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Oops! Server Error 404"),
-              duration: Duration(seconds: 2),
-            ));
-      }
-      else{
-        print("Members List: $body");
-        Map<String, dynamic> memberDatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
-        List membersData = memberDatajsonVersion["users"];
-        //extract the list of user detail maps into a list
-        Map<String,String> placeNameMap = {"username": "cock" }; //add the place name as a value to the key "username" to a new map
-        for (Map<String, dynamic> mapcontent in membersData) { // for every user detail map packet in the main list
-          if (mapcontent["lat"] != null && mapcontent["long"] != null && mapcontent["identifier"] != null){
-            List<Placemark> place = await Geolocator().placemarkFromCoordinates(double.parse(mapcontent["lat"]), double.parse(mapcontent["long"])); //use the lat long values to find the placename
-            placeNameMap[mapcontent["identifier"].toString()] = place[0].thoroughfare.toString(); // add the placename to the map with the key being the name of the user
-          }
-          else{placeNameMap[mapcontent["identifier"].toString()] = "ERRROR";}
-        }
-        membersData.add(placeNameMap);
-//        print("membersData-> $membersData");
-        return membersData;
-      }
-    }
-    catch(e){print("Get-session-details Failed with error: $e");}
   }
 
   @override
@@ -402,7 +343,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                     sessionlink = value;
                   },
                   validator: (value) {
-                    if (value.isEmpty){
+                    if (value.isEmpty || invalidLink){
                       return "Invalid Link";
                     }
                     return null;
@@ -415,13 +356,27 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       actions: <Widget>[
         FlatButton(
           child: Text("Join!"),
-          onPressed: () {
-            if (formKey.currentState.validate()) {
+          onPressed: () async {
+            String checkingLink = sessionlink.replaceAll(new RegExp(r'/get_details'), '');
+            print(checkingLink);
+            http.Response response = await http.get(checkingLink);
+            await Future.delayed(Duration(milliseconds: 400));
+            String body = response.body;
+            Map<String, dynamic> DatajsonVersion = jsonDecode(body); //parse the data from server into a map<string,dynamic>
+
+            if (DatajsonVersion.containsKey("error")) {invalidLink = true;}
+
+            if (formKey.currentState.validate() && !invalidLink) {
+
               data.username = name;
-              getMembers(sessionlink);
+              data.link = sessionlink;
+              data.sessionid = data.linkParser(sessionlink);
+              print("TEST: ${data.dataMap}");
+
               Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data : data)),);
+
             } else {
-              print(formKey.currentState.validate());
+              print("Validate: ${formKey.currentState.validate()}");
             }
           },
         )
