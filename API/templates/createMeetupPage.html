@@ -1,18 +1,39 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8"
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
-    <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
+    <!-- Idk what these are just copy pasting START -->
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
+  <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Idk what these are just copy pasting END -->
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="{{url_for('static', filename='js/maps.js')}}"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g&callback=initMap"
+    async defer></script>
 
     <style>
+
+    body {
+      height: 70%;
+      margin: 0;
+      padding: 0;
+      background-color: SeaShell;
+      background-image: url(/static/background.png);
+
+    }
+    
       #basicMap {
-        width: 400px;
-        height: 400px;
+        width: 70%;
+        height: 300px;
       }
 
       #basicMap:after {
@@ -37,116 +58,125 @@
           padding: 2px;
           margin-bottom: 2px;
         }
-    </style>
 
-    <!-- Idk what these are just copy pasting START -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-      crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-      integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-      crossorigin="anonymous"></script>
-    <!-- Idk what these are END -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-      integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-      crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="{{url_for('static', filename='js/maps.js')}}"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g&callback=initMap"
-      async defer></script>
+        h1 {
+      color: white;
+      margin-left: 20px;
+      font-size: 5vw;
+      font-family: 'Pacifico';
+
+    }
+
+    h2 {
+      margin-left: 20px;
+      margin-top:1mm;
+      font-family: 'Patrick Hand SC';
+      font-size: 3vw;
+  
+    }
+    </style>
 </head>
 
 <body>
-    <!-- Copy Pasted for visual appeal -->
     <div>
-      <div style='position:absolute;' class='row pl-2'>
-        <div class='col col-10'>
-
+        
+        <div style='position:absolute;' class='row '>
+          <div class='col col-8'>
+    
+          </div>
+          <div class='col col-2'>
+            <img style="height:100%;width:200%;margin-right:0px;" src="/static/Mouse.png" alt="Mouse"
+              width="500" height="500">
+    
+          </div>
         </div>
-        <div class='col col-2'>
-<!--          <img style="height:103%;width:220%;margin-right:0px;" align=right src="/static/Mouse.png" alt="Mouse"
-            width="500" height="500">
-            -->
 
+        <div class='row pl-2' style='background-color:Tomato;height:100%;'>
+          <h1 style='font-family:Pacifico; color: white;margin-left: 20px;font-size: 5vw;'>MeetUp Mouse</h1>
         </div>
+        <div class='row pl-2' style="background-color:White;">
+          <h2 style='font-family:Patrick Hand SC;margin-left: 20px;margin-top:1mm;font-size: 3vw;'>Allow meetup mouse to access your location and squeak away!</h2>
+        </div>
+      </div>
+      </div>
 
-      </div>
-      <div class='row pl-2' style='background-color:Tomato;height:100%;'>
-        <h1>MeetUp Mouse</h1>
-      </div>
-      <div class='row pl-2' style="background-color:White;">
-        <h2>Allow meetup mouse to access your location and squeak away!</h2>
-      </div>
-    </div>
+
 
     <!-- Form for user to submit and create meeting type,
     Choose preferences and share link -->
-    <div class="container-fluid" style="margin-top:20px;">
-      <div class="row">
-        <div class="col col-5 ">
+    
+      <div style='font-family:Patrick Hand SC;' class="row">
+        <div class='col col-2'></div>
+        <div class='col col-6' style='background-color:rgb(255,245,238);'>
         <form id='createMeetup' method='POST'>
-          <p>What is the purpose of your meetup?</p>
-          <p><input type="radio" name="meetupPurpose" value="Recreation"> Recreation </input>
+          <p style='margin-top:2%;font-size:2vw;margin-left:1%;'>What is the purpose of your meetup?</p>
+          <p style='font-size:1.5vw;margin-left:1%;'><input type="radio" name="meetupPurpose" value="Recreation"> Recreation </input>
               <input type="radio" name="meetupPurpose" value="Food"> Food </input>
               <input type="radio" name="meetupPurpose" value="Meeting"> Meeting </input></p>
 
-          <p>Transport mode</p>
-          <p><select name="transportMode" id="transportPreference"></p>
+          <p style='font-size:2vw;margin-left:1%;'>Transport mode:</p>
+          <p style='font-size:1.5vw;margin-left:1%;'><select name="transportMode" id="transportPreference"></p>
             <option value='driving'> Driving </option>
             <option value='publicTransport'> Public Transport </option>
             <option value='walk'> Walk </option>
             <option value='motorcycle'> Riding </option>
           </select>
 
-          <p>Speed</p>
-          <p><select name="speed" id="speedPreference"></p>
+          <p style='font-size:2vw;margin-left:1%;'>Speed:</p>
+          <p style='font-size:1.5vw;margin-left:1%;'><select name="speed" id="speedPreference"></p>
             <option value="noPreference">No Preference</option>
             <option value="regular">Regular</option>
             <option value="fast">Fast</option>
           </select>
 
-          <p>Ratings</p>
-          <p><select name='ratings' id="ratingsPreference"></p>
+          <p style='font-size:2vw;margin-left:1%;'>Ratings:</p>
+          <p style='font-size:1.5vw;margin-left:1%;'><select name='ratings' id="ratingsPreference"></p>
             <option value="noPreference">No Preference</option>
             <option value="regular">Regular</option>
             <option value="best">Best</option>
           </select>
 
-          <p>Price</p>
-          <input name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
-          <span id='priceValue'>No Preference</span>
+          <p style='font-size:2vw;margin-left:1%;'>Price:</p>
+          <input style='font-size:1.5vw;margin-left:1%;' name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
+          <span  style='font-size:1.5vw;margin-left:1%; ' id='priceValue'>No Preference</span>
 
           <br>  <!-- Just a page break -->
-          <button type='button' id='submitbutton'>Submit</button>
-        </div>
-
+          <button style= 'margin-left:1%; margin-bottom:3%;font-size:1.5vw;'type='button' id='submitbutton'>Submit</button>
+        
+     
         <!-- Map for user info -->
-        <div class='col col-4' style="margin-top:7%;">
           <div
-            style="padding-top:0%;border:5px dotted rgb(214,129,137);border-radius:12px;padding:2px;height:100%;width:100%;vertical-align:top;"
+            style="margin-left:1%;padding-top:0%;border:5px dotted rgb(214,129,137);border-radius:12px;padding:2px;vertical-align:top;"
             class="round3" id='basicMap'></div>
 
           <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
           <input style="margin-right:0%;margin-top:0%;" type='hidden' name='long' id='long' />
 
-        </div>
 
-        </form>
+          <h3 style='margin-left:1%;margin-top:3%;'>Generate and share the link!</h3>
+      <!-- I don't know how to do, copy pasted from google
+           drive sharing html element
+           Come back later -->
+      <input id='shareLink' style="margin-left:1%;" aria-label="Link to share">
+      <textarea rows="3" type="text" aria-label="Link to share" style="display: none;margin-left:1%;"></textarea>
+  
+      <button style='margin-left:1%;font-size:1.5vw;' type='button' onclick='copyLinkFunction()'>Copy Link</button>
+      <button style='margin-left:1%;font-size:1.5vw;margin-bottom:15%;' type='button' onclick='createMeetupButton()'>Create Meetup</button>
+  
+      <!-- Edit this -->
+       <script src="{{url_for('static', filename='js/createMeetupPage.js')}}"></script>
       </div>
-    </div>
+      
+        </form>
 
-    <h3>Generate and share the link!</h3>
-    <!-- I don't know how to do, copy pasted from google
-         drive sharing html element
-         Come back later -->
-    <input id='shareLink' style="" aria-label="Link to share">
-    <textarea rows="3" type="text" aria-label="Link to share" style="display: none;"></textarea>
 
-    <button type='button' onclick='copyLinkFunction()'>Copy Link</button>
-    <button type='button' onclick='createMeetupButton()'>Create Meetup</button>
+      </div>
+    <div class='col col-2'></div>
 
-    <!-- Edit this -->
-     <script src="{{url_for('static', filename='js/createMeetupPage.js')}}"></script>
+      </div>
+ 
+
+   
 </body>
 
 </html>

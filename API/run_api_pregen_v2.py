@@ -63,9 +63,9 @@ def index():
         print("SENT!")
         return content
 
-@app.route('/session/<session_id>/get_details')
+@app.route('/session/<session_id>/get_details', methods=['GET','POST'])
 def get_details(session_id):
-    if request.method == "GET":
+    if request.method == "GET" or request.method == "POST":
         return render_template('Geoloc2.html')
 
 @app.route('/session/<session_id>/results_display')

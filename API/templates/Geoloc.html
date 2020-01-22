@@ -34,9 +34,13 @@
 
      
     }
-
+img{
+  z-index:1;
+  position:relative;
+}
     body {
       background-color: SeaShell;
+      background-image: url(/static/background.png);
 
     }
 
@@ -56,7 +60,7 @@
     }
 
     .round3 {
-      border: 5px dotted rgb(214, 129, 137);
+      border: 5px dotted #FDCBCB;
       border-radius: 12px;
       padding: 2px;
       position: relative;
@@ -90,11 +94,11 @@
   </div>
 
 
-  <div style='padding:3%;' class='row'>
+  <div  class='row'>
     <div class='col-2'></div>
     <div class='col-8'>
     <div
-      style=' width: 100%; align-items: center; justify-content: center; height: 400px;border:5px dotted rgb(214,129,137);border-radius:12px;position:relative;'
+      style='background-color:rgb(255,245,238); width: 100%; align-items: center; justify-content: center;margin-top:2%; margin-bottom:2%;height: 400px;border:5px dotted rgb(214,129,137);border-radius:12px;position:relative;'
       class="round3" id="map">
     </div>
   </div>
@@ -102,13 +106,13 @@
 </div>
 <div class='row justify-content-center'>
     <script src="{{url_for('static', filename='js/application.js') }}"></script>
-    <button style='font-family: Patrick Hand SC;' id='jayson' onclick=jayson()>Get JSON data</button>
+    <button style='font-family: Patrick Hand SC; margin-top:1%;' id='jayson' onclick=jayson()>SQUEAK PEEK</button>
   </div>
   <div class='row justify-content-center' style='font-family: Patrick Hand SC;font-size:1.5vw'>
-<p>See who's in the session!</p></div>
+<p id='loader'>See who's in the session!</p></div>
   <div></div>
-  <div class="container-fluid" style='height:10%;margin-left:2%; font-family:Patrick Hand SC;'>
-    <div class='row' style='margin-left:3.5%;align-items: center;justify-content: space-evenly;'>
+  <div class="container-fluid" style='height:10%; font-family:Patrick Hand SC;'>
+    <div class='row align-items-center' style='align-items: center;justify-content: space-evenly;'>
       <div style='font-family: Patrick Hand SC;' id='buttons_div'>
       </div>
     </div>
