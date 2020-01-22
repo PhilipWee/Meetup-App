@@ -12,7 +12,7 @@ console.log('geolocation works')
 // Scipt for price preference slider
 var values = ['No Preference', '$', '$$', '$$$', '$$$$'];
 $('#pricePreference').change(function() {
-    $('span').text(values[this.value]);
+    $('#pricePreference').text(values[this.value]);
 });
 
 function success(pos) {
