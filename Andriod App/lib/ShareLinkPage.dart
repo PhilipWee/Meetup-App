@@ -140,9 +140,10 @@ class ShareLinkState extends State<ShareLinkWidget> {
                   color: Colors.amber,
                   textColor: Colors.black,
                   onPressed: () {
-//                    checkMeetupDone(data.sessionid);
-                    Navigator.push(context,MaterialPageRoute(builder: (context) => MapSample(data:data)),);
+                    checkMeetupDone(data.sessionid);
                     print("TEST: ${data.dataMap}");
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => MapSample(data:data)),);
+
                   },
                   child: Text("Create Meetup!"), //TODO
                 ),

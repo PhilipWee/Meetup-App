@@ -27,6 +27,7 @@ class MapSampleState extends State<MapSample> {
 
   //Create the get request function
   Future<Map<String, dynamic>> _getCalculate() async {
+    print("TEST: ${data.dataMap}");
     String id = data.sessionid;
     String address = globalurl();
     // final result = await http.get("$address/session/$id/calculate")
