@@ -2,8 +2,8 @@ import 'main.dart';
 import 'ShareLinkPage.dart';
 import 'CustomizationPage.dart';
 import 'Meetingtype.dart';
-
-
+import 'color_loader.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -39,10 +39,8 @@ class MapSampleState extends State<MapSample> {
     // final result = await http.get("$address/session/$id/calculate")
     var _ = await http.get("$address/session/$id/calculate");
     while (true) {
-      print('111111111111111111111');
       var result = await http.get("$address/session/$id/results");
       if (result.statusCode != 200 || result.statusCode != 302) {
-        print('211111111111111111111');
         Map<String, dynamic> results = jsonDecode(result.body);
         //Check if its still info or not
         print(results);
@@ -140,27 +138,36 @@ class MapSampleState extends State<MapSample> {
     double destinationLat = 0;
     double destinationLong = 0;
     LatLng destinationLatLng;
+
     for (String key in data[locationName].keys) {
+      //Continue the loop for the banned keys
+      var bannedNames = ['price','rating','place_id','total_cost'];
+      if (bannedNames.contains(key)) {
+        continue;
+      }
       var latitude = data[locationName][key]['latitude'];
       var longtitude = data[locationName][key]['longtitude'];
+      var transport_type = data[locationName][key]['transport_type'];
+      var transport_type_id = data[locationName][key]['transport_type_id'];
+      print('111111111111111111111111111111111111111111');
+      print(transport_type);
       // print(latitude);
       // print(longtitude);
       polylineContainer.add(_makeLine(latitude,longtitude,lineIterator));
       lineIterator++;
-
       destinationLong = data[locationName][key]['restaurant_x'];
       destinationLat = data[locationName][key]['restaurant_y'];
 
       destinationLatLng = LatLng(destinationLat,destinationLong);
+//      print(destinationLatLng);
 
-      print(destinationLatLng);
       markerContainer.add(_makeMarker(destinationLatLng, lineIterator));
+
 
     }
     //Draw routes
     setState(() {
-      print("111111111111111111111111111111");
-      print(markerContainer.length.toString());
+//      print(markerContainer.length.toString());
       _locationName = locationName;
       _destinationLat = destinationLat;
       _destinationLong = destinationLong;
@@ -186,6 +193,9 @@ class MapSampleState extends State<MapSample> {
   //Build the listview
   FutureBuilder<Map<String,dynamic>> displayPossibleOptions() {
     //Make a helper function for each button of the listview
+//    var price = data[locationName]['price'].toString();
+//    var rating = data[locationName]['rating'].toString();
+//    var totalTravelTime = data[locationName]['total_cost'].toString();
     Card _tile(String locationName, Map<String,dynamic> data) => Card(
         child: FlatButton(
             padding: EdgeInsets.all(0.1),
@@ -194,7 +204,8 @@ class MapSampleState extends State<MapSample> {
               _drawRoutes(locationName, data);
             },
             child: ListTile(
-                title: Text(locationName.toString())
+                title: Text(locationName.toString()),
+                trailing: Text('Rating:' + data[locationName]['rating'].toString() + ' Price:' + data[locationName]['price'].toString() + ' Travel time:' + data[locationName]['total_cost'].toString())
             )
         )
 
@@ -221,12 +232,11 @@ class MapSampleState extends State<MapSample> {
               print('warning the snapshot is still at the info stage!');
             }
             possibleLocations = snapshot.data['possible_locations'];
-            print(snapshot.data);
+//            print(snapshot.data);
             datacopy = snapshot.data;
             return ListView.builder(
               itemCount: possibleLocations.length,
               itemBuilder: (BuildContext context, int index) {
-                print(possibleLocations);
                 //Need to add in code to prevent nulls form appearing
                 return _tile(possibleLocations[index], datacopy);
               },

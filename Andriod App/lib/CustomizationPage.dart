@@ -2,7 +2,8 @@ import 'main.dart';
 import 'MapPage.dart';
 import 'ShareLinkPage.dart';
 import 'Meetingtype.dart';
-
+import 'color_loader.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -44,9 +45,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
   CustomizationPageState({this.data});
 
-  String value2 = "Select...";
-  String value3 = "Select...";
-  String value4 = "Select...";
+//  Future<Map<String,double>> saveMyLocation() async{
+
+  String value2 = "Public Transit";
+//  String value3 = "Select...";  //originally used for speed
+  String value4 = "No Preference";
   double value5 = 0;
   //Method for the labels on the slider
   String labels() {
@@ -65,19 +68,108 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     return "";
   }
 
+  Future<String> postDataGetID() async {
+
+    //extract data from PrefData to add to json package
+    double lat = data.lat;
+    double long = data.long;
+    int quality = data.quality;
+    int speed = data.speed;
+    String transportmode = data.transportMode;
+    int price  = data.price;
+
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String address = globalurl();
+
+    String url = '$address/session/create';
+
+//    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$price"}';
+    print("Sending Jsonpackage To Server >>> $jsonpackage");
+    try{
+
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+
+      if (statusCode != 200){
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error 404! Can"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+
+      else{
+
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+        print("PostData successfull with statuscode: $statusCode");
+        print("Get Session ID successfull with body : $body");
+
+        //decode the string-map
+        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
+        var sessionid = sessionidjsonversion['session_id'];
+        data.sessionid = sessionid;
+        data.link = "$address/session/$sessionid/get_details";
+        String theLink = data.link;
+        print('Link Created[ $theLink ]');
+        return theLink;
+
+      }
+    }
+    catch(e){print("Error caught at PostDataGetID(): $e");}
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 10, bottom: 8.0),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.home, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Location", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0
+                        ),),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child:Padding(
+                  padding:const EdgeInsets.only(left: 0, top: 8, right: 8, bottom: 8),
+                  child: PlacesAutocompleteField(
+                    controller: TextEditingController(text:data.userplace),
+                    apiKey: 'AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g',
+                    leading: Icon(Icons.search, color: Colors.black),
+                    hint: "Manually enter location",
+                    mode: Mode.overlay
+                  )
+                ),
+              ),
+            ],
+          ), //for location
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Expanded(
-                flex: 5,
                 child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30, bottom: 8.0),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.directions_car, color: Colors.black),
@@ -94,7 +186,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 ),
               ),
               Expanded(
-                flex: 5,
                 child: Container(
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
@@ -105,7 +196,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           data.transportMode = newValue; //ADD TO DATABASE
                         });
                       },
-                      items: <String>["Select...", "Driving", "Public Transit", "Walk", "Riding"].map<DropdownMenuItem<String>>((String value) {
+                      items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -117,56 +208,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               )
             ],
           ),//for transport
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.timer, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Speed", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0
-                        ),),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 5,
-                child: Container(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value3,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value3 = newValue;
-                          if (value3=="Fast"){data.speed = 3;}
-                          else if (value3=="Regular"){data.speed=2;}
-                          else if (value3=="No Preference"){data.speed=1;}  //ADD TO DATABASE
-                          else {data.speed=0;}
-                        });
-                      },
-                      items: <String>["Select...", "No Preference", "Regular", "Fast"].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
-              )
-            ],
-          ),//for speed
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
@@ -205,7 +246,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           else{data.quality=0;}
                         });
                       },
-                      items: <String>["Select...", "No Preference", "Regular", "Best"]
+                      items: <String>["No Preference", "Regular", "Best"]
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -261,15 +302,17 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 ),
               )
             ],
-          ),
-
+          ), //for price
         ], //children of ListView
       ),
       bottomNavigationBar: BottomAppBar(
         child: FlatButton(
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
-            onPressed: () {
-              if (value2 != "Select..." && value3 != "Select..." && value4 != "Select...") {
+            onPressed: () async {
+              if (value2.isNotEmpty && value4.isNotEmpty) {
+                data.speed = 3;
+                postDataGetID();
+                await Future.delayed(Duration(milliseconds: 2000));
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
               } else {
                 Scaffold.of(context).showSnackBar(

@@ -4,14 +4,17 @@ function initMap() {
     // 1.287828, 103.865900
      myLatLng = { lat: 1.587828, lng: 104.865900 }; //first position
      map = new google.maps.Map(document.getElementById('basicMap'), {
-         center: myLatLng,
-         zoom: 15})
-         map.addListener('center_changed', function () {
-            lat = map.getCenter().lat();
-            long = map.getCenter().lng();
-            $("#lat").val(lat);
-            $("#long").val(long);
-        });
+        center: myLatLng,
+        zoom: 15})
+        map.addListener('center_changed', function () {
+           lat = map.getCenter().lat();
+           long = map.getCenter().lng();
+           $("#lat").val(lat);
+           $("#long").val(long);
+       });
+
+
+        
      
 
      var defaultBounds = new google.maps.LatLngBounds(

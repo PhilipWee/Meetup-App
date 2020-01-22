@@ -19,6 +19,7 @@ xhr.onreadystatechange = (e) => {
       // btn.addEventListener('click', function(i) {return {location_modifier}(i)});
       btn.onclick = function() {
         location_modifier(list_of_restaurant_names[i])
+      button.style = "font-family: Patrick Hand SC;"
       }
       // btn.onclick = function() {
       //   location_modifier(btn.innerHTML)
@@ -150,6 +151,7 @@ xhr.onreadystatechange = (e) => {
 
 function jayson() {
 $(document).ready(function(){
+  $('#map').empty();
 
     $.getJSON(host_address_port + '/session/' + session_id, function(data) {
 
@@ -174,6 +176,9 @@ else {
   user.id = 'row_num'
   user.append((String(allUsers[i]['username'] + ', the host mouse is travelling by ')))
   user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
+  h1 = document.createElement('h1')
+  h1.value = 'test'
+  user.append(src="/static/Mousenspeech.png")
 
 
   }
