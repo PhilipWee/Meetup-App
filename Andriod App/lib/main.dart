@@ -2,7 +2,8 @@ import 'MapPage.dart';
 import 'ShareLinkPage.dart';
 import 'CustomizationPage.dart';
 import 'Meetingtype.dart';
-
+import 'color_loader.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -36,7 +37,8 @@ class PrefData {
   int quality;
   String sessionid;
   int price;
-  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid,this.price});
+  String userplace;
+  PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid,this.price,this.userplace});
 }
 
 class MyApp extends StatelessWidget {
@@ -60,9 +62,6 @@ class CheckNetworkPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   title: Text(""),
-        // ),
         body: StreamBuilder(
             stream: Connectivity().onConnectivityChanged,
             builder: (BuildContext ctxt,
@@ -75,7 +74,6 @@ class CheckNetworkPage extends StatelessWidget {
                   return Center(child: Text("No Internet Connection!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:
-                  print("Connected to Internet!");
                   return HomeScreen();
                 default:
                   return Center(child: Text("No Internet Connection!"));
@@ -84,6 +82,7 @@ class CheckNetworkPage extends StatelessWidget {
       );
   }
 }
+
 
 refreshServer() async {
   String address = globalurl();
@@ -170,28 +169,38 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
   static String name;
+  static String sessionID;
   final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
   final textController  = TextEditingController();
+  final idTextController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
-  saveLocation() async{
-    // Get user's current location
-    var location = Location(); 
+  saveMyLocation() async{
+    var location = Location();
     LocationData currentLocation = await location.getLocation();
     data.lat = currentLocation.latitude;
     data.long = currentLocation.longitude;
-    print(data.lat);
-    print(data.long);
+    print("User Location Data");
+    print("${data.lat},${data.long}");
+    Map<String,double> mycoordinates = {"mylat":data.lat, "mylong":data.long};
+    List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(data.lat,data.long);
+    Placemark placeMark = myplacemark[0];
+    String name = myplacemark[0].thoroughfare.toString();
+    String locality = placeMark.locality;
+    data.userplace = "${name}, ${locality}";
+    print(data.userplace);
   }
 
   @override
   void dispose() {
     textController.dispose();
+    idTextController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    //Logo and start message
+    //Logo and start messages
     Widget welcomeSection = Container(
       margin: const EdgeInsets.only(left: 50.0, top: 20.0, right: 50.0),
       alignment: Alignment.center,
@@ -220,67 +229,90 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     Widget buttonSection =  Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            FlatButton(
-              onPressed: () {
-//                refreshServer();
-                saveLocation();
-                if (textController.text != "") {
-                  name = textController.text;
-                  data.username = name;
-                  Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
-                } else {
-                  Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Please enter your username!"),
-                        duration: Duration(seconds: 2),
-                      ));
-                }},
-              child: _buildButtonColumn(Colors.black, Icons.arrow_forward, 'Get Started!'),
-              color: Colors.amber,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-            )
-          ],
-        ) ,
-        Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        Padding(
+          padding: const EdgeInsets.only(left: 33.0, right: 33.0),
+          child: Row(
             children: <Widget>[
-              Container(
-                  child: Text( "OR", style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 20.0
-                  ),
-                  )
-              ),
-              ButtonBar(
-                alignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  FlatButton(
-                    onPressed: () {
-                      if (textController.text != "") {
-                        Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data : data)),);
-                      } else {
-                        Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("There is no ongoing session!"),
-                              duration: Duration(seconds: 2),
-                            ));
-                      }
-                    },
-                    child: _buildButtonColumn(Colors.black, Icons.autorenew, 'Go to My Meetup!'),
-                    color: Colors.lightBlue,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                  )
-                ],
-              ),
-              Container(
-                child: Text("       "),
-              ),
+              Expanded(
+                child: FlatButton(
+                  onPressed: () {
+                    saveMyLocation();
+                    if (textController.text != "") {
+                      name = textController.text;
+                      data.username = name;
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+//                      dispose();
+                    } else {
+                      name = "Host";
+                      data.username = name;
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+//                      Scaffold.of(context).showSnackBar(
+//                          SnackBar(
+//                            content: Text("Please enter your username!"),
+//                            duration: Duration(seconds: 2),
+//                          ));
+                    }},
+                  child: _buildButtonColumn(Colors.black, Icons.arrow_right, 'Get Started!'),
+                  color: Colors.amber,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                ),
+              )
             ],
-          )
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 33.0, right: 33.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                  child: FlatButton(
+                    onPressed: () {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          builder: (BuildContext context) {
+                            if (textController.text != "") {
+                              name = textController.text;
+                              return _buildEnterID(name);
+                            } else {
+                              name = "Anonymouse";
+                              return _buildEnterID(name);
+                            }
+                          }
+                        );
+                    },
+                    child: _buildButtonColumn(Colors.black, Icons.add, 'Join Meetup'),
+                    color: Colors.orange,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                  ),
+              ),
+              Container(
+                padding: const EdgeInsets.only(left: 3, right: 3),
+                child: Text(""),
+              ),
+              Expanded(
+                child: FlatButton(
+                  onPressed: () {
+                    if (textController.text != "") {
+                      Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data : data)),);
+//                      dispose();
+                    } else {
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("There is no ongoing session!"),
+                            duration: Duration(seconds: 2),
+                          ));
+                    }},
+                  child: _buildButtonColumn(Colors.black, Icons.autorenew, 'My Meetup'),
+                  color: Colors.lightBlue,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                )
+              )
+            ],
+          ),
+        ),
+
       ],
     );
 
@@ -294,7 +326,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               child: TextFormField(
                 controller: textController,
                 decoration: InputDecoration(
-                    labelText: "Username"
+//                    labelText: "Name (Optional)",
+                    hintText: "Name (Optional)"
                 ),
               ),
             ),
@@ -307,15 +340,14 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   //Helper method to create button icons with text
   Row _buildButtonColumn(Color color, IconData icon, String label) {
     return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
-          margin: const EdgeInsets.only(right: 8),
           child: Text(
             label,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 14.9,
               fontWeight: FontWeight.bold,
               color: color,
             ),
@@ -325,6 +357,52 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       ],
     );
   }
+
+  //Helper method to build AlertDialog for entering Session ID
+  AlertDialog _buildEnterID(String name) {
+    return AlertDialog(
+      title: Text("Enter Session ID"),
+      content: Row(
+        children: <Widget>[
+          Expanded(
+            child: Form(
+              key: formKey,
+              child: TextFormField(
+                  controller: idTextController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      labelText: "Session ID"
+                  ),
+                  onChanged: (value) {
+                    sessionID = value;
+                  },
+                  validator: (value) {
+                    if (value.isEmpty){
+                      return "Invalid ID";
+                    }
+                    return null;
+                  },
+                ),
+            )
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text("Join!"),
+          onPressed: () {
+            if (formKey.currentState.validate()) {
+              data.username = name;
+              Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data : data)),);
+            } else {
+              print(formKey.currentState.validate());
+            }
+          },
+        )
+      ],
+    );
+  }
+  
 
 }
 

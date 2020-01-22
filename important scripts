@@ -354,45 +354,108 @@ from
  	order by total_cost
 
 #Step 2(Updated to have routes as well)
-with results as (
-	select
-		results.*,osm_2po_4pgr.geom_way,osm_2po_4pgr.x1,osm_2po_4pgr.y1
-	from
-			(SELECT *,singapore_restaurants_2.cost as price FROM (SELECT
-				 *
-			FROM pgr_dijkstra(
-			'SELECT osm_id as id, osm_source_id as source, osm_target_id as target, cost, reverse_cost FROM osm_2po_4pgr',
-			ARRAY[425482381, 4488019045, 243213958]::bigint[],
-			ARRAY(select nearest_road_neighbour_osm_id from singapore_restaurants_2)))
-		as results
-	join singapore_restaurants_2
-		on results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) as results
-	join
-		osm_2po_4pgr on results.node = osm_2po_4pgr.osm_source_id
-), best_places as (
-	select start_vid,end_vid,sum(agg_cost) over (partition by end_vid) as total_cost from results where edge = -1 order by total_cost limit 5*cardinality(ARRAY[425482381, 4488019045, 243213958]::bigint[])
-)
+  WITH results AS
+(
+       SELECT results.*,
+              osm_2po_4pgr.geom_way,
+              osm_2po_4pgr.x1,
+              osm_2po_4pgr.y1
+       FROM   (
+                     SELECT public_result.*,public_edges_2.transport_type,public_edges_2.type_id as transport_type_id
+                     FROM   (
+                                   SELECT *,
+                                          singapore_restaurants_2.cost AS price
+                                   FROM   (
+                                                 SELECT *
+                                                        --public
+                                                 FROM   pgr_dijkstra( 'select id,source,target,x1,y1,x2,y2,cost,reverse_cost from public_edges_2', array[425482381]::bigint[], array
+                                                        (
+                                                               SELECT nearest_road_neighbour_osm_id
+                                                               FROM   singapore_restaurants_2))) AS results
+                                   JOIN   singapore_restaurants_2
+                                   ON     results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) public_result
+                     JOIN   public_edges_2
+                     ON     public_result.edge = public_edges_2.id
+                     UNION
+                     SELECT *,singapore_restaurants_2.cost AS price, 'driving' as transport_type, 'nil' as transport_type_id
 
-select
-	path_seq,
-	results.start_vid as start_user,
-	agg_cost as cost_for_user,
-	total_cost,
-	name,
-	results.end_vid,
-	geom_way as location,
-	x1 as longtitude,
-	y1 as latitude,
-	ST_X(way) as restaurant_x,
-	ST_Y(way) as restaurant_y,
-	results.price,
-	results.rating,
-	results.place_id
-from
-	results
-	inner join
-	best_places
-	on results.end_vid = best_places.end_vid and results.start_vid = best_places.start_vid
+                     FROM   (
+                                   SELECT *
+                                          --driving
+                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y1,x2,y2 FROM osm_2po_4pgr', array[4488019045]::bigint[], array
+                                          (
+                                                 SELECT nearest_road_neighbour_osm_id
+                                                 FROM   singapore_restaurants_2))) AS results
+                     JOIN   singapore_restaurants_2
+                     ON     results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id
+                     UNION
+                     SELECT *,singapore_restaurants_2.cost AS price, 'walking' as transport_type, 'nil' as transport_type_id
+                            --walking
+
+                     FROM   (
+                                   SELECT *
+                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost*kmh/5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2,closest_outing_node,closest_restaurant_node  FROM osm_2po_4pgr where clazz!=11', array[4488019045]::bigint[], array
+                                          (
+                                                 SELECT nearest_road_neighbour_osm_id
+                                                 FROM   singapore_restaurants_2))) AS results
+                     JOIN   singapore_restaurants_2
+                     ON     results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id ) AS results
+       JOIN   osm_2po_4pgr
+       ON     results.node = osm_2po_4pgr.osm_source_id ), best_places AS
+(
+         SELECT   *
+         FROM     (
+                         SELECT place_id,
+                                sum(agg_cost) OVER (partition BY end_vid) AS total_cost,
+                                max(agg_cost) OVER (partition BY end_vid) AS max_travel_time,
+                                min(agg_cost) OVER (partition BY end_vid) AS min_travel_time
+                         FROM   (
+                                       SELECT *
+                                       FROM   results
+                                       WHERE  price != 'None') results
+                         WHERE  edge = -1
+-- --                    AND    cast (price AS integer) < 3
+-- --                    AND    cast (price AS integer) > 0
+                         AND    rating > 4 ) results
+         WHERE    max_travel_time   - min_travel_time < 100
+         ORDER BY total_cost limit 5*cardinality(array[425482381, 4488019045, 243213958]::bigint[]) )
+SELECT    path_seq,
+          results.start_vid AS start_user,
+          agg_cost          AS cost_for_user,
+          total_cost,
+          NAME,
+          results.end_vid,
+          geom_way  AS location,
+          x1        AS longtitude,
+          y1        AS latitude,
+          st_x(way) AS restaurant_x,
+          st_y(way) AS restaurant_y,
+          results.price,
+          results.rating,
+          results.place_id,
+          transport_type,
+          transport_type_id
+FROM       results
+INNER JOIN best_places
+ON         results.place_id = best_places.place_id
+#------------------------------------Adding transport type--------------------------
+SELECT * FROM
+(SELECT *,
+		singapore_restaurants_2.cost AS price
+ FROM   (
+			   SELECT *
+	 --public
+			   FROM   pgr_dijkstra( 'select id,source,target,x1,y1,x2,y2,cost,reverse_cost from public_edges_2', array[425482381]::bigint[], array
+					  (
+							 SELECT nearest_road_neighbour_osm_id
+							 FROM   singapore_restaurants_2))) AS results
+ JOIN   singapore_restaurants_2
+ ON     results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) public_result
+ JOIN public_edges_2
+ ON public_result.edge = public_edges_2.id
+--  AND public_result.end_vid = public_edges_2.target
+#------------------------------------Adding transport type--------------------------
+
 
 #------------------------------------cost and ratings requirements----------------------------
 select * from singapore_restaurants_2 where cost = '3' or cost ='2' or cost = '1' or cost = '4' and rating > 3
@@ -485,21 +548,88 @@ PGUSER=postgres PGPASSWORD=housepotato heroku pg:pull DATABASE_URL mylocaldb -a 
 https://www.google.com/maps/dir/?api=1&destination=47.5951518,-122.3316393
 
 -----------------------------------------Combining the mrt, bus and walking maps------------------
-#Create the table
-CREATE TABLE public_edges (id SERIAL, source bigint, target bigint, cost double precision, reverse_cost double precision, x1 double precision, y1 double precision,x2 double precision,y2 double precision, PRIMARY KEY(id));
+-- #Create the table
+CREATE TABLE public_edges_2 (id SERIAL, source bigint, target bigint, cost double precision, reverse_cost double precision, x1 double precision, y1 double precision,x2 double precision,y2 double precision, transport_type varchar(255),transport_type_id varchar(255), PRIMARY KEY(id));
 
-#For walking routes
-insert into public_edges (source,target,cost,reverse_cost,x1,y1,x2,y2)
-SELECT  osm_source_id as source, osm_target_id as target, cost*kmh/5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2 FROM osm_2po_4pgr where clazz!=11
+-- #For walking routes
+insert into public_edges_2 (source,target,cost,reverse_cost,x1,y1,x2,y2,transport_type,transport_type_id)
+SELECT  osm_source_id as source, osm_target_id as target, cost*kmh/6 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2,'walking' as transport_type,'nil' as transport_type_id  FROM osm_2po_4pgr where clazz!=11;
 
 
-#For bus routes
-insert into public_edges (source,target,cost,reverse_cost,x1,y1,x2,y2)
-SELECT osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y1,x2,y2 FROM bus_routes_locations
+-- #For bus routes
+insert into public_edges_2 (source,target,cost,reverse_cost,x1,y1,x2,y2,transport_type,transport_type_id)
+SELECT osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y1,x2,y2,'bus' as transport_type,bus_no as transport_type_id FROM bus_routes_locations;
 
-#For mrt routes
-insert into public_edges (source,target,cost,reverse_cost,x1,y1,x2,y2)
-SELECT osm_source_id as source, osm_target_id as target, "Time" as cost, "Time" as reverse_cost, "Longitude_Start" as x1,"Latitude_Start" as y1,"Longitude_End" as x2,"Latitude_End" as y2 FROM mrt_map_edges
+-- #For mrt routes
+insert into public_edges_2 (source,target,cost,reverse_cost,x1,y1,x2,y2,transport_type,transport_type_id)
+SELECT osm_source_id as source, osm_target_id as target, "Time" as cost, "Time" as reverse_cost, "Longitude_Start" as x1,"Latitude_Start" as y1,"Longitude_End" as x2,"Latitude_End" as y2,'mrt' as transport_type, "REF_STNSTART" as transport_type_id FROM mrt_map_edges;
 
 # --------------------------RUNNING THE DOCKER POSTGRES------------------------------
 sudo docker run --name postgres -p 5432:5432 -v $HOME/Desktop/Meetup-Data/postgresdatadir:/var/lib/postgresql/data -d pgrouting/pgrouting:v2.6.3-postgresql_10
+
+#---------------------temp testing (No results)-------------------------
+WITH results AS
+(
+       SELECT results.*,
+              osm_2po_4pgr.geom_way,
+              osm_2po_4pgr.x1,
+              osm_2po_4pgr.y1
+       FROM   (
+
+            SELECT public_result.*,public_edges_2.transport_type,public_edges_2.type_id as transport_type_id
+                     FROM   (
+                                   SELECT *,
+                            singapore_restaurants_2.cost AS price
+                     FROM   (
+                                   SELECT *
+                                                 --public
+                                   FROM   pgr_dijkstra( 'select id,source,target,x1,y1,x2,y2,cost,reverse_cost from public_edges', ARRAY[5113422345]::bigint[], array
+                                          (
+                                                 SELECT nearest_road_neighbour_osm_id
+                                                 FROM   singapore_restaurants_2))) AS results
+                     JOIN   singapore_restaurants_2
+                     ON     results.end_vid = singapore_restaurants_2.nearest_road_neighbour_osm_id) public_result
+
+                     JOIN   public_edges_2
+                     ON     public_result.edge = public_edges_2.id
+           )
+
+        AS results
+       JOIN   osm_2po_4pgr
+       ON     results.node = osm_2po_4pgr.osm_source_id ), best_places AS
+(
+         SELECT   *
+         FROM    (
+                         SELECT place_id,
+                                sum(agg_cost) OVER (partition BY end_vid) AS total_cost,
+                                max(agg_cost) OVER (partition BY end_vid) AS max_travel_time,
+                                min(agg_cost) OVER (partition BY end_vid) AS min_travel_time
+                         FROM   (
+                                       SELECT *
+                                       FROM   results
+                                       WHERE  price != 'None') results
+                         WHERE  edge = -1
+                         AND    cast (price AS integer) <= 5
+                         AND    cast (price AS integer) >= 0
+                         AND    rating > 1.0 ) results
+         WHERE    max_travel_time   - min_travel_time < 0.25
+         ORDER BY total_cost limit 20*1 )
+SELECT    path_seq,
+          results.start_vid AS start_user,
+          agg_cost          AS cost_for_user,
+          total_cost,
+          NAME,
+          results.end_vid,
+          geom_way  AS location,
+          x1        AS longtitude,
+          y1        AS latitude,
+          st_x(way) AS restaurant_x,
+          st_y(way) AS restaurant_y,
+          results.price,
+          results.rating,
+          results.place_id,
+          transport_type,
+          transport_type_id
+FROM       results
+INNER JOIN best_places
+ON                 results.place_id = best_places.place_id
