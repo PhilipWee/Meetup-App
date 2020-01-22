@@ -295,6 +295,6 @@ if __name__ == '__main__':
 
 # #--------------------------------------CONNECT TO DATABASE-------------------------------
 #Run the App
-app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5001)
+app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
 # app.run(host='0.0.0.0', debug=True, use_reloader=False)
 crsr.close()
