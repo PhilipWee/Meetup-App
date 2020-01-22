@@ -38,6 +38,8 @@ class PrefData {
   String sessionid;
   int price;
   String userplace;
+
+  //PrefData Constructor
   PrefData({this.username,this.transportMode, this.quality, this.speed, this.link, this.lat, this.long, this.activityType,this.sessionid,this.price,this.userplace});
 }
 
@@ -326,7 +328,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               child: TextFormField(
                 controller: textController,
                 decoration: InputDecoration(
-//                    labelText: "Name (Optional)",
                     hintText: "Name (Optional)"
                 ),
               ),
