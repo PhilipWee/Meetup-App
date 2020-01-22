@@ -41,8 +41,10 @@ xhr.onreadystatechange = (e) => {
         calcButton = document.createElement("BUTTON");
         calcButton.innerHTML = "Everyone's here, Calculate Results!";
         calcButton.onclick = "calculateButton()";
+        calcButton.id = "calcButton";
 
         document.getElementById('calculateButton_div').appendChild(calcButton);
+        document.getElementById('calcButton').addEventListener("click", calculateButton);
       }
 
     //var y;
@@ -77,7 +79,7 @@ xhr.onreadystatechange = (e) => {
     }
 
     function calculateButton() {
-      window.location.href = session_id + "/calculate";
+      window.location.href = "calculate";
     }
     // MADE CHANGES END
 

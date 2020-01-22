@@ -72,7 +72,7 @@
 
       </div>
       <div class='row pl-2' style='background-color:Tomato;height:100%;'>
-        <h1>MeetUp Mouse</h1>
+        <h1 style='margin-left':3%;>MeetUp Mouse</h1>
       </div>
       <div class='row pl-2' style="background-color:White;">
         <h2>Allow meetup mouse to access your location and squeak away!</h2>
@@ -81,40 +81,46 @@
 
     <!-- Form for user to submit and create meeting type,
     Choose preferences and share link -->
-    <div class="container-fluid" style="margin-top:20px;">
+    <di3
+    v class="container-fluid" style="margin-top:20px;">
       <div class="row">
         <div class="col col-5 ">
         <form id='createMeetup' method='POST'>
           <p>What is the purpose of your meetup?</p>
-          <p><input type="radio" name="meetupPurpose" value="Recreation"> Recreation </input>
-              <input type="radio" name="meetupPurpose" value="Food"> Food </input>
-              <input type="radio" name="meetupPurpose" value="Meeting"> Meeting </input></p>
+          <p><input type="radio" name="meeting_type" value="Recreation"> Recreation </input>
+              <input type="radio" name="meeting_type" value="Food"> Food </input>
+              <input type="radio" name="meeting_type" value="Meeting"> Meeting </input></p>
 
           <p>Transport mode</p>
-          <p><select name="transportMode" id="transportPreference"></p>
+          <p><select name="transport_mode" id="transportPreference"></p>
             <option value='driving'> Driving </option>
             <option value='publicTransport'> Public Transport </option>
             <option value='walk'> Walk </option>
             <option value='motorcycle'> Riding </option>
           </select>
 
+          <!--
           <p>Speed</p>
           <p><select name="speed" id="speedPreference"></p>
             <option value="noPreference">No Preference</option>
             <option value="regular">Regular</option>
             <option value="fast">Fast</option>
           </select>
+        -->
 
           <p>Ratings</p>
-          <p><select name='ratings' id="ratingsPreference"></p>
-            <option value="noPreference">No Preference</option>
-            <option value="regular">Regular</option>
-            <option value="best">Best</option>
+          <p><select name='quality' id="ratingsPreference"></p>
+            <option value="1">No Preference</option>
+            <option value="2">Regular</option>
+            <option value="3">Best</option>
           </select>
 
           <p>Price</p>
           <input name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
           <span id='priceValue'>No Preference</span>
+
+          <input name='speed' value='3' style="display:none"></input>
+          <input name='username' value='web_host' style="display:none"></input>
 
           <br>  <!-- Just a page break -->
           <button type='button' id='submitbutton'>Submit</button>

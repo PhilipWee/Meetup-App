@@ -12,7 +12,7 @@ console.log('geolocation works')
 // Scipt for price preference slider
 var values = ['No Preference', '$', '$$', '$$$', '$$$$'];
 $('#pricePreference').change(function() {
-    $('#pricePreference').text(values[this.value]);
+    $('#priceValue').text(values[this.value]);
 });
 
 function success(pos) {
@@ -44,10 +44,11 @@ var options = {
 function submitButton() {
 
     meetupForm = $('#meetupData')
-    console.log(meetupForm);
     meetupData = meetupForm.serializeArray()
+    //console.log(meetupData);
+
     if ($('#lat').val() == '') {
-        alert("Please drag the map to select your location!")
+        alert("Please use the map to select your location!")
     } else {
         newFunction();
     }
@@ -64,8 +65,9 @@ function submitButton() {
             }
         })
 
+
     }
-document.getElementById('jayson').addEventListener("onclick", jayson)
+document.getElementById('jayson').addEventListener("onclick", jayson);
 
 
 
