@@ -1,21 +1,13 @@
 import 'main.dart';
-import 'MapPage.dart';
 import 'ShareLinkPage.dart';
-import 'Meetingtype.dart';
-import 'color_loader.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
-import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:connectivity/connectivity.dart';
-import 'color_loader.dart';
+import 'Data.dart';
+
 
 class CustomizationPage extends StatelessWidget {
   final PrefData data;
@@ -316,10 +308,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
             onPressed: () async {
               if (value2.isNotEmpty && value4.isNotEmpty) {
-                data.speed = 3;
-                postDataGetID();
-                await Future.delayed(Duration(milliseconds: 2000));
+                data.speed = 3; // For future work, fixed at 3 for now
+                if (data.sessionid.isEmpty && data.link.isEmpty) {postDataGetID();} //TODO
+                await Future.delayed(Duration(milliseconds: 1000));
                 Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
+                print("TEST: ${data.dataMap}");
               } else {
                 Scaffold.of(context).showSnackBar(
                     SnackBar(

@@ -1,21 +1,7 @@
-import 'main.dart';
-import 'MapPage.dart';
-import 'ShareLinkPage.dart';
 import 'CustomizationPage.dart';
-import 'color_loader.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
-import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:connectivity/connectivity.dart';
-import 'color_loader.dart';
+import 'Data.dart';
 
 
 class MeetingType extends StatelessWidget {
@@ -51,6 +37,7 @@ class MeetingType extends StatelessWidget {
               padding: EdgeInsets.all(0.0),
               onPressed: (){
                 Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data: data)),);
+                print("TEST: ${data.dataMap}");
               },
               child:_buildCustomButton(custLabels[index], custImgs[index]) ,
             ),

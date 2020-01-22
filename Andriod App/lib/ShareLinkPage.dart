@@ -1,23 +1,14 @@
-import 'package:flutter/services.dart';
-
 import 'main.dart';
 import 'MapPage.dart';
-import 'CustomizationPage.dart';
-import 'Meetingtype.dart';
-import 'color_loader.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
-import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:connectivity/connectivity.dart';
-import 'color_loader.dart';
+import 'Data.dart';
+
 
 class ShareLinkPage extends StatelessWidget {
   final PrefData data;
@@ -54,7 +45,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
       await Future.delayed(Duration(milliseconds: 1500));
       int statusCode = response.statusCode;
       String body = response.body;
-      print("GetMembere Request Successful/Failed With Status: $statusCode");
+      print("GetMembers Request Successful/Failed With Status: $statusCode");
 
       if (statusCode != 200){
         Scaffold.of(context).showSnackBar(
@@ -171,6 +162,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
                   textColor: Colors.black,
                   onPressed: () {
                     Navigator.push(context,MaterialPageRoute(builder: (context) => MapSample(data:data)),);
+                    print("TEST: ${data.dataMap}");
                   },
                   child: Text("Create Meetup!"),
                 ),
