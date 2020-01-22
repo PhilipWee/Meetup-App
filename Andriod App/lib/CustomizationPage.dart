@@ -45,7 +45,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final PrefData data;
   CustomizationPageState({this.data});
 
-//  Future<Map<String,double>> saveMyLocation() async{
 
   String value2 = "Public Transit";
 //  String value3 = "Select...";  //originally used for speed
@@ -71,6 +70,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   Future<String> postDataGetID() async {
 
     //extract data from PrefData to add to json package
+    data.transportMode = value2;
+    data.price = value5.floor();
+    data.quality = 1;
+    data.speed = 3; //hidden for now
+
     double lat = data.lat;
     double long = data.long;
     int quality = data.quality;
@@ -85,7 +89,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     String url = '$address/session/create';
 
 //    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode"}';
-    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,    "transport_mode":"$transportmode", "price_level":"$price"}';
+    String jsonpackage = '{"lat":$lat,   "long":$long,   "quality":$quality,   "speed":$speed,   "transport_mode":"$transportmode",  "price_level":"$price"}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     try{
 
@@ -193,7 +197,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value2 = newValue;
-                          data.transportMode = newValue; //ADD TO DATABASE
+                          if (value2=="Walk"){data.transportMode="Walk";}
+                          else if (value2=="Driving"){data.transportMode="Driving";}
+                          else if (value2=="Riding"){data.transportMode="Riding";}
+                          else {data.transportMode="Public Transit";}
                         });
                       },
                       items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
@@ -243,7 +250,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           if (value4=="Best"){data.quality=3;}
                           else if (value4=="Regular"){data.quality=2;}
                           else if (value4=="No Preference"){data.quality=1;}  //ADD TO DATABASE
-                          else{data.quality=0;}
                         });
                       },
                       items: <String>["No Preference", "Regular", "Best"]

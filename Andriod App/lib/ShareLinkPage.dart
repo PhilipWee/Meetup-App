@@ -46,11 +46,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
   ShareLinkState({this.data});
   List listofmembers = [];
 
-  Future<List<dynamic>> getMembers() async {
+  Future<List<dynamic>> getMembers(sessID) async {
 
-    String sessID = data.sessionid;
     String address = globalurl();
-
     try{
       http.Response response = await http.get('$address/session/$sessID');
       await Future.delayed(Duration(milliseconds: 1500));
@@ -94,29 +92,29 @@ class ShareLinkState extends State<ShareLinkWidget> {
         padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
         child: Column(
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 2,
-                  child: TextField(
-                      controller: TextEditingController(text:data.sessionid),
-                      decoration: InputDecoration(labelText: "Tap here for Session ID", border: OutlineInputBorder())
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(left: 5, right: 5),
-                  child: Text(""),
-                ),
-                IconButton(
-                    icon: Icon(Icons.content_copy),
-                    onPressed: () {Clipboard.setData(ClipboardData(text: data.sessionid));}
-                ),
-              ],
-            ),
-            Container(
-              padding: const EdgeInsets.only(top: 5, bottom: 5),
-              child: Text(""),
-            ),
+//            Row(
+//              children: <Widget>[
+//                Expanded(
+//                  flex: 2,
+//                  child: TextField(
+//                      controller: TextEditingController(text:data.sessionid),
+//                      decoration: InputDecoration(labelText: "Tap here for Session ID", border: OutlineInputBorder())
+//                  ),
+//                ),
+//                Container(
+//                  padding: const EdgeInsets.only(left: 5, right: 5),
+//                  child: Text(""),
+//                ),
+//                IconButton(
+//                    icon: Icon(Icons.content_copy),
+//                    onPressed: () {Clipboard.setData(ClipboardData(text: data.sessionid));}
+//                ),
+//              ],
+//            ),
+//            Container(
+//              padding: const EdgeInsets.only(top: 5, bottom: 5),
+//              child: Text(""),
+//            ),
             Row(
               children: <Widget>[
                 Expanded(
@@ -191,7 +189,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     Widget listSection = Container(
       child:
       FutureBuilder(
-        future: getMembers(),
+        future: getMembers(data.sessionid),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           listofmembers = snapshot.data;
           if(listofmembers == null){
