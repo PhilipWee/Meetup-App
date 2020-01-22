@@ -16,13 +16,10 @@ xhr.onreadystatechange = (e) => {
       btn = document.createElement("BUTTON");
       btn.innerHTML = String(list_of_restaurant_names[i]);
       btn.id = "location_modifier" + String(list_of_restaurant_names[i])
-      btn.style.marginLeft='10px'
-      btn.style.marginRight='10px'
       // btn.addEventListener('click', function(i) {return {location_modifier}(i)});
       btn.onclick = function() {
         location_modifier(list_of_restaurant_names[i])
-        $('#jayson').remove();
-        $('#loader').remove();
+      button.style = "font-family: Patrick Hand SC;"
       }
       // btn.onclick = function() {
       //   location_modifier(btn.innerHTML)
@@ -47,11 +44,7 @@ xhr.onreadystatechange = (e) => {
         calcButton.id = "calcButton";
 
         document.getElementById('calculateButton_div').appendChild(calcButton);
-        $('#jayson').remove();
-        $('#loader').remove();
-
         document.getElementById('calcButton').addEventListener("click", calculateButton);
-
       }
 
     //var y;
@@ -175,43 +168,19 @@ if (user_details.includes('identifier')) {
   user.class = 'row'
   user.id = 'row_num'
   // document.body.appendChild(user)
-  user.style.fontFamily = 'Patrick Hand SC'
-  user.style.fontSize='2vw'
-  user.style.backgroundColor= '#FDCBCB'
-  user.style.borderRadius='12px'
-  user.style.marginLeft='10px'
-  user.style.marginRight='10px'
-  user.style.marginTop='10px'
-  user.append((String(allUsers[i][  'identifier'] + ', the mouse is travelling by ')))
+
+  user.append((String(allUsers[i]['identifier'] + ', the mouse is travelling by ')))
   user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
-  var pic = document.createElement("IMG")
-  pic.setAttribute("src", "/static/mouseAvatar1.png");
-  pic.setAttribute("width", "60");
-  pic.setAttribute("height", "60");
-  pic.setAttribute("alt","host");
-  user.append(pic)
   }
-
-
 else {
   user = document.createElement("div")
   user.class = 'row'
   user.id = 'row_num'
-  user.style.fontFamily = 'Patrick Hand SC'
-  user.style.fontSize='2vw'
-  user.style.backgroundColor= '#FDCBCB'
-  user.style.borderRadius='12px'
-  user.style.marginLeft='10px'
-  user.style.marginRight='10px'
-  user.style.marginTop='10px'
-  user.append((String(allUsers[i][  'username'] + ', the host mouse is travelling by ')))
+  user.append((String(allUsers[i]['username'] + ', the host mouse is travelling by ')))
   user.append(' ' + (String(allUsers[i]['transport_mode'] + '. . . . . . . . . . . . . . . . . . . ')))
-  var pic = document.createElement("IMG")
-  pic.setAttribute("src", "/static/mouseAvatar2.png");
-  pic.setAttribute("width", "60");
-  pic.setAttribute("height", "60");
-  pic.setAttribute("alt","host");
-  user.append(pic)
+  h1 = document.createElement('h1')
+  h1.value = 'test'
+  user.append(src="/static/Mousenspeech.png")
 
 
   }

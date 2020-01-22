@@ -30,8 +30,10 @@ function submitBugReport() {
       url: host_address_port + '/',
       data: JSON.stringify(bugReport),
       contentType:'application/json',
-      success: function (response_data) {
-          console.log("running redirect")
+      success: function (response) {
+          if (response == "SENT!") {
+            alert("Your feedback has been received! Thank you (:")
+          }
 //  window.location.href='results_display' //form submission
           }
   })

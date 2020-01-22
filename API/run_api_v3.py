@@ -64,10 +64,8 @@ def index():
     if request.method == 'POST':
         content = request.get_json()
 
-        firebase = firebase_upload_bugs.firebase_data()
-        firebase.send_bug_report(content)
-        print("SENT!")
-        return content
+        send_bug_report(content)
+        return "SENT!"
 
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
@@ -268,6 +266,15 @@ def get_details_for_session_id(session_id):
 def get_doc_ref_for_id(session_id):
     session_id = str(session_id)
     return db.collection(u'sessions').document(session_id)
+
+# Function to send bug reports to firebase
+def send_bug_report(content):
+    report = {
+        u'content': content,
+        u'timestamp': firestore.SERVER_TIMESTAMP
+    }
+    database = firestore.client()
+    database.collection(u'bugReports').add(report)
 
 
 
