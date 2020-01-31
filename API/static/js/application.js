@@ -41,8 +41,10 @@ xhr.onreadystatechange = (e) => {
         calcButton = document.createElement("BUTTON");
         calcButton.innerHTML = "Everyone's here, Calculate Results!";
         calcButton.onclick = "calculateButton()";
+        calcButton.id = "calcButton";
 
         document.getElementById('calculateButton_div').appendChild(calcButton);
+        document.getElementById('calcButton').addEventListener("click", calculateButton);
       }
 
     //var y;
@@ -77,7 +79,12 @@ xhr.onreadystatechange = (e) => {
     }
 
     function calculateButton() {
-      window.location.href = session_id + "/calculate";
+      jQuery.getJSON(
+        host_address_port + '/session/' + session_id + '/calculate',
+        function(data) {
+            console.log(data);
+            alert("Calculation in Progress");
+        });
     }
     // MADE CHANGES END
 

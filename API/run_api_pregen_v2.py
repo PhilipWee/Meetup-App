@@ -63,9 +63,9 @@ def index():
         print("SENT!")
         return content
 
-@app.route('/session/<session_id>/get_details')
+@app.route('/session/<session_id>/get_details', methods=['GET','POST'])
 def get_details(session_id):
-    if request.method == "GET":
+    if request.method == "GET" or request.method == "POST":
         return render_template('Geoloc2.html')
 
 @app.route('/session/<session_id>/results_display')
@@ -82,22 +82,40 @@ def create_session():
     if request.method == "GET":
         return render_template('createMeetupPage.html')
     if request.method == "POST":
-        content = request.get_json()
+        content_unparsed = request.get_json()
         session_id = str(uuid.uuid1())
+
+        if isinstance(content_unparsed, list):
+            content = {}
+            #print(content_unparsed)
+            for dic in content_unparsed:
+                content[dic['name']] = dic['value']
+        else:
+            content = content_unparsed
 
         # Example of content list
         # [{"name":"meetupPurpose","value":"Food"},{"name":"transport_mode","value":"Walk"},{"name":"lat","value":"1.33518"},{"name":"long","value":"103.97242539999999"}]
-        host_user_details = {'lat':content[5].get('value'),
-                            'long':content[6].get('value'),
-                            'transport_mode':content[1].get('value'),
-                            'speed':content[2].get('value'),
-                            'quality':content[3].get('value'),
-                            'price':content[4].get('value'),
-                            'time_created':str(datetime.datetime.now())}
+        #host_user_details = {'lat':content[5].get('value'),
+        #                    'long':content[6].get('value'),
+        #                    'transport_mode':content[1].get('value'),
+        #                    'speed':content[2].get('value'),
+        #                    'quality':content[3].get('value'),
+        #                    'price':content[4].get('value'),
+        #                    'time_created':str(datetime.datetime.now())}
 
-        details = {'users':host_user_details,'meeting_type':content[0].get('value')}
+        host_user_details = {'username':content.get('username'),
+                            'lat':content.get('lat'),
+                            'long':content.get('long'),
+                            'transport_mode':content.get('transport_mode','public'),
+                            'metrics':{
+                                'speed':int(content.get('speed',5)),
+                                'quality':int(content.get('quality',5)),
+                                'price':int(content.get('price', 0))
+                            }}
+
+        details = {'users':[host_user_details],'meeting_type':content.get('meeting_type')}
         json_details = json.dumps(details)
-        #print(json_details)
+        print(json_details)
         return(session_id)
 
 #Create a function to refresh the data if necessary
@@ -1696,7 +1714,7 @@ def results(session_id):
 if __name__ == '__main__':
 
     # Run the App
-    app.run(host='0.0.0.0', debug=True, use_reloader=False, port=5000)
+    app.run(host='0.0.0.0', debug=True, use_reloader=False, port=5001)
 
     #These settings are required for session to work
     app.config['SESSION_TYPE'] = 'filesystem'

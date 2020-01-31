@@ -2,7 +2,6 @@ var host_address_port = location.protocol+'//'+location.hostname+(location.port 
 //var session_id = window.location.pathname.split('/')[2]
 
 navigator.geolocation.getCurrentPosition(success, error, options);
-console.log('test');
 
 // Scipt for price preference slider
  var values = ['No Preference', '$', '$$', '$$$', '$$$$'];
@@ -34,30 +33,34 @@ function submitbutton() {
   meetupForm = $('#createMeetup')
   //console.log(meetupForm);
   meetupData = meetupForm.serializeArray();
-  console.log(meetupData);
-
-  if ($('#lat').val() == '') {
-      alert("Please drag the map to select your location!")
+  //console.log(meetupData.length);
+  if (meetupData.length != 8) {
+    alert("Please choose the purpose of your meetup!");
   } else {
-      newFunction();
-  }
-  function newFunction() {
-      $.ajax({
-          type: 'POST',
-          url: host_address_port + '/session/create',
-          data: JSON.stringify(meetupData),
-          contentType:'application/json',
-          success: function (response_data) {
-              window.session_id = response_data;
-              document.getElementById('shareLink').value = host_address_port + '/session/' + response_data;
-  //window.location.href='results_display' //form submission
-          }
-      })
+      if ($('#lat').val() == '') {
+          alert("Please drag the map to select your location!");
+      } else {
+          newFunction();
+      }
+      function newFunction() {
+          $.ajax({
+              type: 'POST',
+              url: host_address_port + '/session/create',
+              data: JSON.stringify(meetupData),
+              contentType:'application/json',
+              success: function (response_data) {
+                  response = response_data['session_id'];
+                  window.session_id = response;
+                  document.getElementById('shareLink').value = host_address_port + '/session/' + response + '/get_details';
+      //window.location.href='results_display' //form submission
+              }
+          })
 
-      console.log(JSON.stringify(meetupData));
-
-  }
+          //console.log(JSON.stringify(meetupData));
+        }
+    }
 }
+
 
   function copyLinkFunction() {
     /* Get the text field */
@@ -75,8 +78,12 @@ function submitbutton() {
   }
 
   function createMeetupButton() {
-    //console.log(window.session_id);
-    window.location.href = window.session_id + '/results_display' + '?isHost=true';
+    link = document.getElementById('shareLink').value;
+    if (link == "") {
+      alert("Click on submit to generate a shareable link first.");
+    } else {
+      window.location.href = window.session_id + '/results_display' + '?isHost=true';
+    }
   }
 
 document.getElementById ("submitbutton").addEventListener ("click", submitbutton);
