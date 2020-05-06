@@ -9,11 +9,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
 
-    
+
     #basicMap {
       width: 800px;
       height: 200px;
-      
+
     }
 
     #basicMap:after {
@@ -37,7 +37,7 @@
       border: 10px;
 
     }
-    
+
 
     body {
       background-color: SeaShell;
@@ -55,7 +55,7 @@ div.example {
   align-content: center;
   align-items: center;
   justify-content: center;
-  
+
 }
 
     h1 {
@@ -71,7 +71,7 @@ div.example {
       margin-top:1mm;
       font-family: 'Patrick Hand SC';
       font-size: 3vw;
-     
+
 
 
     }
@@ -89,7 +89,7 @@ div.example {
 
       padding: 2px;
       margin-bottom: 2px;
-      
+
     }
 
     .outer {
@@ -116,40 +116,40 @@ div.example {
 }
 
 @media screen and (max-width: 700px) {
-  .col col-3 d-lg-none, .navbar {   
+  .col col-3 d-lg-none, .navbar {
     flex-direction: column;
   }
 }
 
   </style>
-  
+
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
     crossorigin="anonymous"></script>
-    
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
     integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
     crossorigin="anonymous"></script>
-    
+
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
     crossorigin="anonymous"></script>
-  
+
   <!-- Load the google maps api stuff -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  
+
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g&callback=initMap&libraries=places"
     async defer></script>
-  
+
   <script src="{{url_for('static', filename='js/maps.js')}}"></script>
-    
-  
+
+
 </head>
 
 <body>
 
     <div>
-        
+
 
     <div style='position:absolute;' class='row '>
       <div class='col col-8'>
@@ -160,7 +160,7 @@ div.example {
           width="500" height="500">
 
       </div>
-  
+
 
     </div>
     <div class='row pl-2' style='background-color:Tomato;height:100%;'>
@@ -173,8 +173,8 @@ div.example {
   </div>
   <div class="container-fluid" >
     <div class="row justify-content-center" style="margin-right:20%;" >
-      
-      
+
+
       <div class="col col-8" style='background-color:rgb(255,245,238); ' >
         <div class="row" >
         <form action=''+'/get_details?isHost=false' id='meetupData' method='POST'>
@@ -186,7 +186,7 @@ div.example {
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;" >
             <!-- MADE CHANGES START -->
-            <p><select name="transportMode" id="transportPreference" ></p>
+            <p><select name="transport_mode" id="transportPreference" ></p>
               <option value='driving'> Driving </option>
               <option value='publicTransport'> Public Transport </option>
               <option value='walk'> Walk </option>
@@ -194,27 +194,33 @@ div.example {
             </select>
             <!-- MADE CHANGES END -->
           </div>
+
+        <!--
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;margin-left:22.5%;" >
             <p >How important is speed to you?</p>
           </div>
+
+
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;" >
-            <!-- MADE CHANGES START -->
+
             <p><select name="speed" id="speedPreference" ></p>
               <option value="noPreference">No Preference</option>
               <option value="regular">Regular</option>
               <option value="fast">Fast</option>
             </select>
-            <!-- MADE CHANGES END -->
+
           </div>
+        -->
+
           <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;margin-left:22.5%;" >
-            <p>What about the quality of the transport?</p>
+            <p>What about the ratings?</p>
           </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;" >
             <!-- MADE CHANGES START -->
-            <p><select name='ratings' id="ratingsPreference" ></p>
-              <option value="noPreference">No Preference</option>
-              <option value="regular">Regular</option>
-              <option value="best">Best</option>
+            <p><select name='quality' id="ratingsPreference" ></p>
+              <option value="1">No Preference</option>
+              <option value="2">Regular</option>
+              <option value="3">Best</option>
             </select>
             <!-- MADE CHANGES END -->
           </div>
@@ -224,33 +230,34 @@ div.example {
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;">
             <!-- MADE CHANGES START -->
             <input name='price' type="range" min="0" max="4" value="0" id="pricePreference" ></input>
-            <span style='margin-left:4%;' id = pricePreferences>No Preference</span>
+            <span style='margin-left:4%;' id = 'priceValue'>No Preference</span>
+
+            <input name='speed' value='3' style="display:none"></input>
             <!-- MADE CHANGES END -->
           </div>
         </div>
-          
 
-          <div class="row" style='margin-right:25%;' >          
+          <div class="row" style='margin-right:25%;' >
            <input id="pac-input" style="font-family: Patrick Hand SC;margin-top:2%;margin-left:22.5%;margin-right:-25%;" class="controls" type="text" placeholder="   Search Location">
 
-            <div class="round3" id='basicMap' style='margin-top:2%;margin-bottom:3%;margin-left:22.5%;margin-right:-25%;'></div>  
-      
+            <div class="round3" id='basicMap' style='margin-top:2%;margin-bottom:3%;margin-left:22.5%;margin-right:-25%;'></div>
+
 
         <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
         <input style="margin-right:0%;margin-top:0%;" type='hidden' name='long' id='long' />
       </div>
         <div class='row' style='margin-left:15.5%;'>
             <div style='font-size: 2.2vw;font-family: Patrick Hand SC;width:400px;' ><button type='button'  id='submitbutton'>Submit</button></div>
-     
+
       </div>
   </div>
     </div>
   </div>
-      
+
 </form>
 
 
-  
+
 </body>
 <script src="{{url_for('static', filename='js/button.js')}}"></script>
 

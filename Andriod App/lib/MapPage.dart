@@ -142,8 +142,7 @@ class MapSampleState extends State<MapSample> {
       var longtitude = data[locationName][key]['longtitude'];
       var transport_type = data[locationName][key]['transport_type'];
       var transport_type_id = data[locationName][key]['transport_type_id'];
-      print('111111111111111111111111111111111111111111');
-      print(transport_type);
+      print(data[locationName][key]['end_vid']);
       // print(latitude);
       // print(longtitude);
       polylineContainer.add(_makeLine(latitude,longtitude,lineIterator));

@@ -137,7 +137,7 @@ def calculate(sess_id,info):
         for user in info[0]['users']:
 #            print(user)
             #Get the osm_id closest to the user's location
-            sql_string = "SELECT osm_source_id as osm_id FROM osm_2po_4pgr\
+            sql_string = "SELECT osm_source_id as osm_id FROM osm_2po_4pgr_2 where geom_way is not null\
                 ORDER BY sqrt((x1- "+str(user['long'])+")^2 + (y1- "+str(user['lat'])+")^2) \
             LIMIT 1"
 #            print(sql_string)
@@ -174,6 +174,8 @@ def calculate(sess_id,info):
             location_db = "singapore_restaurants_2"
         elif info[0]['meeting_type'] == 'outing':
             location_db = "outing_data"
+        else:
+            location_db = "singapore_restaurants_2"
         
         #Get the number of users
         number_of_users = len(info[0]['users'])
@@ -199,10 +201,17 @@ def calculate(sess_id,info):
                        'number_of_results':NUMBER_OF_RESULTS,
                        'number_of_users':number_of_users}
         
+        print(params_dict['location_db'])
+        
         #Create the string for public, driving and walking
         dijkstra_string = ""
         if len(user_public_osms) > 0:
             dijkstra_string += """
+            SELECT DISTINCT results.*,
+              
+              osm_2po_4pgr_2.x1,
+              osm_2po_4pgr_2.y1
+       FROM   (
             SELECT public_result.*,public_edges_2.transport_type,public_edges_2.transport_type_id
                      FROM   (
                                    SELECT *,
@@ -220,6 +229,10 @@ def calculate(sess_id,info):
                      JOIN   public_edges_2
                      ON     public_result.edge = public_edges_2.id
             
+            AS results
+       JOIN   osm_2po_4pgr_2
+       ON     results.node = osm_2po_4pgr_2.osm_source_id 
+            
             
             """.format(**params_dict)
         
@@ -227,47 +240,94 @@ def calculate(sess_id,info):
             dijkstra_string += " UNION \n"
             
         if len(user_driving_osms) > 0:
-            dijkstra_string += """SELECT *,singapore_restaurants_2.cost AS price, 'driving' as transport_type, 'nil' as transport_type_id
-                     FROM   (
+            dijkstra_string += """
+             SELECT DISTINCT
+            ON (
+                                            x1,y1) results.*
+            FROM            (
                                    SELECT *
-						 --driving
-                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y1,x2,y2 FROM osm_2po_4pgr', {user_driving_array}, array
+                                   FROM   (
+                                                 SELECT *,
+                                                        {location_db}.cost AS price,
+                                                        'driving'                    AS transport_type,
+                                                        'nil'                        AS transport_type_id
+                                                 FROM   (
+                                                               SELECT *
+                                                                      --driving
+                                                               FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y1,x2,y2 FROM osm_2po_4pgr_2 where geom_way is not null ', {user_driving_array}, array
+                                                                      (
+                                                                             SELECT nearest_road_neighbour_osm_id
+                                                                             FROM   {location_db}))) AS results
+                                                 JOIN   {location_db}
+                                                 ON     results.end_vid = {location_db}.nearest_road_neighbour_osm_id ) results
+                                   JOIN
                                           (
-                                                 SELECT nearest_road_neighbour_osm_id
-                                                 FROM   {location_db}))) AS results
-                     JOIN   {location_db}
-                     ON     results.end_vid = {location_db}.nearest_road_neighbour_osm_id""".format(**params_dict)
+                                                 SELECT *
+                                                 FROM   osm_2po_4pgr_2
+                                                 WHERE  geom_way IS NOT NULL) a
+                                   ON     results.node = a.osm_source_id) results""".format(**params_dict)
+            
+#            dijkstra_string += """
+#            SELECT DISTINCT results.*,
+#              
+#              osm_2po_4pgr_2.x1,
+#              osm_2po_4pgr_2.y1
+#       FROM   (
+#            SELECT *,{location_db}.cost AS price, 'driving' as transport_type, 'nil' as transport_type_id
+#                     FROM   (
+#                                   SELECT *
+#						 --driving
+#                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost, reverse_cost,x1,y1,x2,y2 FROM osm_2po_4pgr_2 where geom_way is not null ', {user_driving_array}, array
+#                                          (
+#                                                 SELECT nearest_road_neighbour_osm_id
+#                                                 FROM   {location_db}))) AS results
+#                     JOIN   {location_db}
+#                     ON     results.end_vid = {location_db}.nearest_road_neighbour_osm_id
+#                     
+#                     AS results
+#       JOIN   osm_2po_4pgr_2
+#       ON     results.node = osm_2po_4pgr_2.osm_source_id """.format(**params_dict)
         
         if len(user_driving_osms) > 0 and len(user_walking_osms) > 0:
             dijkstra_string += " UNION \n"
         
         if len(user_walking_osms) > 0:
-            dijkstra_string += """SELECT *,singapore_restaurants_2.cost AS price, 'walking' as transport_type, 'nil' as transport_type_id
+            dijkstra_string += """
+            SELECT DISTINCT results.*,
+              
+              osm_2po_4pgr_2.x1,
+              osm_2po_4pgr_2.y1
+       FROM   (
+            SELECT *,{location_db}.cost AS price, 'walking' as transport_type, 'nil' as transport_type_id
                      FROM   (
                                    SELECT *
-                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost*kmh/6.5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2,closest_outing_node,closest_restaurant_node  FROM osm_2po_4pgr where clazz!=11', {user_walking_array}, array
+                                   FROM   pgr_dijkstra( 'SELECT  osm_id as id,osm_source_id as source, osm_target_id as target, cost*kmh/6.5 as cost, reverse_cost*kmh/5 as reverse_cost,x1,y1,x2,y2,closest_outing_node,closest_restaurant_node  FROM osm_2po_4pgr_2 where clazz!=11', {user_walking_array}, array
                                           (
                                                  SELECT nearest_road_neighbour_osm_id
                                                  FROM   {location_db}))) AS results
                      JOIN   {location_db}
-                     ON     results.end_vid = {location_db}.nearest_road_neighbour_osm_id""".format(**params_dict)
+                     ON     results.end_vid = {location_db}.nearest_road_neighbour_osm_id
+                     
+                     AS results
+       JOIN   osm_2po_4pgr_2
+       ON     results.node = osm_2po_4pgr_2.osm_source_id """.format(**params_dict)
         
         params_dict['dijkstra_string'] = dijkstra_string
         
 #        print("""WITH results AS
 #(
 #       SELECT results.*,
-#              osm_2po_4pgr.geom_way,
-#              osm_2po_4pgr.x1,
-#              osm_2po_4pgr.y1
+#              osm_2po_4pgr_2.geom_way,
+#              osm_2po_4pgr_2.x1,
+#              osm_2po_4pgr_2.y1
 #       FROM   (
 #                     {dijkstra_string}
 #	   
 #	   )
 #	
 #	AS results
-#       JOIN   osm_2po_4pgr
-#       ON     results.node = osm_2po_4pgr.osm_source_id ), best_places AS
+#       JOIN   osm_2po_4pgr_2
+#       ON     results.node = osm_2po_4pgr_2.osm_source_id ), best_places AS
 #(
 #         SELECT   *
 #         FROM    (
@@ -304,20 +364,14 @@ def calculate(sess_id,info):
 #ON		   results.place_id = best_places.place_id""".format(**params_dict))
         
         #Get the driving results
-        sql_string = """WITH results AS
-(
-       SELECT results.*,
-              
-              osm_2po_4pgr.x1,
-              osm_2po_4pgr.y1
-       FROM   (
+        sql_string = """WITH results AS (
+
+       
                      {dijkstra_string}
 	   
-	   )
+	   
 	
-	AS results
-       JOIN   osm_2po_4pgr
-       ON     results.node = osm_2po_4pgr.osm_source_id ), best_places AS
+	), best_places AS
 (
          SELECT   *
          FROM    (
@@ -442,7 +496,7 @@ def upload_calculated_route(sess_id,result):
 #    except:
 #        print('Error inserting user details, does session id exist?')
 
-#sess_id = '7fbd69c4-3c2b-11ea-bf52-06b6ade4a06c'
+#sess_id = '0d3f9570-380c-11ea-bf52-06b6ade4a06c'
 #info = get_details_for_session_id(sess_id)
 #results = calculate(sess_id,info)
 

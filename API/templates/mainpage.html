@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Idk what these are just copy pasting START -->
-     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
   <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
     <!-- Idk what these are just copy pasting END -->
     <style>
       body {
@@ -31,29 +33,29 @@
       margin-top:1mm;
       font-family: 'Patrick Hand SC';
       font-size: 3vw;
-  
+
     }
 
-    
+
 
     </style>
   </head>
 
   <body>
       <div>
-        
+
 
           <div style='position:absolute;' class='row '>
             <div class='col col-8'>
-      
+
             </div>
             <div class='col col-2'>
               <img style="height:100%;width:200%;margin-right:0px;" src="/static/Mouse.png" alt="Mouse"
                 width="500" height="500">
-      
+
             </div>
-        
-      
+
+
           </div>
           <div class='row pl-2' style='background-color:Tomato;height:100%;'>
             <h1 >MeetUp Mouse</h1>
@@ -85,14 +87,14 @@
             <input type="text" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="inputReport" placeholder="What bugs did you meet?" >
             <button style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="enterBugReport" onclick='submitBugReport()'>Submit</button>
           </div>
-          
+
 
         </div>
         <div class='col-2'></div>
 
       </div>
 
-   
+
   </body>
 
   <script src="{{url_for('static', filename='js/mainpage.js')}}"></script>
