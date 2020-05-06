@@ -37,8 +37,9 @@ class ShareLinkState extends State<ShareLinkWidget> {
   ShareLinkState({this.data});
   List listofmembers = [];
 
-  Future<List<dynamic>> getMembers(sessID) async {
+  Future<List<dynamic>> getMembers() async {
 
+    String sessID = data.sessionid;
     String address = globalurl();
     try{
       http.Response response = await http.get('$address/session/$sessID');
@@ -161,7 +162,7 @@ class ShareLinkState extends State<ShareLinkWidget> {
     Widget listSection = Container(
       child:
       FutureBuilder(
-        future: getMembers(data.sessionid),
+        future: getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           listofmembers = snapshot.data;
           if(listofmembers == null){
