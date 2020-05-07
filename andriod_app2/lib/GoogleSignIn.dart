@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image(image: AssetImage("images/google_logo.png"), height: 35.0),
+              Image(image: AssetImage("images/Mouse_copy.png"), height: 170),
               SizedBox(height: 50),
               _signInButton(),
             ],
@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       splashColor: Colors.grey,
       onPressed: () {
         signInWithGoogle().whenComplete(() {
-          Navigator.of(context).push(
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) {
                 return CheckNetworkPage();
