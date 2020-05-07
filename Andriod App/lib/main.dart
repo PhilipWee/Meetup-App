@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'ShareLinkPage.dart';
 import 'CustomizationPage.dart';
 import 'Meetingtype.dart';
+import 'GoogleSignIn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
@@ -14,7 +15,8 @@ import 'package:http/http.dart' as http;
 String globalurl(){
 //   String serverAddress = "http://192.168.194.178:5000";
 //   String serverAddress = "http://169.254.158.154:5000";
-  String serverAddress = "http://ec2-3-16-181-51.us-east-2.compute.amazonaws.com:5000";
+//  String serverAddress = "http://ec2-3-16-181-51.us-east-2.compute.amazonaws.com:5000";
+  String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
   return serverAddress;
 }
 
@@ -32,8 +34,20 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => CheckNetworkPage(),
+        '/': (context) => GoogleSignInPage(),
       },
+    );
+  }
+}
+class GoogleSignInPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Login',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: LoginPage(),
     );
   }
 }

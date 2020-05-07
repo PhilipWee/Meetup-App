@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "318397023701",
+    "firebase_url": "https://meetup-mouse-934d0.firebaseio.com",
+    "project_id": "meetup-mouse-934d0",
+    "storage_bucket": "meetup-mouse-934d0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:318397023701:android:3ec91934c2e13337e8e95c",
+        "android_client_info": {
+          "package_name": "com.example.meetupmouse_official_draft_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "318397023701-9foh64qf42ldceo63km3q3oumtefgoe8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6N6_IjRG5bZQjvtf2SBe32cM306M8NB8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "318397023701-9foh64qf42ldceo63km3q3oumtefgoe8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
