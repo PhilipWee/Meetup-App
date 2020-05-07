@@ -14,7 +14,8 @@ import 'package:http/http.dart' as http;
 String globalurl(){
 //   String serverAddress = "http://192.168.194.178:5000";
 //   String serverAddress = "http://169.254.158.154:5000";
-  String serverAddress = "http://ec2-3-16-181-51.us-east-2.compute.amazonaws.com:5000";
+//  String serverAddress = "http://ec2-3-16-181-51.us-east-2.compute.amazonaws.com:5000";
+  String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
   return serverAddress;
 }
 
