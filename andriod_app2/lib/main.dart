@@ -147,26 +147,25 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   bool invalidLink = false;
   static String name;
   static String sessionlink;
-  final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
   final textController  = TextEditingController();
   final idTextController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
-  saveMyLocation() async{
-    var location = Location();
-    LocationData currentLocation = await location.getLocation();
-    data.lat = currentLocation.latitude;
-    data.long = currentLocation.longitude;
-    print("User Location Data");
-    print("${data.lat},${data.long}");
-    Map<String,double> mycoordinates = {"mylat":data.lat, "mylong":data.long};
-    List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(data.lat,data.long);
-    Placemark placeMark = myplacemark[0];
-    String name = myplacemark[0].thoroughfare.toString();
-    String locality = placeMark.locality;
-    data.userplace = "${name}, ${locality}";
-    print(data.userplace);
-  }
+//  saveMyLocation() async{
+//    var location = Location();
+//    LocationData currentLocation = await location.getLocation();
+//    data.lat = currentLocation.latitude;
+//    data.long = currentLocation.longitude;
+//    print("User Location Data");
+//    print("${data.lat},${data.long}");
+//    Map<String,double> mycoordinates = {"mylat":data.lat, "mylong":data.long};
+//    List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(data.lat,data.long);
+//    Placemark placeMark = myplacemark[0];
+//    String name = myplacemark[0].thoroughfare.toString();
+//    String locality = placeMark.locality;
+//    data.userplace = "${name}, ${locality}";
+//    print(data.userplace);
+//  }
 
   @override
   void dispose() {
@@ -213,16 +212,16 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               Expanded(
                 child: FlatButton(
                   onPressed: () {
-                    saveMyLocation();
+//                    saveMyLocation();
                     if (textController.text != "") {
                       name = textController.text;
-                      data.username = name;
-                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+//                      data.username = name;
+//                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
 //                      dispose();
                     } else {
                       name = "Host";
-                      data.username = name;
-                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
+//                      data.username = name;
+//                      Navigator.push(context,MaterialPageRoute(builder: (context) => MeetingType(data : data)),);
 //                      Scaffold.of(context).showSnackBar(
 //                          SnackBar(
 //                            content: Text("Please enter your username!"),
@@ -272,7 +271,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                   child: FlatButton(
                     onPressed: () {
                       if (textController.text != "") {
-                        Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data : data)),);
+//                        Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data : data)),);
 //                      dispose();
                       } else {
                         Scaffold.of(context).showSnackBar(
@@ -377,12 +376,12 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
             if (formKey.currentState.validate() && !invalidLink) {
 
-              data.username = name;
-              data.link = sessionlink;
-              data.sessionid = data.linkParser(sessionlink);
-              print("TEST: ${data.dataMap}");
+//              data.username = name;
+//              data.link = sessionlink;
+//              data.sessionid = data.linkParser(sessionlink);
+//              print("TEST: ${data.dataMap}");
 
-              Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data : data)),);
+//              Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage(data : data)),);
 
             } else {
               print("Validate: ${formKey.currentState.validate()}");
