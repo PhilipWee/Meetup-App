@@ -1,0 +1,162 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.andriodx_app"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="16"
+9        android:targetSdkVersion="28" />
+10    <!--
+11         Flutter needs it to communicate with the running application
+12         to allow setting breakpoints, to provide hot reload, etc.
+13    -->
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\debug\AndroidManifest.xml:6:5-66
+14-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\debug\AndroidManifest.xml:6:22-64
+15    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+15-->[:location] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\location\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-81
+15-->[:location] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\location\intermediates\library_manifest\debug\AndroidManifest.xml:7:22-78
+16    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+16-->[:location] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\location\intermediates\library_manifest\debug\AndroidManifest.xml:8:5-79
+16-->[:location] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\location\intermediates\library_manifest\debug\AndroidManifest.xml:8:22-76
+17    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+17-->[:connectivity] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\connectivity\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-79
+17-->[:connectivity] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\connectivity\intermediates\library_manifest\debug\AndroidManifest.xml:7:22-76
+18    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+18-->[:connectivity] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\connectivity\intermediates\library_manifest\debug\AndroidManifest.xml:8:5-76
+18-->[:connectivity] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\connectivity\intermediates\library_manifest\debug\AndroidManifest.xml:8:22-73
+19
+20    <uses-feature
+20-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\6b9b7fc1ad481537ed0a66d62976ec46\play-services-maps-17.0.0\AndroidManifest.xml:26:5-28:35
+21        android:glEsVersion="0x00020000"
+21-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\6b9b7fc1ad481537ed0a66d62976ec46\play-services-maps-17.0.0\AndroidManifest.xml:27:9-41
+22        android:required="true" />
+22-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\6b9b7fc1ad481537ed0a66d62976ec46\play-services-maps-17.0.0\AndroidManifest.xml:28:9-32
+23    <!--
+24 io.flutter.app.FlutterApplication is an android.app.Application that
+25         calls FlutterMain.startInitialization(this); in its onCreate method.
+26         In most cases you can leave this as-is, but you if you want to provide
+27         additional functionality it is fine to subclass or reimplement
+28         FlutterApplication and put your custom class here.
+29    -->
+30    <application
+30-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:8:5-29:19
+31        android:name="io.flutter.app.FlutterApplication"
+31-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:9:9-57
+32        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+32-->[androidx.core:core:1.2.0] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\b6252bb7f30c7dceb20e97dfa6dfae00\core-1.2.0\AndroidManifest.xml:24:18-86
+33        android:debuggable="true"
+34        android:icon="@mipmap/ic_launcher"
+34-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:11:9-43
+35        android:label="andriodx_app" >
+35-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:10:9-37
+36        <activity
+36-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:12:9-23:20
+37            android:name="com.example.andriodx_app.MainActivity"
+37-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:13:13-41
+38            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+38-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:16:13-163
+39            android:hardwareAccelerated="true"
+39-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:17:13-47
+40            android:launchMode="singleTop"
+40-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:14:13-43
+41            android:theme="@style/LaunchTheme"
+41-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:15:13-47
+42            android:windowSoftInputMode="adjustResize" >
+42-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:18:13-55
+43            <intent-filter>
+43-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:19:13-22:29
+44                <action android:name="android.intent.action.MAIN" />
+44-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:20:17-68
+44-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:20:25-66
+45
+46                <category android:name="android.intent.category.LAUNCHER" />
+46-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:21:17-76
+46-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:21:27-74
+47            </intent-filter>
+48        </activity>
+49        <!--
+50             Don't delete the meta-data below.
+51             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+52        -->
+53        <meta-data
+53-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:26:9-28:33
+54            android:name="flutterEmbedding"
+54-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:27:13-44
+55            android:value="2" />
+55-->C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\android\app\src\main\AndroidManifest.xml:28:13-30
+56
+57        <provider
+57-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:8:9-16:20
+58            android:name="de.esys.esysfluttershare.EsysFlutterShareFileProvider"
+58-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:9:13-81
+59            android:authorities="com.example.andriodx_app.fileprovider.github.com/orgs/esysberlin/esys-flutter-share"
+59-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:10:13-110
+60            android:exported="false"
+60-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:11:13-37
+61            android:grantUriPermissions="true" >
+61-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:12:13-47
+62            <meta-data
+62-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:13:13-15:72
+63                android:name="android.support.FILE_PROVIDER_PATHS"
+63-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:14:17-67
+64                android:resource="@xml/esys_flutter_share_filepaths" />
+64-->[:esys_flutter_share] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\esys_flutter_share\intermediates\library_manifest\debug\AndroidManifest.xml:15:17-69
+65        </provider>
+66
+67        <activity
+67-->[:url_launcher] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\url_launcher\intermediates\library_manifest\debug\AndroidManifest.xml:8:9-11:74
+68            android:name="io.flutter.plugins.urllauncher.WebViewActivity"
+68-->[:url_launcher] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\url_launcher\intermediates\library_manifest\debug\AndroidManifest.xml:9:13-74
+69            android:exported="false"
+69-->[:url_launcher] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\url_launcher\intermediates\library_manifest\debug\AndroidManifest.xml:10:13-37
+70            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+70-->[:url_launcher] C:\Users\steph\Documents\GitHub\Meetup-App\andriodx_app\build\url_launcher\intermediates\library_manifest\debug\AndroidManifest.xml:11:13-71
+71        <activity
+71-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:23:9-27:75
+72            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+72-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:24:13-93
+73            android:excludeFromRecents="true"
+73-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:25:13-46
+74            android:exported="false"
+74-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:26:13-37
+75            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+75-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:27:13-72
+76        <!--
+77            Service handling Google Sign-In user revocation. For apps that do not integrate with
+78            Google Sign-In, this service will never be started.
+79        -->
+80        <service
+80-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:33:9-36:110
+81            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+81-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:34:13-89
+82            android:exported="true"
+82-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:35:13-36
+83            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION" /> <!-- Needs to be explicitly declared on P+ -->
+83-->[com.google.android.gms:play-services-auth:16.0.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\a9a336c779b8c9167b91fc128046d16c\jetified-play-services-auth-16.0.1\AndroidManifest.xml:36:13-107
+84        <uses-library
+84-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\6b9b7fc1ad481537ed0a66d62976ec46\play-services-maps-17.0.0\AndroidManifest.xml:33:9-35:40
+85            android:name="org.apache.http.legacy"
+85-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\6b9b7fc1ad481537ed0a66d62976ec46\play-services-maps-17.0.0\AndroidManifest.xml:34:13-50
+86            android:required="false" />
+86-->[com.google.android.gms:play-services-maps:17.0.0] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\6b9b7fc1ad481537ed0a66d62976ec46\play-services-maps-17.0.0\AndroidManifest.xml:35:13-37
+87
+88        <activity
+88-->[com.google.android.gms:play-services-base:17.2.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\f81e9fffe318fdc5660099e12e35729e\play-services-base-17.2.1\AndroidManifest.xml:23:9-26:75
+89            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+89-->[com.google.android.gms:play-services-base:17.2.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\f81e9fffe318fdc5660099e12e35729e\play-services-base-17.2.1\AndroidManifest.xml:24:13-79
+90            android:exported="false"
+90-->[com.google.android.gms:play-services-base:17.2.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\f81e9fffe318fdc5660099e12e35729e\play-services-base-17.2.1\AndroidManifest.xml:25:13-37
+91            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+91-->[com.google.android.gms:play-services-base:17.2.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\f81e9fffe318fdc5660099e12e35729e\play-services-base-17.2.1\AndroidManifest.xml:26:13-72
+92
+93        <meta-data
+93-->[com.google.android.gms:play-services-basement:17.2.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\0c81272dc0a202ee4625392a12cd5ba6\jetified-play-services-basement-17.2.1\AndroidManifest.xml:23:9-25:69
+94            android:name="com.google.android.gms.version"
+94-->[com.google.android.gms:play-services-basement:17.2.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\0c81272dc0a202ee4625392a12cd5ba6\jetified-play-services-basement-17.2.1\AndroidManifest.xml:24:13-58
+95            android:value="@integer/google_play_services_version" />
+95-->[com.google.android.gms:play-services-basement:17.2.1] C:\Users\steph\.gradle\caches\transforms-2\files-2.1\0c81272dc0a202ee4625392a12cd5ba6\jetified-play-services-basement-17.2.1\AndroidManifest.xml:25:13-66
+96    </application>
+97
+98</manifest>
