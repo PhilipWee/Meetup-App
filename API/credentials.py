@@ -1,5 +1,8 @@
 PGHOST='127.0.0.1'
 PGDATABASE='session_info'
 PGROUTINGDATABASE='gisdb'
+PGDATADATABASE='data'
 PGUSER='postgres'
 PGPASSWORD='housepotato'
+ONEMAPEMAIL='philip.andrewweedewang@gmail.com'
+ONEMAPPASSWORD='Marisstella123'
