@@ -3,19 +3,14 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/Andriod App/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/Andriod App/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/Andriod App/build" />
-      <excludeFolder url="file://$MODULE_DIR$/maps_test/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/maps_test/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/maps_test/build" />
-      <excludeFolder url="file://$MODULE_DIR$/philip_test/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/philip_test/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/philip_test/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Dart Packages" level="project" />
-    <orderEntry type="library" name="Dart SDK" level="project" />
   </component>
 </module>
