@@ -36,6 +36,14 @@
 
     }
 
+    h3 {
+      margin-left: 20px;
+      margin-top:1mm;
+      font-family: 'Patrick Hand SC';
+      font-size: 1.5vw;
+
+    }
+
 
 
     </style>
@@ -59,7 +67,7 @@
           </div>
           <div class='row pl-2' style='background-color:Tomato;height:100%;'>
             <div class = 'col-10'><h1 >MeetUp Mouse</h1></div>
-            <div class = 'col-2' style='margin-top:2%;margin-left:0%' > <button style='font-family: Patrick Hand SC;font-size:2vw;margin-left:45%' onclick='createMeetup()'>Login</button>
+           
             
           </div>
           </div>       
@@ -71,31 +79,19 @@
         </div>
         </div>
 
-<div class='row justify-content-center'>
-  <div class='col-1'></div>
-        <div class='col-1 ' style='margin-top:2%;'>
-            <img class='row d-none d-lg-block' style="height:90%;width:250%;" src="/static/Map.png" alt="Map" class="map">
+<div class='row'>
+  
+       
+           
+        <div class='col ' style="margin-top:3%">
+            <h2 style='text-align: center;'>Login</h2>
+            <h3 style='text-align: center;'>Login up to access your plan from any device</h3>
+            <h3 style='text-align: center;'>By continuing, you agree to Term's of Use and Privacy Policy</h3>
+<div class='row' style="justify-content: center;">
+            <button style='font-family: Patrick Hand SC;font-size:2vw;justify-items: center;text-align: center;margin-top:3%'  onclick='joinMeetup()'>Login</button>
         </div>
-        <div class='col-8 '>
-          <div class='row justify-content-center' style='margin-top:20%; margin-bottom:1%;'>
-            <button style='font-family: Patrick Hand SC;font-size:2vw' onclick='createMeetup()'>Create New Meetup</button><br>
-          </div>
-
-          <div class='row justify-content-center' style='margin-top:1%; margin-bottom:1%;'>
-            <button style='font-family: Patrick Hand SC;font-size:2vw; ' onclick='joinMeetup()'>Join Meetup</button>
-            <input type="text" id="inputSessionId" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' placeholder="Enter session id">
-            <button style='font-family: Patrick Hand SC;font-size:2vw; display:none; ' id="enterSessionId" onclick='submitButton()'>Enter</button>
-          </div>
-
-          <div class='row justify-content-center'>
-            <br><button style='font-family: Patrick Hand SC;font-size:2vw' onclick='reportBug()'>Feedback / Report a bug</button>
-            <input type="text" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="inputReport" placeholder="What bugs did you meet?" >
-            <button style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="enterBugReport" onclick='submitBugReport()'>Submit</button>
-          </div>
-
-
         </div>
-        <div class='col-2'></div>
+     
 
       </div>
 

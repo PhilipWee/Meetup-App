@@ -72,6 +72,11 @@ def get_details(session_id):
     if request.method == "GET":
         return render_template('Geoloc2.html', session_id = session_id)
 
+@app.route('/login/')
+def login():
+    if request.method == "GET":
+        return render_template('newpage.html')
+
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     checkHost = request.args['isHost']
@@ -285,7 +290,7 @@ if __name__ == '__main__':
 
         # Use the application default credentials
         # Use a service account
-        cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+        cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
