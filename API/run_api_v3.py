@@ -293,7 +293,7 @@ if __name__ == '__main__':
         
         # Use the application default credentials
         # Use a service account
-        cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
+        # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
         cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-934d0-firebase-adminsdk-txqu5-9b67a90c2c.json')
         firebase_admin.initialize_app(cred)
         db = firestore.client()
