@@ -7,6 +7,16 @@ class fakeData {
   List images;
 
   fakeData({this.name, this.address, this.details, this.rating, this.images});
+
+  Map<String,dynamic> get dataMap {
+    return {
+      "name" : name,
+      "address" : address,
+      "details" : details,
+      "rating" : rating,
+      "images" : images,
+    };
+  }
 }
 
 class PrefData {
