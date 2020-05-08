@@ -76,9 +76,20 @@ class CheckNetworkPage extends StatelessWidget {
       );
   }
 }
+class HomeScreen extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _HomeScreenState();
+  }
+}
 
-class HomeScreen extends StatelessWidget {
+class _HomeScreenState extends State<HomeScreen> {
   static final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  int _currentIndex = 1;
+  static final data = PrefData(username:"",activityType: "",lat: 0,long: 0,link:"",transportMode: "",speed: 0, quality: 0,sessionid: '');
+
+  final List<Widget> _children = [ShareLinkPage(data : data),HomeUsernameWidget()];
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +105,7 @@ class HomeScreen extends StatelessWidget {
           },
         ),
       ),
-      body: HomeUsernameWidget(),
+      body: _children[_currentIndex],
       drawer: Drawer(
         child: ListView(
           // Important: Remove any padding from the ListView.
@@ -138,7 +149,31 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped, // new
+        currentIndex: _currentIndex, // new
+        items: [
+          new BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            title: Text('My Meetups'),
+          ),
+          new BottomNavigationBarItem(
+            icon: Icon(Icons.add_box),
+            title: Text('New Meetup'),
+          ),
+          new BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              title: Text('My Account')
+          )
+        ],
+      ),
       );
+  }
+  void onTabTapped(int index) {
+    setState(() {
+      print("changing to index: " + index.toString());
+      _currentIndex = index;
+    });
   }
 
 }
