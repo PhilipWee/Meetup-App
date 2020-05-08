@@ -59,6 +59,10 @@ flutter:
     - images/Mouse_copy.png
     - images/food.jpg
     - images/outing.jpg
+    - images/bikinibottom.jpg
+    - images/backyard.jpg
+    - images/sanf.jpg
+    - images/zoo.jpg
 
   # To add assets to your application, add an assets section, like this:
   # assets:

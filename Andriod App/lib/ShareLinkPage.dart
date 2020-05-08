@@ -1,5 +1,6 @@
 import 'main.dart';
 import 'MapPage.dart';
+import 'ResultSwipePage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -143,8 +144,8 @@ class ShareLinkState extends State<ShareLinkWidget> {
                   onPressed: () {
                     checkMeetupDone(data.sessionid);
                     print("TEST: ${data.dataMap}");
-                    Navigator.push(context,MaterialPageRoute(builder: (context) => MapSample(data:data)),);
-
+//                    Navigator.push(context,MaterialPageRoute(builder: (context) => MapSample(data:data)),);
+                    Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage(data:data)),);
                   },
                   child: Text("Create Meetup!"), //TODO
                 ),

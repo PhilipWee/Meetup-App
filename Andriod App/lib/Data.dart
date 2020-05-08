@@ -1,4 +1,14 @@
 
+class fakeData {
+  String name;
+  String address;
+  String details;
+  int rating;
+  List images;
+
+  fakeData({this.name, this.address, this.details, this.rating, this.images});
+}
+
 class PrefData {
   String username;
   String activityType;
