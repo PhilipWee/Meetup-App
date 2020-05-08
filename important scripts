@@ -760,3 +760,17 @@ insert into all_osm_edges (x1,y1,x2,y2,transport_type,transport_type_id,source,t
 select x1,y1,x2,y2,transport_type,transport_type_id,source,target,cost,reverse_cost from public_edges_2
 
 
+----------------Create a new table for the new food places blog----------
+create table food_blog_places (
+id SERIAL,
+name varchar,
+writeup TEXT,
+postal_code int,
+address TEXT,
+lat double precision,
+long double precision,
+operating_hours TEXT,
+pictures_url TEXT[],
+cost_per_pax SMALLINT,
+rating SMALLINT
+);
