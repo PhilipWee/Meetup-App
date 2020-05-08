@@ -120,7 +120,7 @@ class _HomeState extends State<Home> {
           ),
           new BottomNavigationBarItem(
             icon: Icon(Icons.add_location),
-            title: Text('Join/Create', style: TextStyle(fontFamily: "Quicksand")),
+            title: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
           ),
           new BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
@@ -128,8 +128,8 @@ class _HomeState extends State<Home> {
           )
         ],
         backgroundColor: Colors.deepOrange,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.white,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white54,
       ),
     );
   }

@@ -33,6 +33,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     "images/meetingButton.jpg",
   ];
 
+
   @override
   //Creates a listview with buildCustomButtons inside
   Widget build(BuildContext context) {
@@ -50,9 +51,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           return Card(
             child: FlatButton(
               padding: EdgeInsets.all(0.0),
-              onPressed: (){
-//                Navigator.push(context,MaterialPageRoute(builder: (context) => MeetupPage1()),);
-              },
+              onPressed: (){},
               child:_buildCustomButton(custLabels[index], custImgs[index]) ,
             ),
           );
@@ -87,7 +86,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fontFamily: "Quicksand",
               color: Colors.white,
 //              fontWeight: FontWeight.bold,
-              fontSize: 20),
+              fontSize: 17),
         ),
       ),
       alignment: Alignment.bottomLeft,
