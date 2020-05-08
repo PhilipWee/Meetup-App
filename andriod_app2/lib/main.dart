@@ -102,7 +102,7 @@ class _HomeState extends State<Home> {
 
     CustomizationPageWidget(),
 
-    Profile(Colors.orange)
+    ProfilePage()
 
   ];
 
@@ -116,15 +116,15 @@ class _HomeState extends State<Home> {
         items: [
           new BottomNavigationBarItem(
             icon: Icon(Icons.dashboard),
-            title: Text('Meetups'),
+            title: Text('Meetups', style: TextStyle(fontFamily: "Quicksand")),
           ),
           new BottomNavigationBarItem(
             icon: Icon(Icons.add_location),
-            title: Text('Join/Create'),
+            title: Text('Join/Create', style: TextStyle(fontFamily: "Quicksand")),
           ),
           new BottomNavigationBarItem(
               icon: Icon(Icons.account_circle),
-              title: Text('Profile')
+              title: Text('Profile', style: TextStyle(fontFamily: "Quicksand"))
           )
         ],
         backgroundColor: Colors.deepOrange,

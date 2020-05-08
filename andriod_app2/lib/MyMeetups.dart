@@ -8,7 +8,7 @@ class Homescreen extends StatelessWidget {
       key: _scaffoldKey,
       appBar: AppBar(
         title: Center(
-            child: Text('My Meetups', style: TextStyle(fontWeight: FontWeight.bold),)),
+            child: Text('My Meetups', style: TextStyle(fontFamily: "Quicksand"))),
         backgroundColor: Colors.deepOrange,
       ),
     );
@@ -39,7 +39,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     return Scaffold(
       appBar: AppBar(
         title: Center(
-          child: Text('My Meetups', style: TextStyle(fontWeight: FontWeight.bold)),
+          child: Text('My Meetups', style: TextStyle(fontFamily: "Quicksand")),
         ),
         backgroundColor: Colors.deepOrange,
       ),
@@ -84,8 +84,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         child: Text(
           label,
           style: TextStyle(
+              fontFamily: "Quicksand",
               color: Colors.white,
-              fontWeight: FontWeight.bold,
+//              fontWeight: FontWeight.bold,
               fontSize: 20),
         ),
       ),

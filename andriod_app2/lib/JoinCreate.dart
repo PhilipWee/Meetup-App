@@ -282,41 +282,41 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             ],
           ), //for price
           buttonSection,
-          linkSection
+          linkSection,
         ], //children of ListView
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: FlatButton(
-            child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: () {},
-//            onPressed: () async {
-//              if (value2.isNotEmpty && value4.isNotEmpty) {  //CHECK IF PREFERENCES HAS BEEN FILLED IN
-//                data.speed = 3; // fix at 3
-//                if (data.sessionid.isEmpty) {
-//                  print("Running PostDataGetID");
-//                  postDataGetID();
-//                }  //IF THERE IS NO ID
-//                else if (data.sessionid.isNotEmpty) {
-//                  print("Running PostDataUpdateSess");
-//                  postDataUpdateSess();
-//                }  //IF THERE IS ID
+//      bottomNavigationBar: BottomAppBar(
+//        child: FlatButton(
+//            child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
+//              onPressed: () {},
+////            onPressed: () async {
+////              if (value2.isNotEmpty && value4.isNotEmpty) {  //CHECK IF PREFERENCES HAS BEEN FILLED IN
+////                data.speed = 3; // fix at 3
+////                if (data.sessionid.isEmpty) {
+////                  print("Running PostDataGetID");
+////                  postDataGetID();
+////                }  //IF THERE IS NO ID
+////                else if (data.sessionid.isNotEmpty) {
+////                  print("Running PostDataUpdateSess");
+////                  postDataUpdateSess();
+////                }  //IF THERE IS ID
+////
+////                await Future.delayed(Duration(milliseconds: 2000));
+////                Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
+////                print("TEST: ${data.dataMap}");
+////
+////              } else {
+////                Scaffold.of(context).showSnackBar(
+////                    SnackBar(
+////                      content: Text("Please select preferences!"),
+////                      duration: Duration(seconds: 2),
+////                    ));
+////              }
+////            }
 //
-//                await Future.delayed(Duration(milliseconds: 2000));
-//                Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
-//                print("TEST: ${data.dataMap}");
 //
-//              } else {
-//                Scaffold.of(context).showSnackBar(
-//                    SnackBar(
-//                      content: Text("Please select preferences!"),
-//                      duration: Duration(seconds: 2),
-//                    ));
-//              }
-//            }
-
-
-        ),
-      ),
+//        ),
+//      ),
     );
   }
 
