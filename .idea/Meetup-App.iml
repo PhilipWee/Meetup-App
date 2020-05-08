@@ -20,6 +20,9 @@
       <excludeFolder url="file://$MODULE_DIR$/Andriod App/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/Andriod App/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/Andriod App/build" />
+      <excludeFolder url="file://$MODULE_DIR$/andriod_app2/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/andriod_app2/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/andriod_app2/build" />
       <excludeFolder url="file://$MODULE_DIR$/maps_test/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/maps_test/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/maps_test/build" />

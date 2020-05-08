@@ -12,7 +12,6 @@ import 'package:http/http.dart' as http;
 import 'MyMeetups.dart';
 import 'JoinCreate.dart';
 import 'Profile.dart';
-
 String globalurl(){
 //   String serverAddress = "http://192.168.194.178:5000";
 //   String serverAddress = "http://169.254.158.154:5000";
@@ -54,30 +53,6 @@ class GoogleSignInPage extends StatelessWidget {
   }
 }
 
-class CheckNetworkPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        body: StreamBuilder(
-            stream: Connectivity().onConnectivityChanged,
-            builder: (BuildContext ctxt,
-                AsyncSnapshot<ConnectivityResult> snapShot) {
-              if (!snapShot.hasData) return CircularProgressIndicator();
-              var result = snapShot.data;
-              switch (result) {
-                case ConnectivityResult.none:
-                  print("Internet servie unavailable");
-                  return Center(child: Text("No Internet Connection!"));
-                case ConnectivityResult.mobile:
-                case ConnectivityResult.wifi:
-                  return HomeScreen();
-                default:
-                  return Center(child: Text("No Internet Connection!"));
-              }
-            })
-    );
-  }
-}
 
 class HomeScreen extends StatelessWidget {
   @override
