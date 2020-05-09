@@ -2,7 +2,8 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
-
+import 'TinderPopUp.dart';
+import 'Globals.dart' as globals;
 
 class CustomizationPageWidget extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class CustomizationPageWidget extends StatefulWidget {
 
 class CustomizationPageState extends State<CustomizationPageWidget> {
 
-  final _joinController = TextEditingController();
+  final _meetupNameController = TextEditingController();
 
   String value7 = "Recreation";
   String value2 = "Public Transit";
@@ -37,9 +38,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
   void initState() {
     super.initState();
-    _joinController.addListener(() {
-      final text = _joinController.text.toLowerCase();
-      _joinController.value = _joinController.value.copyWith(
+    _meetupNameController.addListener(() {
+      final text = _meetupNameController.text.toLowerCase();
+      _meetupNameController.value = _meetupNameController.value.copyWith(
         text: text,
         selection:
         TextSelection(baseOffset: text.length, extentOffset: text.length),
@@ -49,7 +50,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   }
 
   void dispose() {
-    _joinController.dispose();
+    _meetupNameController.dispose();
     super.dispose();
   }
 
@@ -69,10 +70,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           controller: TextEditingController(text:""),
                           decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
-                      child: Text(""),
                     ),
                     IconButton(
                         icon: Icon(Icons.share),
@@ -100,7 +97,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
-                  onPressed: () {},
+                  onPressed: () {showPopup(context, _popupBody(), 'F07 Class Outing');},
                   child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
               ),
@@ -129,7 +126,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 child: Padding(
                   padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
                   child: TextFormField(
-                    controller: _joinController,
+                    controller: _meetupNameController,
                     decoration: InputDecoration(labelText: "Name of Meetup", border: OutlineInputBorder()),
                   ),
                 )
@@ -214,7 +211,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 child:Padding(
                     padding:const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
                     child: PlacesAutocompleteField(
-                        controller: TextEditingController(text:""),
+                        controller: TextEditingController(text: globals.myLocationName),
                         apiKey: 'AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g',
                         leading: Icon(Icons.search, color: Colors.black),
                         hint: "Enter Location",
@@ -384,6 +381,36 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     } catch (e) {
       print('error: $e');
     }
+  }
+
+  showPopup(BuildContext context, Widget widget, String title, {BuildContext popupContext}) {
+    Navigator.push(
+      context,
+      PopupLayout(
+        top: 30,
+        left: 30,
+        right: 30,
+        bottom: 50,
+        child: PopupContent(
+          content: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.black,
+              title: Center(child:Text(title),),
+              brightness: Brightness.light,
+              automaticallyImplyLeading: false,
+            ),
+            resizeToAvoidBottomPadding: false,
+            body: widget,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _popupBody() {
+    return Container(
+      child: Text('This is a popup window'),
+    );
   }
 
 }

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'main.dart';
+import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
+import 'Globals.dart' as globals;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -36,9 +39,23 @@ class _LoginPageState extends State<LoginPage> {
   }
   void signOutGoogle() async{
     await googleSignIn.signOut();
-
     print("User Sign Out");
+  }
 
+  void saveMyLocationName() async{
+    var location = Location();
+    LocationData currentLocation = await location.getLocation();
+    double mylat = currentLocation.latitude;
+    double mylong = currentLocation.longitude;
+    print("User's Current Coordinates: ${mylat},${mylong}");
+    Map<String,double> mycoordinates = {"mylat":mylat, "mylong":mylong};
+    List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(mylat,mylong);
+    Placemark placeMark = myplacemark[0];
+    String name = myplacemark[0].thoroughfare.toString();
+    String locality = placeMark.locality;
+    String myLocationName = "${name}, ${locality}";
+    print("User's Current Location ${myLocationName}." );
+    globals.myLocationName = myLocationName;
   }
 
   @override
@@ -64,7 +81,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget _signInButton() {
     return FlatButton(
       color: Colors.white,
-      onPressed: () {
+      onPressed: () async {
+        saveMyLocationName();
         signInWithGoogle().whenComplete(() {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(

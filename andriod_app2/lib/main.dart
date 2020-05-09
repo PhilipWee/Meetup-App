@@ -1,7 +1,4 @@
 import 'dart:convert';
-import 'package:andriod_app2/JoinCreate.dart';
-import 'package:andriod_app2/MyMeetups.dart';
-import 'package:andriod_app2/Profile.dart';
 import 'GoogleSignIn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'MyMeetups.dart';
 import 'JoinCreate.dart';
 import 'Profile.dart';
+import 'TinderPopUp.dart';
+
 
 String globalurl(){
 //   String serverAddress = "http://192.168.194.178:5000";
@@ -96,6 +95,9 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   int _currentIndex = 0;
+
+  String myLocationName = "";
+
   final List<Widget> _children = [
 
     HomeUsernameWidget(),
@@ -105,6 +107,7 @@ class _HomeState extends State<Home> {
     ProfilePage()
 
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +136,49 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-  void onTabTapped(int index) {
+
+  void onTabTapped(int index) async{
     setState(() {_currentIndex = index;});
   }
+
+  showPopup(BuildContext context, Widget widget, String title,
+      {BuildContext popupContext}) {
+    Navigator.push(
+      context,
+      PopupLayout(
+        top: 30,
+        left: 30,
+        right: 30,
+        bottom: 50,
+        child: PopupContent(
+          content: Scaffold(
+            appBar: AppBar(
+              title: Text(title),
+              leading: new Builder(builder: (context) {
+                return IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    try {
+                      Navigator.pop(context); //close the popup
+                    } catch (e) {}
+                  },
+                );
+              }),
+              brightness: Brightness.light,
+            ),
+            resizeToAvoidBottomPadding: false,
+            body: widget,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _popupBody() {
+    return Container(
+      child: Text('This is a popup window'),
+    );
+  }
+
+
 }
