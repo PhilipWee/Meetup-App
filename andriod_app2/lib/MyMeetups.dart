@@ -77,21 +77,21 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                   padding: const EdgeInsets.all(8),
                   child: Row(
                     children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.person_add),
-                        onPressed: (){},
-                        iconSize: 25,
-                        color: Colors.black87,
-                      ),
                       Expanded(
                         flex: 2,
                         child: TextFormField(
                           controller: _joinController,
                           decoration: InputDecoration(
-                              labelText: "Joining meetup? Enter Meeting ID or Link",
-                              border: OutlineInputBorder(gapPadding: 0),
+                            labelText: "Joining meetup? Enter Meeting ID or Link",
+                            border: OutlineInputBorder(gapPadding: 0),
                           ),
                         ),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.person_add),
+                        onPressed: (){},
+                        iconSize: 25,
+                        color: Colors.black87,
                       ),
                     ],
                   ),
