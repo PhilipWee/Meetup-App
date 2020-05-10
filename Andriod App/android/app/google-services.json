@@ -1,34 +1,42 @@
 {
   "project_info": {
-    "project_number": "318397023701",
-    "firebase_url": "https://meetup-mouse-934d0.firebaseio.com",
-    "project_id": "meetup-mouse-934d0",
-    "storage_bucket": "meetup-mouse-934d0.appspot.com"
+    "project_number": "1052519191030",
+    "firebase_url": "https://meetup-mouse-265200.firebaseio.com",
+    "project_id": "meetup-mouse-265200",
+    "storage_bucket": "meetup-mouse-265200.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:318397023701:android:3ec91934c2e13337e8e95c",
+        "mobilesdk_app_id": "1:1052519191030:android:259d80c0d87a9e746377d7",
         "android_client_info": {
           "package_name": "com.example.meetupmouse_official_draft_1"
         }
       },
       "oauth_client": [
         {
-          "client_id": "318397023701-9foh64qf42ldceo63km3q3oumtefgoe8.apps.googleusercontent.com",
+          "client_id": "1052519191030-60q7k3ekaqfri289h03rlod8ob4k7npc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.meetupmouse_official_draft_1",
+            "certificate_hash": "763d4b998832bbcb2b58e9c07ea43ca7e6807b28"
+          }
+        },
+        {
+          "client_id": "1052519191030-0mmuvv541gc9vmanbf6253fb4tggr4l7.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB6N6_IjRG5bZQjvtf2SBe32cM306M8NB8"
+          "current_key": "AIzaSyDv0WXo9UMRWGXI23KXOoNGrYY_iYvi-Ss"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "318397023701-9foh64qf42ldceo63km3q3oumtefgoe8.apps.googleusercontent.com",
+              "client_id": "1052519191030-0mmuvv541gc9vmanbf6253fb4tggr4l7.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

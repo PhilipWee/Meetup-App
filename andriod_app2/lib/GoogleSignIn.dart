@@ -41,9 +41,10 @@ class _LoginPageState extends State<LoginPage> {
           'lat': 0.0,
           'long': 0.0,
           'link': 'link',
-          'price': 1,
+          'price': 0,
+          'quality': 'No Preference',
           'sessionId': "ABCDE",
-          'transportMode': 'transportMode',
+          'transportMode': 'Public Transit',
           'userName': user.displayName,
           'uid': user.uid
         }).whenComplete(() =>
