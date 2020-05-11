@@ -33,6 +33,7 @@ dependencies:
   pull_to_refresh: ^1.5.7
   loading_indicator: ^1.0.0
   dropdown_banner: ^1.4.0
+  flutter_socket_io: ^0.6.0
 
   cloud_firestore: 0.13.5
   firebase_auth: 0.16.0

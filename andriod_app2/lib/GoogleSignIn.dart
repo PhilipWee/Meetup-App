@@ -71,21 +71,6 @@ class _LoginPageState extends State<LoginPage> {
     print("User Sign Out");
   }
 
-  void saveMyLocationName() async{
-    var location = Location();
-    LocationData currentLocation = await location.getLocation();
-    double mylat = currentLocation.latitude;
-    double mylong = currentLocation.longitude;
-    print("User's Current Coordinates: ${mylat},${mylong}");
-    Map<String,double> mycoordinates = {"mylat":mylat, "mylong":mylong};
-    List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(mylat,mylong);
-    Placemark placeMark = myplacemark[0];
-    String name = myplacemark[0].thoroughfare.toString();
-    String locality = placeMark.locality;
-    String myLocationName = "${name}, ${locality}";
-    print("User's Current Location ${myLocationName}." );
-    globals.myLocationName = myLocationName;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +96,7 @@ class _LoginPageState extends State<LoginPage> {
     return FlatButton(
       color: Colors.white,
       onPressed: () async {
-        saveMyLocationName();
+        globals.saveMyLocationName();
         signInWithGoogle().whenComplete(() {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
