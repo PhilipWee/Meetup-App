@@ -193,10 +193,19 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                               child: Row(
                                 children: <Widget>[
                                   Expanded(
-                                    flex: 4,
+                                    flex: 6,
                                     child: Padding(
                                         padding: const EdgeInsets.only(left:10.0, top: 20.0, bottom: 15, right: 20.0),
                                         child: _Description(name: item.name, address: item.address,)
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: Text(
+                                      item.rating.toString(),
+                                      style: TextStyle(
+                                          fontSize: 15.0
+                                      ),
                                     ),
                                   ),
                                   Expanded(
