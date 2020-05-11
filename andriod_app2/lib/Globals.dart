@@ -1,10 +1,17 @@
 library meetupmouse.globals;
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
+import 'socketiohelper.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
 
 String userLocationName = "Jalan Membina, Singapore";
+
+CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
 Map<String,dynamic> tempData = {
   "meetupname" : "",
@@ -18,6 +25,7 @@ Map<String,dynamic> tempData = {
   "transportMode" : "",
   "quality" : 0,
   "price" : 0,
+  "speed" :0,
 };
 
 Map<String,dynamic> userGoogleData = {

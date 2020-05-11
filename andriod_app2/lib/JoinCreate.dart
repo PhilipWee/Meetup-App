@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'TinderPopUp.dart';
 import 'Globals.dart' as globals;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CustomizationPageWidget extends StatefulWidget {
   @override
@@ -35,6 +37,46 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         return "\$\$\$\$";
     }
     return "";
+  }
+
+  Future<String> sessionCreate() async {
+
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String address = globals.serverAddress;
+
+    String url = '$address/session/create';
+    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "${globals.tempData["username"]}"}';
+    print("Sending Jsonpackage To Server >>> $jsonpackage");
+    try{
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+      String errorMessage = response.body;
+
+      if (statusCode != 200){
+        print(errorMessage);
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error. StatusCode:$statusCode"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+      else{
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+        print("PostData successfull with statuscode: $statusCode");
+        print("Get Session ID successfull with body : $body");
+
+        //decode the string-map
+        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
+        var sessionid = sessionidjsonversion['session_id'];
+        globals.tempData["sessionid"] = sessionid;
+        globals.tempData["sessionid"] = "$address/session/$sessionid/get_details";
+        String theLink = globals.tempData["sessionid"];
+        print('Link Created[ $theLink ]');
+        return theLink;
+      }
+    }
+    catch(e){print("Error caught at PostDataGetID(): $e");}
   }
 
 //  void initState() {
@@ -99,10 +141,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   color: Colors.deepOrange,
                   textColor: Colors.white,
                   onPressed: () {
-                    showPopup(context, _popupBody(), 'F07 Class Outing');
+//                    showPopup(context, _popupBody(), 'F07 Class Outing');
                     globals.tempData["meetupname"] = _meetupNameController.text;
                     globals.tempData["userplace"] = _locationNameController.text;
-                    print(globals.tempData);
+//                    print(globals.tempData);
+                    sessionCreate();
                     },
                   child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),

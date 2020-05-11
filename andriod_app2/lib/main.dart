@@ -11,6 +11,7 @@ import 'JoinCreate.dart';
 import 'Profile.dart';
 import 'TinderPopUp.dart';
 import 'BuildMeetupDetails.dart';
+import 'Globals.dart' as globals;
 
 
 void main() => runApp(MyApp());

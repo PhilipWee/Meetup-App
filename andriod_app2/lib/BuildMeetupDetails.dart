@@ -51,32 +51,22 @@ class MeetupPageState extends State<MeetupPageWidget> {
       "transport_mode" : "Driving",
       "metrics" : {"speed":0, "quality":0, "price":0}
     },
-    {
-      "identifier" : "Alex Veda",
-      "lat" : 1.332319,
-      "long" : 103.672113,
-      "transport_mode" : "Driving",
-      "metrics" : {"speed":0, "quality":0, "price":0}
-    },
-    {
-      "identifier" : "Philip Wee",
-      "lat" : 1.332319,
-      "long" : 103.672113,
-      "transport_mode" : "Driving",
-      "metrics" : {"speed":0, "quality":0, "price":0}
-    },
-    {
-      "identifier" : "Joel",
-      "lat" : 1.332319,
-      "long" : 103.672113,
-      "transport_mode" : "Driving",
-      "metrics" : {"speed":0, "quality":0, "price":0}
-    }
   ]; //snapshot from future is added to this
+  
+  @override
+  initState(){
+    super.initState();
+    globals.socketIO.joinSession("123456");
+    globals.socketIO.subscribe("user_joined_room", (data)=>{
+      //whatever is inside here will run when server sends stuff
+      print(data),
+      listofmembers.add(data)
+    });
+  }
+
 
 //  List listofplacenames(List _listofmembers) {
 //    for (var index in _listofmembers) {
-//      _listofmembers[index]
 //    }
 //  };
 
@@ -108,7 +98,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
         }
         else {
           return Expanded (child: RefreshIndicator(child: ListView.builder(
-            itemCount: listofmembers.length-1,
+            itemCount: listofmembers.length,
             itemBuilder: (BuildContext context, int index) {
 
               if (index == 0){ //means it is the meetup creator a.k.a first user on the list
