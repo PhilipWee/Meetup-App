@@ -3,6 +3,7 @@ from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from flask_socketio import SocketIO
+from flask_socketio import send, emit
 
 #import psycopg2
 import sys, os
@@ -54,6 +55,8 @@ API important links explanation:
 
 app = Flask(__name__)
 CORS(app)
+
+socketio = SocketIO(app)
 
 #The secret key is necessary for session to work
 app.secret_key = 'super dsagbrjuyki64y5tg4fd key'
@@ -196,6 +199,13 @@ def results(session_id):
         return jsonify({'error':'sesson_id or username is wrong'})
     elif result == 'not_started':
         return jsonify({'info': 'session exists but calculation not started'})
+    
+# ==================== SOCKETS =============================
+@socketio.on('my event')
+def handle_message(message):
+    if message['data'] == 'RIGHT':
+        send(message)
+
 
 def create_firebase_session(content,meeting_type,username):
     # Consolidate the session details
@@ -289,7 +299,6 @@ def send_bug_report(content):
     database.collection(u'bugReports').add(report)
 
 
-
 if __name__ == '__main__':
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
     print('Connecting to firebase')
@@ -305,8 +314,9 @@ if __name__ == '__main__':
     print('Connected!')
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
 
-# #--------------------------------------CONNECT TO DATABASE-------------------------------
-#Run the App
-app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
-# app.run(host='0.0.0.0', debug=True, use_reloader=False)
-crsr.close()
+    # #--------------------------------------CONNECT TO DATABASE-------------------------------
+    #Run the App
+    #socketio.run(app)
+    socketio.run(app, host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
+    # app.run(host='0.0.0.0', debug=True, use_reloader=False)
+    crsr.close()
