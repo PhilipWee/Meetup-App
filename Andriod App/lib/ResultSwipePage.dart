@@ -166,11 +166,12 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                         _addCard(item);
                       }
                     },
-                    child: Card(
-                      elevation: 0.5,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(0))
-                      ),
+                    child: Container(
+                      color: Colors.white,
+//                      elevation: 0.5,
+//                      shape: RoundedRectangleBorder(
+//                          borderRadius: BorderRadius.all(Radius.circular(0))
+//                      ),
                       child: Container(
                         child: Column(
                           children: <Widget>[
