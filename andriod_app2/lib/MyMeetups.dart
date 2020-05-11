@@ -98,7 +98,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                 ),
               )
             ],
-          ),
+          ),//join text controller
           Container(
             child: Expanded(
               child: ListView.builder(
@@ -125,7 +125,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   //Helper method to create layout of the buttons
   Container _buildCustomButton(String label, String imgName) {
     return Container(
-      height: 200.0,
+      height: 150.0,
       decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage(imgName),

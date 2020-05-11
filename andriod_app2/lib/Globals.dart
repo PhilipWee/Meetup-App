@@ -4,7 +4,7 @@ import 'package:geolocator/geolocator.dart';
 
 String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
 
-String userLocationName = "";
+String userLocationName = "Jalan Membina, Singapore";
 
 Map<String,dynamic> tempData = {
   "meetupname" : "",
@@ -21,7 +21,7 @@ Map<String,dynamic> tempData = {
 };
 
 Map<String,dynamic> userGoogleData = {
-  "name" : 0,
+  "name" : "Stephen",
 };
 
 void saveMyLocationName() async{
@@ -30,7 +30,6 @@ void saveMyLocationName() async{
   double mylat = currentLocation.latitude;
   double mylong = currentLocation.longitude;
   print("User's Current Coordinates: $mylat,$mylong");
-//  Map<String,double> mycoordinates = {"mylat":mylat, "mylong":mylong};
   List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(mylat,mylong);
   Placemark placeMark = myplacemark[0];
   String name = myplacemark[0].thoroughfare.toString();
@@ -38,4 +37,19 @@ void saveMyLocationName() async{
   String myLocationName = "$name, $locality";
   print("User's Current Location $myLocationName." );
   userLocationName = myLocationName;
+}
+
+Future<String> getplacefromcoor(double givenlat, double givenlong) async{
+  var location = Location();
+  LocationData currentLocation = await location.getLocation();
+  double lat = givenlat;
+  double long = givenlong;
+  print("Member Coordinates: $lat,$long");
+  List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(lat,long);
+  Placemark placeMark = myplacemark[0];
+  String name = myplacemark[0].thoroughfare.toString();
+  String locality = placeMark.locality;
+  String memberLocationName = "$name, $locality";
+  print("Member Location $memberLocationName." );
+  return memberLocationName;
 }

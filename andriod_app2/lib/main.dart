@@ -10,6 +10,7 @@ import 'MyMeetups.dart';
 import 'JoinCreate.dart';
 import 'Profile.dart';
 import 'TinderPopUp.dart';
+import 'BuildMeetupDetails.dart';
 
 
 void main() => runApp(MyApp());
