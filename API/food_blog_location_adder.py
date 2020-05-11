@@ -5,6 +5,7 @@ from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from bs4 import BeautifulSoup
+import re
 import psycopg2
 import sys, os
 import numpy as np
@@ -17,9 +18,15 @@ import uuid
 import datetime
 import firebase_admin
 import requests
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium import webdriver
+from selenium.webdriver.common import keys
 from firebase_admin import credentials
 from firebase_admin import firestore
 from onemapsg import OneMapClient
+from sqlalchemy import create_engine
 import pprint
 #--------------------------------------REQUIREMENTS--------------------------------------
 
@@ -43,35 +50,7 @@ print('Connected!')
 
 #--------------------------------------CONNECT TO DATABASE-------------------------------
 # Set up a connection to the postgres server.
-try:
-    print("Connecting to the postgres server")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr = conn.cursor()
-    #Set up a connection to gisdb, the routing database
-    print("Connecting to routing database")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn_gis=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr_gis = conn_gis.cursor()
-except:
-    creds.PGHOST = 'journey'
-    print("Connecting to the postgres server")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr = conn.cursor()
-    #Set up a connection to gisdb, the routing database
-    print("Connecting to routing database")
-    conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGROUTINGDATABASE +" user=" + creds.PGUSER \
-    +" password="+ creds.PGPASSWORD
-    conn_gis=psycopg2.connect(conn_string)
-    print("Connected!")
-    crsr_gis = conn_gis.cursor()
+
 try:
     print("Connecting to the data database")
     conn_string = "host="+ creds.PGHOST +" port="+ "5432" +" dbname="+ creds.PGDATADATABASE +" user=" + creds.PGUSER \
@@ -81,6 +60,9 @@ try:
     crsr = conn.cursor()
 except:
     raise Exception("Unable to connect to the food blog data database, check postgres is running and IP address is correct")
+try:
+    db_string = creds.PGUSER+"://"+creds.PGUSER+":"+creds.PGPASSWORD+"@"+creds.PGHOST+":5432/data"
+    data_engine = create_engine(db_string)
 #--------------------------------------CONNECT TO DATABASE-------------------------------
     
 #Get the one map api
@@ -88,8 +70,10 @@ Client = OneMapClient(creds.ONEMAPEMAIL,creds.ONEMAPPASSWORD)
 
 def add_food_place(name,writeup,postal_code,address,operating_hours,pictures_url_arr,cost_per_pax,rating):
     data_conn.rollback()
-    cost_per_pax = str(cost_per_pax)
-    rating = str(rating)
+    if cost_per_pax is not None:  
+        cost_per_pax = str(cost_per_pax)
+    if rating is not None:
+        rating = str(rating)
     loc_details = Client.search(postal_code)
     long = loc_details['results'][0]['LONGITUDE']
     lat = loc_details['results'][0]['LATITUDE']
@@ -131,5 +115,131 @@ def add_food_place(name,writeup,postal_code,address,operating_hours,pictures_url
 #                ,4)
     
 #Scraping code for sethlui.com
-URL = "https://sethlui.com/singapore/food/"
-page = requests.get(URL)
+driver = webdriver.Chrome()
+driver.get("https://sethlui.com/singapore/food/")
+assert "SETHLUI" in driver.title
+filter_buttons = driver.find_elements_by_class_name('filter-option')
+filter_buttons[2].click()
+cafe_button = driver.find_element_by_id('cafes')
+cafe_button.click()
+filterSubmit = driver.find_element_by_id('filterSubmit')
+filterSubmit.click()
+
+cafe_links = []
+
+while True:
+    #repeat this script for every food page
+    try:
+        food_place_urls = WebDriverWait(driver,10).until(
+            EC.presence_of_all_elements_located((By.XPATH,"//div[@id='latestPosts']/div/a")))
+    except:
+        print('Driver Quitting')
+        driver.quit()
+    cur_page_cafe_links = [food_place_url.get_attribute('href') for food_place_url in food_place_urls]
+    cafe_links = cafe_links + cur_page_cafe_links
+    
+    try:
+        next_button = WebDriverWait(driver,10).until(
+            EC.element_to_be_clickable((By.XPATH,"(//a[@class='paging__arrow'])[2]")))
+        next_button.click()
+    except:
+        break
+
+cafe_links = list(dict.fromkeys(cafe_links))
+
+# cafe_link = "https://sethlui.com/plus-eight-two-cafe-korean-bingsu-singapore/"
+
+def get_cafe_details_from_webpage(cafe_link):
+    #Now that we have each page we need to get the data from each of them
+    driver.get(cafe_link)
+    wait = WebDriverWait(driver,3)
+    try:
+        name_element = wait.until(
+            EC.presence_of_element_located((By.XPATH,"//div[@class='desktop']/h4")))
+        name = name_element.text
+    except:
+        try:
+            name_element = wait.until(
+            EC.presence_of_element_located((By.XPATH,"//h1")))
+            name = name_element.text.split(':')[0]
+        except:
+            print("Unable to get data for " + cafe_link + " it is probably a different format.")
+            return None
+    wait = WebDriverWait(driver,1)
+    try:
+        write_up_elements = wait.until(
+            EC.presence_of_all_elements_located((By.XPATH,"//span[@style='font-weight: 400;']")))
+    except:
+        #The write up elements are stored in a different format
+        write_up_elements = driver.find_elements_by_xpath("//div[@class='col-md-6 article__post responsive-iframe-video']/p")
+    write_ups = [write_up_element.text for write_up_element in write_up_elements]
+    write_up = ' '.join(write_ups)
+    try:
+        #The new seth lui format
+        address_element = driver.find_element_by_xpath("//div[@class='desktop']/p")
+        address,postal_code = address_element.text.split(', Singapore ')
+        operating_hours_element = driver.find_element_by_xpath("//div[@class='review-meta desktop']")
+        operating_hours = operating_hours_element.text
+    except:
+        #the old seth lui format
+        try:
+            info_element = driver.find_element_by_xpath("//div[@class='col-md-6 article__post responsive-iframe-video']/h3")
+            address_and_postal = info_element.text.split('|')[0].split(':')[1]
+            address,postal_code=  address_and_postal.split(', Singapore ')
+            operating_hours = info_element.text.split('|')[2].strip()
+        except:
+            print('Unable to get address for ' + cafe_link + ' assuming its overseas and continuing')
+            return None
+    img_elements = driver.find_elements_by_css_selector("img[class^='alignnone size-full']")
+    if len(img_elements)==0:
+        #Another image format
+        img_elements = driver.find_elements_by_css_selector("img[class$='size-large']")
+    img_urls = [img_element.get_attribute('src') for img_element in img_elements]
+    try:
+        cost_per_pax = re.split('Expected Damage:',write_up, flags = re.IGNORECASE)[1].strip()
+    except:
+        cost_per_pax = None
+        print('Unable to get cost for ' + cafe_link)
+    try:
+        rating_element = driver.find_element_by_css_selector("span[style^='font-size:11px; color:#888;font-weight:bold;']")
+        rating = rating_element.text.split('/')[0]
+    except:
+        rating = None
+        print('Unable to get rating for ' + cafe_link)
+    address = address.strip()
+    postal_code = postal_code.strip()
+    return [name,write_up,postal_code,address,operating_hours,img_urls,cost_per_pax,rating]
+
+#Final execute loop
+for cur_iteration,cafe_link in enumerate(cafe_links):
+    details = get_cafe_details_from_webpage(cafe_link)
+    if details is None:
+        continue
+    else:
+        print('Adding food place to postgres for iteration ' + str(cur_iteration) + ' and webpage ' + cafe_link)
+        # pprint.pprint(details)
+        add_food_place(*details)
+
+def correct_operating_hrs(op_hrs):
+    contains_illegal_words = bool(re.search('Facebook|Website|Tel',op_hrs))
+    if contains_illegal_words:
+        return ""
+    else:
+        return op_hrs
+
+def is_not_closed(place_name):
+    if bool(re.search('close',place_name)):
+        return False
+    else:
+        return True
+
+#Data cleaning
+food_places_df = pd.read_sql('SELECT * FROM food_blog_places',data_conn)
+x = [picture_urls != [] for picture_urls in food_places_df['pictures_url']]
+food_places_df = food_places_df[x]
+food_places_df['operating_hours'] = pd.Series(correct_operating_hrs(op_hrs) for op_hrs in food_places_df['operating_hours'])
+x = [is_not_closed(place_name) for place_name in food_places_df['name']]
+food_places_df = food_places_df[x]
+
+#Uplaod the cleaned results
+food_places_df.to_sql('food_blog_places_clean',data_engine)
