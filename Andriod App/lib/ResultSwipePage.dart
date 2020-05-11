@@ -57,7 +57,7 @@ List myData = [
       images: ["images/backyard.jpg", "images/food.jpg"]),
   fakeData(name: "Fisherman's Wharf",
       address: "39 San Francisco Bay Area",
-      details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder!",
+      details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
       rating: 4.6,
       images: ["images/sanf.jpg", "images/sanfrans.jpg", "images/food.jpg"]),
 ];
@@ -166,61 +166,61 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                         _addCard(item);
                       }
                     },
-                    child: Hero(
-                        tag: item.name,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Details(item: item,)));
-                          },
-                          child: Card(
-                            elevation: 0.5,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(0))
+                    child: Card(
+                      elevation: 0.5,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(0))
+                      ),
+                      child: Container(
+                        child: Column(
+                          children: <Widget>[
+                            Expanded(
+                              flex: 12,
+                              child: Hero(
+                                tag: item.name,
+                                child: GestureDetector(
+                                  child: Container(
+                                    child: Image.asset(item.images[0], fit: BoxFit.cover,),
+                                  ),
+                                  onTap: () {
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(item: item,)));
+                                  },
+                                )
+                              ),
                             ),
-                            child: Container(
-                              child: Column(
+                            Expanded(
+                              flex: 2,
+                              child: Row(
                                 children: <Widget>[
                                   Expanded(
-                                    flex: 12,
-                                    child: Container(
-                                      child: Image.asset(item.images[0], fit: BoxFit.cover,),
+                                    flex: 4,
+                                    child: Padding(
+                                        padding: const EdgeInsets.only(left:10.0, top: 20.0, bottom: 15, right: 20.0),
+                                        child: _Description(name: item.name, address: item.address,)
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 2,
-                                    child: Row(
-                                      children: <Widget>[
-                                        Expanded(
-                                          flex: 4,
-                                          child: Padding(
-                                              padding: const EdgeInsets.only(left:10.0, top: 20.0, bottom: 15, right: 20.0),
-                                              child: _Description(name: item.name, address: item.address,)
+                                      flex: 2,
+                                      child: Container(
+                                        padding: const EdgeInsets.only(right: 10.0),
+                                        alignment: Alignment.centerRight,
+                                        child: RatingBarIndicator(
+                                          rating: item.rating,
+                                          itemBuilder: (context, index) => Icon(
+                                            Icons.star,
+                                            color: Colors.black,
                                           ),
+                                          itemCount: 5,
+                                          itemSize: 15,
                                         ),
-                                        Expanded(
-                                            flex: 2,
-                                            child: Container(
-                                              padding: const EdgeInsets.only(right: 10.0),
-                                              alignment: Alignment.centerRight,
-                                              child: RatingBarIndicator(
-                                                rating: item.rating,
-                                                itemBuilder: (context, index) => Icon(
-                                                  Icons.star,
-                                                  color: Colors.black,
-                                                ),
-                                                itemCount: 5,
-                                                itemSize: 18,
-                                              ),
-                                            )
-                                        )
-                                      ],
-                                    ),
+                                      )
                                   )
                                 ],
                               ),
-                            ),
-                          ),
-                        )
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 }).toList(),
