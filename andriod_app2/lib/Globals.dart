@@ -13,16 +13,19 @@ String userLocationName = "Jalan Membina, Singapore";
 
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
+Map<String, dynamic> tempMeetingDetails = {};
+
 Map<String,dynamic> tempData = {
-  "meetupname" : "",
-  "meetingType": 0,
+  "meetupname" : "Default Name",
+  "meetingType": "Recreation",
   "sessionid" : 0,
   "link" : "",
+  "joinlink": "",
   "username" : "",
   "userplace" : "",
   "lat" : 0.0,
   "long" : 0.0,
-  "transportMode" : "",
+  "transportMode" : "Public Transit",
   "quality" : 0,
   "price" : 0,
   "speed" :0,
@@ -61,3 +64,5 @@ Future<String> getplacefromcoor(double givenlat, double givenlong) async{
   print("Member Location $memberLocationName." );
   return memberLocationName;
 }
+
+

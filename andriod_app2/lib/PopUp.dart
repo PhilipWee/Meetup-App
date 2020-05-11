@@ -83,8 +83,8 @@ class PopupLayout extends ModalRoute {
     // You can add your own animations for the overlay content
     return FadeTransition(
       opacity: animation,
-      child: ScaleTransition(
-        scale: animation,
+      child: FadeTransition(
+        opacity: animation,
         child: child,
       ),
     );

@@ -2,19 +2,19 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
-import 'TinderPopUp.dart';
+import 'PopUp.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class CustomizationPageWidget extends StatefulWidget {
+
+class CustomizationPage2Widget extends StatefulWidget {
   @override
-  CustomizationPageState createState() => CustomizationPageState();
+  CustomizationPage2State createState() => CustomizationPage2State();
 }
 
-class CustomizationPageState extends State<CustomizationPageWidget> {
+class CustomizationPage2State extends State<CustomizationPage2Widget> {
 
-  final _meetupNameController = TextEditingController();
   final _locationNameController = TextEditingController(text: globals.userLocationName);
 
   String value7 = "Recreation";
@@ -38,47 +38,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     }
     return "";
   }
-
-  Future<String> sessionCreate() async {
-
-    //send json package to server as POST
-    Map<String, String> headers = {"Content-type": "application/json"};
-    String address = globals.serverAddress;
-
-    String url = '$address/session/create';
-    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "${globals.tempData["username"]}"}';
-    print("Sending Jsonpackage To Server >>> $jsonpackage");
-    try{
-      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
-      int statusCode = response.statusCode;
-      String errorMessage = response.body;
-
-      if (statusCode != 200){
-        print(errorMessage);
-        Scaffold.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Oops! Server Error. StatusCode:$statusCode"),
-              duration: Duration(seconds: 2),
-            ));
-      }
-      else{
-        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
-        print("PostData successfull with statuscode: $statusCode");
-        print("Get Session ID successfull with body : $body");
-
-        //decode the string-map
-        Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
-        var sessionid = sessionidjsonversion['session_id'];
-        globals.tempData["sessionid"] = sessionid;
-        globals.tempData["sessionid"] = "$address/session/$sessionid/get_details";
-        String theLink = globals.tempData["sessionid"];
-        print('Link Created[ $theLink ]');
-        return theLink;
-      }
-    }
-    catch(e){print("Error caught at PostDataGetID(): $e");}
-  }
-
 //  void initState() {
 //    super.initState();
 //    _locationNameController.addListener(() {
@@ -100,30 +59,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   @override
   Widget build(BuildContext context) {
 
-    Widget linkSection = Container(
-        child: Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 2,
-                      child: TextField(
-                          controller: TextEditingController(text:""),
-                          decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-                      ),
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.share),
-                        onPressed: () async => await _shareText()
-                    ),
-                  ],
-                ),
-              ],
-            )
-        )
-    );
 
     Widget buttonSection = Container(
       height: 50.0,
@@ -142,12 +77,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   textColor: Colors.white,
                   onPressed: () {
 //                    showPopup(context, _popupBody(), 'F07 Class Outing');
-                    globals.tempData["meetupname"] = _meetupNameController.text;
                     globals.tempData["userplace"] = _locationNameController.text;
 //                    print(globals.tempData);
-                    sessionCreate();
-                    },
-                  child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
+                  },
+                  child: Text('Join Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
               ),
             ),
@@ -158,10 +91,12 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Center(
-          child: Text("Create Meetup", style: TextStyle(fontFamily: "Quicksand")),
+          child: Text("Join Meetup", style: TextStyle(fontFamily: "Quicksand")),
         ),
         backgroundColor: Colors.deepOrange,
+        automaticallyImplyLeading: true,
       ),
       body: ListView(
         children: [
@@ -171,65 +106,30 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Expanded(
-                flex: 1,
-                child: Padding(
-                  padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
-                  child: TextFormField(
-                    controller: _meetupNameController,
-                    decoration: InputDecoration(labelText: "Name of Meetup", border: OutlineInputBorder()),
-                  ),
-                )
+                  flex: 1,
+                  child: Padding(
+                    padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
+                    child: Text("F07 Class Outing",
+                      style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
+                  )
               )
             ],
           ),//for meetup name
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:15),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.group, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text("Activity", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                            fontFamily: "Quicksand"
-                        ),),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value7,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value7 = newValue;
-                          if (value7=="Recreation"){globals.tempData["meetingType"]="Recreation";}
-                          else if (value7=="Food"){globals.tempData["meetingType"]="Food";}
-                          else {globals.tempData["meetingType"]="Meeting";}
-                        });
-                      },
-                      items: <String>["Recreation", "Food", "Meeting"].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ),
+                  flex: 1,
+                  child: Padding(
+                      padding:const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 8),
+                      child: Text("Recreation",
+                        style: TextStyle(fontFamily: "QuickSand", fontSize: 15, fontWeight: FontWeight.bold),)
+                  )
               )
             ],
-          ),//for meetup type
+          ),//for activity
+          Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
@@ -417,7 +317,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
           ), //for price
           Divider(height: 40,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
           Container(child: buttonSection),
-          Container(child: linkSection),
         ], //children of ListView
       ),
     );

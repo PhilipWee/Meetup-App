@@ -1,4 +1,12 @@
+import 'package:andriod_app2/BuildMeetupDetails.dart';
 import 'package:flutter/material.dart';
+import 'Globals.dart' as globals;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'Globals.dart' as globals;
+import 'Join.dart';
+
 
 class Homescreen extends StatelessWidget {
   static final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -22,6 +30,8 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
 
+  bool invalidLink = false;
+
   final _joinController = TextEditingController();
 
   final List<String> custLabels = [
@@ -35,26 +45,33 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     "images/meetingButton.jpg",
   ];
 
-  void initState() {
-    super.initState();
-    _joinController.addListener(() {
-      final text = _joinController.text.toLowerCase();
-      _joinController.value = _joinController.value.copyWith(
-        text: text,
-        selection:
-        TextSelection(baseOffset: text.length, extentOffset: text.length),
-        composing: TextRange.empty,
-      );
-    });
-  }
+//  void initState() {
+//    super.initState();
+//    _joinController.addListener(() {
+//      final text = _joinController.text.toLowerCase();
+//      _joinController.value = _joinController.value.copyWith(
+//        text: text,
+//        selection:
+//        TextSelection(baseOffset: text.length, extentOffset: text.length),
+//        composing: TextRange.empty,
+//      );
+//    });
+//  }
+//
+//  void dispose() {
+//    _joinController.dispose();
+//    super.dispose();
+//  }
 
-  void dispose() {
-    _joinController.dispose();
-    super.dispose();
-  }
+  void saveSessionDetailsFromLink(String inputlink) async{
+    globals.tempData["joinlink"] = inputlink;
+    http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
+    String body = response.body;
+    globals.tempMeetingDetails = jsonDecode(body);
+    }
 
   @override
-  //Creates a listview with buildCustomButtons inside
+  //Creates a list view with buildCustomButtons inside
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +106,10 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       IconButton(
                         icon: Icon(Icons.person_add),
-                        onPressed: (){},
+                        onPressed: (){
+                          saveSessionDetailsFromLink(_joinController.text);
+                          Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage2Widget()),);
+                          },
                         iconSize: 25,
                         color: Colors.black87,
                       ),
@@ -115,7 +135,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                 },
               ),
             ),
-          ),
+          ),//list of stuff
         ],
       )
 

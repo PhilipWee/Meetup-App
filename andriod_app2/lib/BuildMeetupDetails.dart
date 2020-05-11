@@ -53,16 +53,16 @@ class MeetupPageState extends State<MeetupPageWidget> {
     },
   ]; //snapshot from future is added to this
   
-  @override
-  initState(){
-    super.initState();
-    globals.socketIO.joinSession("123456");
-    globals.socketIO.subscribe("user_joined_room", (data)=>{
-      //whatever is inside here will run when server sends stuff
-      print(data),
-      listofmembers.add(data)
-    });
-  }
+//  @override
+//  initState(){
+//    super.initState();
+//    globals.socketIO.joinSession("123456");
+//    globals.socketIO.subscribe("user_joined_room", (data)=>{
+//      //whatever is inside here will run when server sends stuff
+//      print(data),
+//      listofmembers.add(data)
+//    });
+//  }
 
 
 //  List listofplacenames(List _listofmembers) {
