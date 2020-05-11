@@ -72,12 +72,12 @@ def index():
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
     if request.method == "GET":
-        return render_template('Geoloc2.html', session_id = session_id)
+        return render_template('joinMeetupPage.html', session_id = session_id)
     
-@app.route('/login/')
+@app.route('/loginPage')
 def login():
     if request.method == "GET":
-        return render_template('newpage.html')
+        return render_template('loginPage.html')
     
 @app.route('/swipe')
 def swipe():
