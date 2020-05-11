@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'main.dart';
-import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart';
-import 'Globals.dart' as globals;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -28,61 +23,35 @@ class _LoginPageState extends State<LoginPage> {
       idToken: googleSignInAuthentication.idToken,
     );
 
-    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    final FirebaseUser user = (await _auth.signInWithCredential(credential));
 
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
-    print("user " + user.uid + " is connected to firebase.");
-
-    try {
-      QuerySnapshot docs = await Firestore.instance.collection('userData').where('uid',isEqualTo: user.uid).getDocuments();
-      if (!docs.documents[0].exists){
-        Firestore.instance.collection('userData').document(user.uid).setData({
-          'activityType': 'activityType',
-          'lat': 0.0,
-          'long': 0.0,
-          'link': 'link',
-          'price': 0,
-          'quality': 'No Preference',
-          'sessionId': "ABCDE",
-          'transportMode': 'Public Transit',
-          'userName': user.displayName,
-          'uid': user.uid
-        }).whenComplete(() =>
-            print("created userData for " + user.displayName));
-      }
-      else{
-        print("userData already exists.");
-
-      }
-    }on PlatformException{
-      print("userData already exists.");
-    }
-
 
     return 'signInWithGoogle succeeded: $user';
 
   }
   void signOutGoogle() async{
     await googleSignIn.signOut();
-    print("User Sign Out");
-  }
 
+    print("User Sign Out");
+
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.deepOrange,
+        color: Colors.white,
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image(image: AssetImage("images/Mouse_copy.png"), height: 170),
+              Image(image: AssetImage("images/google_logo.png"), height: 35.0),
               SizedBox(height: 50),
               _signInButton(),
             ],
@@ -93,12 +62,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _signInButton() {
-    return FlatButton(
-      color: Colors.white,
-      onPressed: () async {
-        globals.saveMyLocationName();
+    return OutlineButton(
+      splashColor: Colors.grey,
+      onPressed: () {
         signInWithGoogle().whenComplete(() {
-          Navigator.of(context).pushReplacement(
+          Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) {
                 return CheckNetworkPage();
@@ -108,8 +76,8 @@ class _LoginPageState extends State<LoginPage> {
         });
       },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-//      highlightElevation: 0,
-//      borderSide: BorderSide(color: Colors.grey),
+      highlightElevation: 0,
+      borderSide: BorderSide(color: Colors.grey),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: Row(
@@ -123,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                 'Sign in with Google',
                 style: TextStyle(
                   fontSize: 20,
-                  color: Colors.black45
+                  color: Colors.grey,
                 ),
               ),
             )
