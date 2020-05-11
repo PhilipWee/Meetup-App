@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'main.dart';
+import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
+import 'Globals.dart' as globals;
 
 class LoginPage extends StatefulWidget {
   @override
@@ -36,16 +39,30 @@ class _LoginPageState extends State<LoginPage> {
   }
   void signOutGoogle() async{
     await googleSignIn.signOut();
-
     print("User Sign Out");
+  }
 
+  void saveMyLocationName() async{
+    var location = Location();
+    LocationData currentLocation = await location.getLocation();
+    double mylat = currentLocation.latitude;
+    double mylong = currentLocation.longitude;
+    print("User's Current Coordinates: ${mylat},${mylong}");
+    Map<String,double> mycoordinates = {"mylat":mylat, "mylong":mylong};
+    List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(mylat,mylong);
+    Placemark placeMark = myplacemark[0];
+    String name = myplacemark[0].thoroughfare.toString();
+    String locality = placeMark.locality;
+    String myLocationName = "${name}, ${locality}";
+    print("User's Current Location ${myLocationName}." );
+    globals.myLocationName = myLocationName;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.white,
+        color: Colors.deepOrange,
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
@@ -62,9 +79,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _signInButton() {
-    return OutlineButton(
-      splashColor: Colors.grey,
-      onPressed: () {
+    return FlatButton(
+      color: Colors.white,
+      onPressed: () async {
+        saveMyLocationName();
         signInWithGoogle().whenComplete(() {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
@@ -76,8 +94,8 @@ class _LoginPageState extends State<LoginPage> {
         });
       },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-      highlightElevation: 0,
-      borderSide: BorderSide(color: Colors.grey),
+//      highlightElevation: 0,
+//      borderSide: BorderSide(color: Colors.grey),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
         child: Row(
@@ -91,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                 'Sign in with Google',
                 style: TextStyle(
                   fontSize: 20,
-                  color: Colors.grey,
+                  color: Colors.black45
                 ),
               ),
             )
