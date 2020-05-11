@@ -2,6 +2,8 @@
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
+from flask_socketio import SocketIO
+
 #import psycopg2
 import sys, os
 import numpy as np
@@ -71,11 +73,16 @@ def index():
 def get_details(session_id):
     if request.method == "GET":
         return render_template('Geoloc2.html', session_id = session_id)
-
+    
 @app.route('/login/')
 def login():
     if request.method == "GET":
         return render_template('newpage.html')
+    
+@app.route('/swipe')
+def swipe():
+    if request.method == "GET":
+        return render_template('cardSwipe.html')
 
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
@@ -204,15 +211,12 @@ def create_firebase_session(content,meeting_type,username):
                         'time_created':str(datetime.datetime.now())}
 
     details = {'users':[host_user_details],'meeting_type':meeting_type}
-    
-    print('hey')
-    
+
     #Generate session id
     session_id = str(uuid.uuid1())
 
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
-    print(doc_ref)
     doc_ref.set({'info':details})
 
     #Return the session id
@@ -290,11 +294,10 @@ if __name__ == '__main__':
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
     print('Connecting to firebase')
     if (not len(firebase_admin._apps)):
-        
+
         # Use the application default credentials
         # Use a service account
-        # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
-        cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-934d0-firebase-adminsdk-txqu5-9b67a90c2c.json')
+        cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
@@ -302,8 +305,8 @@ if __name__ == '__main__':
     print('Connected!')
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
 
-    # #--------------------------------------CONNECT TO DATABASE-------------------------------
-    #Run the App
-    app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
-    # app.run(host='0.0.0.0', debug=True, use_reloader=False)
-    crsr.close()
+# #--------------------------------------CONNECT TO DATABASE-------------------------------
+#Run the App
+app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
+# app.run(host='0.0.0.0', debug=True, use_reloader=False)
+crsr.close()
