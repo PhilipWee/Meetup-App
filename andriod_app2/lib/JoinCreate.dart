@@ -2,7 +2,8 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
-
+import 'TinderPopUp.dart';
+import 'Globals.dart' as globals;
 
 class CustomizationPageWidget extends StatefulWidget {
   @override
@@ -11,10 +12,13 @@ class CustomizationPageWidget extends StatefulWidget {
 
 class CustomizationPageState extends State<CustomizationPageWidget> {
 
+  final _meetupNameController = TextEditingController();
+
+  String value7 = "Recreation";
   String value2 = "Public Transit";
-//  String value3 = "Select...";  //originally used for speed
   String value4 = "No Preference";
   double value5 = 0;
+
   //Method for the labels on the slider
   String labels() {
     switch (value5.floor()) {
@@ -30,6 +34,24 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         return "\$\$\$\$";
     }
     return "";
+  }
+
+  void initState() {
+    super.initState();
+    _meetupNameController.addListener(() {
+      final text = _meetupNameController.text.toLowerCase();
+      _meetupNameController.value = _meetupNameController.value.copyWith(
+        text: text,
+        selection:
+        TextSelection(baseOffset: text.length, extentOffset: text.length),
+        composing: TextRange.empty,
+      );
+    });
+  }
+
+  void dispose() {
+    _meetupNameController.dispose();
+    super.dispose();
   }
 
   @override
@@ -49,10 +71,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.only(left: 5, right: 5, bottom: 80),
-                      child: Text(""),
-                    ),
                     IconButton(
                         icon: Icon(Icons.share),
                         onPressed: () async => await _shareText()
@@ -71,7 +89,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         children: [
           Container(
             child: Padding(
-              padding: const EdgeInsets.only(left: 15, right: 15.0, top: 20),
+              padding: const EdgeInsets.only(left: 15, right: 15.0, top: 5, bottom: 5),
               child: ButtonTheme(
                 minWidth: 150,
                 height: 50,
@@ -79,8 +97,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
-                  onPressed: () {},
-                  child: Text("Create Meetup!"), //TODO
+                  onPressed: () {showPopup(context, _popupBody(), 'F07 Class Outing');},
+                  child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
               ),
             ),
@@ -89,17 +107,81 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       ) ,
     );
 
-
-
     return Scaffold(
       appBar: AppBar(
         title: Center(
-          child: Text("Create Meetup"),
+          child: Text("Create Meetup", style: TextStyle(fontFamily: "Quicksand")),
         ),
         backgroundColor: Colors.deepOrange,
       ),
       body: ListView(
         children: [
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
+                  child: TextFormField(
+                    controller: _meetupNameController,
+                    decoration: InputDecoration(labelText: "Name of Meetup", border: OutlineInputBorder()),
+                  ),
+                )
+              )
+            ],
+          ),//for meetup name
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:15),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.group, color: Colors.black),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Text("Activity", style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0,
+                            fontFamily: "Quicksand"
+                        ),),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: value7,
+                      onChanged: (String newValue) {
+                        setState(() {
+                          value7 = newValue;
+//                          if (value7=="Recreation"){data.meetingType="Recreation";}
+//                          else if (value7=="Food"){data.meetingType="Food";}
+//                          else if (value7=="Meeting"){data.meetingType="Meeting";}
+//                          else {data.meetingType="Public Transit";}
+                        });
+                      },
+                      items: <String>["Recreation", "Food", "Meeting"].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),//for meetup type
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
@@ -107,16 +189,17 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               Expanded(
                 flex: 1,
                 child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 10, bottom: 8.0),
+                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:15),
                   child: Row(
                     children: <Widget>[
-                      Icon(Icons.home, color: Colors.black),
+                      Icon(Icons.location_on, color: Colors.black),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text("Location", style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20.0
+                            fontSize: 20.0,
+                            fontFamily: "Quicksand"
                         ),),
                       ),
                     ],
@@ -126,12 +209,12 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               Expanded(
                 flex: 1,
                 child:Padding(
-                    padding:const EdgeInsets.only(left: 0, top: 8, right: 8, bottom: 8),
+                    padding:const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
                     child: PlacesAutocompleteField(
-                        controller: TextEditingController(text:"THE LOCATION"),
+                        controller: TextEditingController(text: globals.myLocationName),
                         apiKey: 'AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g',
                         leading: Icon(Icons.search, color: Colors.black),
-                        hint: "Manually enter location",
+                        hint: "Enter Location",
                         mode: Mode.overlay
                     )
                 ),
@@ -144,7 +227,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             children: <Widget>[
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30, bottom: 8.0),
+                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.directions_car, color: Colors.black),
@@ -153,7 +236,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                         child: Text("Transport", style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20.0
+                            fontSize: 20.0,
+                            fontFamily: "Quicksand"
                         ),),
                       ),
                     ],
@@ -193,7 +277,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               Expanded(
                 flex: 5,
                 child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.star, color: Colors.black),
@@ -202,7 +286,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                         child: Text("Ratings", style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20.0
+                            fontSize: 20.0,
+                            fontFamily: "Quicksand"
                         ),),
                       ),
                     ],
@@ -243,16 +328,17 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               Expanded(
                 flex: 5,
                 child: Container(
-                  padding: const EdgeInsets.only(left: 10.0, top: 8.0, right: 30.0, bottom: 8.0),
+                  padding: const EdgeInsets.only(top: 8, bottom: 8, left: 15, right:8),
                   child: Row(
                     children: <Widget>[
                       Icon(Icons.attach_money, color: Colors.black),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right:8),
                         child: Text("Price", style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20.0
+                            fontSize: 20.0,
+                            fontFamily: "Quicksand"
                         ),),
                       ),
                     ],
@@ -281,41 +367,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               )
             ],
           ), //for price
+          new Divider(height: 40,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
           buttonSection,
-          linkSection
+          linkSection,
         ], //children of ListView
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: FlatButton(
-            child: Text('Confirm', style: TextStyle(fontWeight: FontWeight.bold)),
-              onPressed: () {},
-//            onPressed: () async {
-//              if (value2.isNotEmpty && value4.isNotEmpty) {  //CHECK IF PREFERENCES HAS BEEN FILLED IN
-//                data.speed = 3; // fix at 3
-//                if (data.sessionid.isEmpty) {
-//                  print("Running PostDataGetID");
-//                  postDataGetID();
-//                }  //IF THERE IS NO ID
-//                else if (data.sessionid.isNotEmpty) {
-//                  print("Running PostDataUpdateSess");
-//                  postDataUpdateSess();
-//                }  //IF THERE IS ID
-//
-//                await Future.delayed(Duration(milliseconds: 2000));
-//                Navigator.push(context,MaterialPageRoute(builder: (context) => ShareLinkPage(data:data)),);
-//                print("TEST: ${data.dataMap}");
-//
-//              } else {
-//                Scaffold.of(context).showSnackBar(
-//                    SnackBar(
-//                      content: Text("Please select preferences!"),
-//                      duration: Duration(seconds: 2),
-//                    ));
-//              }
-//            }
-
-
-        ),
       ),
     );
   }
@@ -326,6 +381,36 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     } catch (e) {
       print('error: $e');
     }
+  }
+
+  showPopup(BuildContext context, Widget widget, String title, {BuildContext popupContext}) {
+    Navigator.push(
+      context,
+      PopupLayout(
+        top: 30,
+        left: 30,
+        right: 30,
+        bottom: 50,
+        child: PopupContent(
+          content: Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.black,
+              title: Center(child:Text(title),),
+              brightness: Brightness.light,
+              automaticallyImplyLeading: false,
+            ),
+            resizeToAvoidBottomPadding: false,
+            body: widget,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _popupBody() {
+    return Container(
+      child: Text('This is a popup window'),
+    );
   }
 
 }
