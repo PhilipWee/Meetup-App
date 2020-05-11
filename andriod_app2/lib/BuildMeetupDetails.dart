@@ -31,7 +31,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   List listofmembers = [
     {
-      "identifier" : "Stepkaboom",
+      "identifier" : "identifier",
       "lat" : 0,
       "long" : 0,
       "transport_mode" : "Driving",
@@ -74,6 +74,12 @@ class MeetupPageState extends State<MeetupPageWidget> {
     }
   ]; //snapshot from future is added to this
 
+//  List listofplacenames(List _listofmembers) {
+//    for (var index in _listofmembers) {
+//      _listofmembers[index]
+//    }
+//  };
+
   Future<List<dynamic>> getMembers() async{}
 
   @override
@@ -88,7 +94,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
       future: getMembers(),
       builder: (BuildContext context, AsyncSnapshot snapshot){
 //        listofmembers = snapshot.data;
-
 
         if(listofmembers == null){
           return
