@@ -5,6 +5,8 @@ import 'main.dart';
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'Globals.dart' as globals;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -26,13 +28,40 @@ class _LoginPageState extends State<LoginPage> {
       idToken: googleSignInAuthentication.idToken,
     );
 
-    final FirebaseUser user = (await _auth.signInWithCredential(credential));
+    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
 
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
+    print("user " + user.uid + " is connected to firebase.");
+
+    try {
+      QuerySnapshot docs = await Firestore.instance.collection('userData').where('uid',isEqualTo: user.uid).getDocuments();
+      if (!docs.documents[0].exists){
+        Firestore.instance.collection('userData').document(user.uid).setData({
+          'activityType': 'activityType',
+          'lat': 0.0,
+          'long': 0.0,
+          'link': 'link',
+          'price': 0,
+          'quality': 'No Preference',
+          'sessionId': "ABCDE",
+          'transportMode': 'Public Transit',
+          'userName': user.displayName,
+          'uid': user.uid
+        }).whenComplete(() =>
+            print("created userData for " + user.displayName));
+      }
+      else{
+        print("userData already exists.");
+
+      }
+    }on PlatformException{
+      print("userData already exists.");
+    }
+
 
     return 'signInWithGoogle succeeded: $user';
 

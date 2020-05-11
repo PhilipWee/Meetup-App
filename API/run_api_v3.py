@@ -215,6 +215,11 @@ def create_firebase_session(content,meeting_type,username):
     print(doc_ref)
     doc_ref.set({'info':details})
 
+    #Update userData sessionId
+    data = db.collection(u'userData').document(username).get().to_dict()
+    data["sessionId"].append(session_id)
+    db.collection(u'userData').document(username).set(data)
+
     #Return the session id
     return session_id
 
@@ -224,8 +229,27 @@ def insert_user_details(details,session_id):
         doc_dict = doc_ref.get().to_dict()
         doc_dict['info']['users'].append(details)
         doc_ref.set(doc_dict)
+
+        #Update userData sessionId
+        data = db.collection(u'userData').document(details["username"]).get().to_dict()
+        data["sessionId"].append(session_id)
+        db.collection(u'userData').document(details["username"]).set(data)
+
     except:
         print('Error inserting user details, does session id exist?')
+@app.route('/session/get', methods = ['GET'])
+def get_user_sessions():
+    if 'username' in request.args:
+        print("this is username args: " + request.args["username"])
+        print("doing query...")
+        data = db.collection(u'userData').document(request.args["username"]).get().to_dict()
+        print("finished query!")
+        print(data["sessionId"])
+        sessionIdDict = { i : i for i in data["sessionId"]}
+        return sessionIdDict
+
+    else:
+        return "Error: no username is provided."
 
 def set_calculate_flag(session_id):
 #    try:
@@ -294,7 +318,7 @@ if __name__ == '__main__':
         # Use the application default credentials
         # Use a service account
         # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
-        cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-934d0-firebase-adminsdk-txqu5-9b67a90c2c.json')
+        cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
