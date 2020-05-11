@@ -33,16 +33,49 @@ def get_doc_ref_for_id(session_id):
 API important links explanation:
 /session/create (POST)
 -> Generate session number, return the session number to user
--> Need key value for lat, long ,transport_mode, speed, quality
+-> Sample Data:
+    {'lat':1.58932801,
+     'long':103.840021,
+     'transport_mode':'public'/'driving'/'walking',
+     {'metrics':
+         'speed':3,
+         'quality':3},
+     'username':abc123,
+     'meeting_type':'food'/'outing'/'meeting'}
 -> Generates lat, long, preferences and others and stores it in the database
 -> Only for OAuth authenticated users
 
 /session/<session_id> (POST)
 -> Insert details for each particular user
--> Need key value for lat, long ,transport_mode, speed, quality
+-> Sample Data:
+    {'lat':1.58932801,
+     'long':103.840021,
+     'transport_mode':'public'/'driving'/'walking',
+     {'metrics':
+         'speed':3,
+         'quality':3},
+     'username':abc123}
 
-/session/<session_id> (GET)
+/session/<session_id> (GET) (DEPRECEATED)
 -> Get all session details
+-> PLEASE USE THE SOCKET CONNECTION INSTEAD
+-> Sample Data:
+    {
+      "meeting_type": "food",
+      "users": [
+        {
+          "lat": 1.3672983,
+          "long": 103.867,
+          "metrics": {
+            "quality": 2,
+            "speed": 2
+          },
+          "time_created": "2020-01-16 09:46:37.973308",
+          "transport_mode": "Driving",
+          "username": "username"
+        }
+      ]
+    }
 -> Requires OAuth
 
 /session/<session_id>/calculate (GET)
@@ -52,8 +85,9 @@ API important links explanation:
 /session/<session_id>/results (GET)
 -> Use this page to show results to prevent lag
 -> If OAuth is provided or IP address matches, show results
+-> Sample data provided in SampleResultsJSON.json
 
-/session/<session_id>/get_details (GET)
+/session/<session_id>/get_details (GET)\
 -> Returns the website for friends to input details
 
 SocketIO important stuff explanation:
@@ -275,7 +309,7 @@ def on_swipe_details(data):
                 break
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
-                emit('location_found',{'swipeIndex':swipeIndex},room=sessionID)
+                emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
         
     except KeyError:
         #Create the session details
