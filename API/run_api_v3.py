@@ -21,7 +21,7 @@ from firebase_admin import firestore
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS------------------------------------------
-NUMBER_OF_RESULTS = 5
+NUMBER_OF_RESULTS = 20
 
 #--------------------------------------SETTINGS------------------------------------------
 
@@ -331,6 +331,7 @@ def insert_user_details(details,session_id):
 
     except:
         print('Error inserting user details, does session id exist?')
+        
 @app.route('/session/get', methods = ['GET'])
 def get_user_sessions():
     if 'username' in request.args:
