@@ -77,6 +77,11 @@ def login():
     if request.method == "GET":
         return render_template('newpage.html')
 
+@app.route('/first_page/')
+def first_page():
+    if request.method == "GET":
+        return render_template('firstpage.html')
+
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     checkHost = request.args['isHost']
@@ -294,7 +299,7 @@ if __name__ == '__main__':
         # Use the application default credentials
         # Use a service account
         # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
-        cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-934d0-firebase-adminsdk-txqu5-9b67a90c2c.json')
+        cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
