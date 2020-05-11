@@ -3,7 +3,7 @@ class fakeData {
   String name;
   String address;
   String details;
-  int rating;
+  double rating;
   List images;
 
   fakeData({this.name, this.address, this.details, this.rating, this.images});
