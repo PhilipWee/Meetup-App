@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'ShareLinkPage.dart';
 import 'CustomizationPage.dart';
 import 'Meetingtype.dart';
+import 'GoogleSignIn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
@@ -33,8 +33,20 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => CheckNetworkPage(),
+        '/': (context) => GoogleSignInPage(),
       },
+    );
+  }
+}
+class GoogleSignInPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Login',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: LoginPage(),
     );
   }
 }

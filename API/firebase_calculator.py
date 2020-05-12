@@ -30,7 +30,7 @@ if (not len(firebase_admin._apps)):
 
     # Use the application default credentials
     # Use a service account
-    cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-934d0-firebase-adminsdk-txqu5-9b67a90c2c.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
