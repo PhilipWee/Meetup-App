@@ -13,7 +13,7 @@ class CustomSocketIO {
   ///Input the url of the Meetup Mouse website and save the instance of the class for use later
   ///
   ///Example:
-  ///```socketIO = CustomSocketIO('http://10.0.2.2:5000');```
+  ///socketIO = CustomSocketIO('http://10.0.2.2:5000');
   CustomSocketIO(String url) {
     this.url = url;
     //Create the socket connection
@@ -31,7 +31,7 @@ class CustomSocketIO {
   ///If you do not join a session the subscribe function WILL NOT WORK
   ///
   ///Example:
-  ///```socketIO.joinSession('1111');```
+  ///socketIO.joinSession('1111');
   joinSession(String sessionID) {
     this.sessionID = sessionID;
     socketIO.sendMessage('join',json.encode({'room':this.sessionID}));
@@ -43,7 +43,7 @@ class CustomSocketIO {
   ///depending on the data received from the server
   ///
   ///Example:
-  ///```socketIO.subscribe('test', (data) => {print(data)});```
+  ///socketIO.subscribe('test', (data) => {print(data)});
   ///
   ///In the above example, when the server emits the event 'test',
   ///the data is received in a Map<String,dynamic>. Hence by using the same
@@ -62,7 +62,7 @@ class CustomSocketIO {
   ///When you need to send data to the server, this is the function
   ///
   ///Example:
-  ///```socketIO.sendMessage('send_message', {'hello':'there'});```
+  ///socketIO.sendMessage('send_message', {'hello':'there'});
   sendMessage(String event, Map<String,dynamic> data) {
     socketIO.sendMessage(event, json.encode(data));
   }

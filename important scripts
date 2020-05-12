@@ -771,6 +771,6 @@ lat double precision,
 long double precision,
 operating_hours TEXT,
 pictures_url TEXT[],
-cost_per_pax SMALLINT,
-rating SMALLINT
+cost_per_pax TEXT,
+rating FLOAT
 );

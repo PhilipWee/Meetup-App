@@ -31,7 +31,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   List listofmembers = [
     {
-      "identifier" : "Stepkaboom",
+      "identifier" : "identifier",
       "lat" : 0,
       "long" : 0,
       "transport_mode" : "Driving",
@@ -51,28 +51,24 @@ class MeetupPageState extends State<MeetupPageWidget> {
       "transport_mode" : "Driving",
       "metrics" : {"speed":0, "quality":0, "price":0}
     },
-    {
-      "identifier" : "Alex Veda",
-      "lat" : 1.332319,
-      "long" : 103.672113,
-      "transport_mode" : "Driving",
-      "metrics" : {"speed":0, "quality":0, "price":0}
-    },
-    {
-      "identifier" : "Philip Wee",
-      "lat" : 1.332319,
-      "long" : 103.672113,
-      "transport_mode" : "Driving",
-      "metrics" : {"speed":0, "quality":0, "price":0}
-    },
-    {
-      "identifier" : "Joel",
-      "lat" : 1.332319,
-      "long" : 103.672113,
-      "transport_mode" : "Driving",
-      "metrics" : {"speed":0, "quality":0, "price":0}
-    }
   ]; //snapshot from future is added to this
+  
+  @override
+  initState(){
+    super.initState();
+    globals.socketIO.joinSession("3046db10-9404-11ea-8bde-06b6ade4a06c");
+    globals.socketIO.subscribe("user_joined_room", (data)=>{
+      //whatever is inside here will run when server sends stuff
+      print(data),
+      listofmembers.add(data),
+      print(listofmembers)
+    });
+  }
+
+//  List listofplacenames(List _listofmembers) {
+//    for (var index in _listofmembers) {
+//    }
+//  };
 
   Future<List<dynamic>> getMembers() async{}
 
@@ -89,7 +85,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
       builder: (BuildContext context, AsyncSnapshot snapshot){
 //        listofmembers = snapshot.data;
 
-
         if(listofmembers == null){
           return
             Expanded(
@@ -103,7 +98,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
         }
         else {
           return Expanded (child: RefreshIndicator(child: ListView.builder(
-            itemCount: listofmembers.length-1,
+            itemCount: listofmembers.length,
             itemBuilder: (BuildContext context, int index) {
 
               if (index == 0){ //means it is the meetup creator a.k.a first user on the list

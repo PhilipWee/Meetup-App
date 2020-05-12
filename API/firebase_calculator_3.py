@@ -19,6 +19,7 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 import pprint
+import threading
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS--------------------------------------
@@ -31,7 +32,7 @@ if (not len(firebase_admin._apps)):
 
     # Use the application default credentials
     # Use a service account
-    cred = credentials.Certificate('D:/Documents/UROP WITH FRIENDS/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -152,7 +153,7 @@ def calculate(sess_id,info):
             #Get the osm_id closest to the user's location
 
             if results_df is None:
-                sql_string = "SELECT *,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places\
+                sql_string = "SELECT *,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean\
                 ORDER BY distance"
     #           print(sql_string)
                 original_df = pd.read_sql(sql_string,data_conn)
@@ -163,7 +164,7 @@ def calculate(sess_id,info):
                 # print(original_df)
                 
             else:
-                sql_string = "SELECT id,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places\
+                sql_string = "SELECT id,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean\
                 ORDER BY distance"
                 table = pd.read_sql(sql_string,data_conn)
                 results_df = pd.concat([results_df,table]).groupby('id').sum().reset_index()
@@ -219,7 +220,7 @@ def calculate(sess_id,info):
                        'number_of_results':NUMBER_OF_RESULTS,
                        'number_of_users':number_of_users}
         
-        results_dict['possible_locations'] = list(results_df['name'])
+        results_dict['possible_locations'] = list(results_df['name'])[:20]
         
         results_dict['users'] = list(user_details.keys())
         
@@ -285,24 +286,43 @@ def calculate(sess_id,info):
 
 
 def upload_calculated_route(sess_id,result):
-#    try:
     doc_ref = get_doc_ref_for_id(sess_id)
     doc_dict = doc_ref.get().to_dict()
     doc_dict['results'] = json.dumps(result)
     doc_dict['calculate'] = 'done'
     doc_ref.set(doc_dict)
-#    except:
-#        print('Error inserting user details, does session id exist?')
 
-#sess_id = '0d3f9570-380c-11ea-bf52-06b6ade4a06c'
-#info = get_details_for_session_id(sess_id)
-#results = calculate(sess_id,info)
+    
+# while True:
+#     print('Checking')
+#     time.sleep(1)
+#     ids_that_need_calc = check_requires_calculation()
+#     for sess_id in ids_that_need_calc:
+#         info = get_details_for_session_id(sess_id)
+#         results = calculate(sess_id,info)
+#         upload_calculated_route(sess_id,results)
 
-while True:
-    print('Checking')
-    time.sleep(1)
-    ids_that_need_calc = check_requires_calculation()
-    for sess_id in ids_that_need_calc:
-        info = get_details_for_session_id(sess_id)
-        results = calculate(sess_id,info)
-        upload_calculated_route(sess_id,results)
+# Create a callback on_snapshot function to capture changes
+def on_snapshot(col_snapshot, changes, read_time):
+    print(u'Callback received query snapshot.')
+    for change in changes:
+        if change.type.name == 'ADDED':
+            print(u'Requires calculation: {}'.format(change.document.id))
+            sess_id = change.document.id
+            info = get_details_for_session_id(sess_id)
+            results = calculate(sess_id,info)
+            upload_calculated_route(sess_id,results)
+        elif change.type.name == 'MODIFIED':
+            print(u'Modification Made: {}'.format(change.document.id))
+        elif change.type.name == 'REMOVED':
+            print(u'No Longer Needs calculation: {}'.format(change.document.id))
+
+col_query = db.collection(u'sessions').where(u'calculate', u'==', u'True')
+
+# Watch the collection query
+query_watch = col_query.on_snapshot(on_snapshot)
+        
+if __name__ == '__main__':
+    while True:
+        time.sleep(2)
+        
