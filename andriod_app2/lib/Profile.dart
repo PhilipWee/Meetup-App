@@ -1,3 +1,5 @@
+//import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
@@ -16,120 +18,163 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
-    final String imgUrl = 'https://instagram.fsin5-1.fna.fbcdn.net/v/t51.2885-19/s320x320/50970111_363470467763943_4307712117529640960_n.jpg?_nc_ht=instagram.fsin5-1.fna.fbcdn.net&_nc_ohc=hQGxnWLr1sUAX-fK7EW&oh=697905853376c6bae9163c7eb70b4a22&oe=5EDD1282';
+    final String imgUrl = 'https://img-s-msn-com.akamaized.net/tenant/amp/entityid/BBYM6ZP.img?h=630&w=1200&m=6&q=60&o=t&l=f&f=jpg&x=2282&y=1331';
 
-    return new Stack(children: <Widget>[
-      new Container(color: Colors.deepOrange,),
-      new Image.network(imgUrl, scale: 0.1, fit: BoxFit.fitWidth,),
-      new BackdropFilter(
-          filter: new ui.ImageFilter.blur(
-            sigmaX: 6.0,
-            sigmaY: 6.0,
-          ),
-          child: new Container(
-            decoration: BoxDecoration(
-              color:  Colors.deepOrange.withOpacity(0.7),
-              borderRadius: BorderRadius.all(Radius.circular(50.0)),
-            ),)),
-      new Scaffold(
-          drawer: new Drawer(child: new Container(),),
-          backgroundColor: Colors.transparent,
-          body: new Center(
-            child: new Column(
-              children: <Widget>[
-                new SizedBox(height: _height/12,),
-                new CircleAvatar(radius:_width<_height? _width/6:_height/6,backgroundImage: NetworkImage(imgUrl),),
-                new SizedBox(height: _height/25.0,),
-                new Text('Stephen Alvin', style: new TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: _width/15,
-                    color: Colors.white,
-                    fontFamily: "Quicksand",
-                ),),
-                new Padding(
-                  padding: new EdgeInsets.only(left: _width/4, right: _width/4),
-                  child: new FlatButton(onPressed: (){}, textColor: Colors.white,
-                    child: new Container(
-                        child: new Row(
+    return new Scaffold(
+        drawer: new Drawer(child: new Container(),),
+        backgroundColor: Colors.deepOrange,
+        body: new Container(
+          width: _width,
+          height: _height,
+          alignment: Alignment.topCenter,
+          child: new CustomScrollView(
+            slivers: <Widget>[
+              SliverAppBar(
+                actions: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.edit, color: Colors.white,),
+                    onPressed: (){ },
+                    iconSize: 25,
+                  )
+                ],
+                backgroundColor: Colors.deepOrange,
+                automaticallyImplyLeading: false,
+                floating: true,
+                expandedHeight: _height*0.5,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      Positioned.fill(
+                        child: new Image.network(imgUrl, scale: 2, fit: BoxFit.cover, width: _width,)),
+                      Positioned.fill(
+                        child: new BackdropFilter(
+                            filter: new ui.ImageFilter.blur(
+                              sigmaX: 5.0,
+                              sigmaY: 5.0,
+                            ),
+                            child: new Container(
+                              color: Colors.deepOrange.withOpacity(0.7),
+                            )
+                        ),
+                      ),
+                      Positioned.fill(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            new Icon(Icons.person),
-                            new SizedBox(width: _width/30,),
-                            new Text('Edit Profile')
-                          ],)),color: Colors.white.withOpacity(0),),),
-                new Padding(padding: new EdgeInsets.only(left: _width/8, right: _width/8),
-                  child:new Text('Bio: I love salty and spicy stuff. Follow me on Instagram! @stepkab00m ',
-                    style: new TextStyle(
-                      fontFamily: "Quicksand",
-                      fontSize: _width/27,color: Colors.white),
-                      textAlign: TextAlign.center,) ,),
-
-                new Divider(height: _height/30,color: Colors.white,),
-
-                new Row(
-                  children: <Widget>[
-                    rowCell(343, 'Meetups'),
-                    rowCell(67, 'Followers'),
-                    rowCell(275, 'Following'),
-                  ],),
-
-                new Divider(height: _height/30,color: Colors.white),
-
-                ListTileTheme(
-                  iconColor: Colors.white,
-                  textColor: Colors.white,
-                  child: ListTile(
-                    title: Text("Saved Places",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Quicksand")),
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    onTap: () {},
+                            Padding(padding: const EdgeInsets.symmetric(vertical: 5.0)),
+                            Align(
+                              alignment: Alignment.center,
+                              child: CircleAvatar(
+                                radius:_width/4.5,
+                                backgroundImage: NetworkImage(imgUrl),),
+                            ),
+                            Padding(padding: const EdgeInsets.symmetric(vertical:5.0)),
+                            Text('Justin Trudeau',
+                              style: new TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                                color: Colors.white,
+                                fontFamily: "Quicksand",
+                              ),),
+                            Padding(
+                              padding: const EdgeInsets.only(top:10.0, left: 10.0, right: 10.0),
+                              child: new Text('Prime Minister of Canada. "Come Home" to Canada, the Maple Leaf Country <3',
+                                maxLines: 2,
+                                style: new TextStyle(
+                                    fontFamily: "Quicksand",
+                                    fontSize: 14,
+                                    color: Colors.white),
+                                textAlign: TextAlign.center,),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0, bottom: 0.0),
+                              child: new Row(
+                                children: <Widget>[
+                                  rowCell(343, 'Meetups'),
+                                  rowCell(67, 'Followers'),
+                                  rowCell(275, 'Following'),
+                                ],),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
                   ),
                 ),
-                ListTileTheme(
-                  iconColor: Colors.white,
-                  textColor: Colors.white,
-                  child: ListTile(
-                    title: Text("Settings",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Quicksand")),
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    onTap: () {},
-                  ),
-                ),
-                ListTileTheme(
-                  iconColor: Colors.white,
-                  textColor: Colors.white,
-                  child: ListTile(
-                    title: Text("Share Feedback",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Quicksand")),
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    onTap: () {},
-                  ),
-                ),
-                ListTileTheme(
-                  iconColor: Colors.white,
-                  textColor: Colors.white,
-                  child: ListTile(
-                    title: Text("Sign Out",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Quicksand")),
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    onTap: () {},
-                  ),
-                ),
+              ),
 
+              SliverList(
+                delegate: SliverChildListDelegate([
+//                    Container(
+//                      color: Colors.white,
+//                      child: Padding(
+//                        padding: const EdgeInsets.only(top:8.0, bottom: 8.0),
+//                        child: new Row(
+//                          children: <Widget>[
+//                            rowCell(343, 'Meetups'),
+//                            rowCell(67, 'Followers'),
+//                            rowCell(275, 'Following'),
+//                          ],),
+//                      ),
+//                    ),
 
-              ],
-            ),
-          )
-      )
-    ],);
+                    ListTileTheme(
+                      iconColor: Colors.white,
+                      textColor: Colors.white,
+                      child: ListTile(
+                        title: Text("Saved Places",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Quicksand")),
+                        trailing: Icon(Icons.keyboard_arrow_right),
+                        onTap: () {},
+                      ),
+                    ),
+                    ListTileTheme(
+                      iconColor: Colors.white,
+                      textColor: Colors.white,
+                      child: ListTile(
+                        title: Text("Settings",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Quicksand")),
+                        trailing: Icon(Icons.keyboard_arrow_right),
+                        onTap: () {},
+                      ),
+                    ),
+                    ListTileTheme(
+                      iconColor: Colors.white,
+                      textColor: Colors.white,
+                      child: ListTile(
+                        title: Text("Share Feedback",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Quicksand")),
+                        trailing: Icon(Icons.keyboard_arrow_right),
+                        onTap: () {},
+                      ),
+                    ),
+                    ListTileTheme(
+                      iconColor: Colors.white,
+                      textColor: Colors.white,
+                      child: ListTile(
+                        title: Text("Sign Out",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Quicksand")),
+                        trailing: Icon(Icons.keyboard_arrow_right),
+                        onTap: () {},
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            ],
+          ),
+        )
+    );
   }
 
   Widget rowCell(int count, String type) => new Expanded(child: new Column(children: <Widget>[
