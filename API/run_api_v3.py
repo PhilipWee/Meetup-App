@@ -2,12 +2,12 @@
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
-#import psycopg2
+import psycopg2
 import sys, os
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import credentials as creds
-import pandas.io.sql as psql
+#import pandas.io.sql as psql
 import json
 import time
 import uuid
@@ -70,26 +70,17 @@ def index():
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
     if request.method == "GET":
-<<<<<<< HEAD
         return render_template('joinMeetupPage.html', session_id = session_id)
-    
+
 @app.route('/loginPage')
 def login():
     if request.method == "GET":
         return render_template('loginPage.html')
-    
+
 @app.route('/swipe')
 def swipe():
     if request.method == "GET":
         return render_template('cardSwipe.html')
-=======
-        return render_template('Geoloc2.html', session_id = session_id)
-
-@app.route('/login/')
-def login():
-    if request.method == "GET":
-        return render_template('newpage.html')
->>>>>>> master
 
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
@@ -116,6 +107,8 @@ def create_session():
         else:
             content = content_unparsed
 
+        print(content_unparsed)
+
         # Retrieve username and meeting_type, set both if none
         if content.get('username') is not None:
             username = content.get('username')
@@ -129,6 +122,7 @@ def create_session():
             meeting_type = "food"
 
         # Create new firebase document for new meeting
+        print("username printed.")
         session_id = create_firebase_session(content,meeting_type,username)
 
         response = jsonify({'session_id':session_id})
@@ -218,19 +212,22 @@ def create_firebase_session(content,meeting_type,username):
                         'time_created':str(datetime.datetime.now())}
 
     details = {'users':[host_user_details],'meeting_type':meeting_type}
-    
+
     print('hey')
-    
+    print(username)
     #Generate session id
     session_id = str(uuid.uuid1())
-
+    print(session_id)
+    print('Hello there')
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
     print(doc_ref)
+    print('wel well')
     doc_ref.set({'info':details})
 
     #Update userData sessionId
     data = db.collection(u'userData').document(username).get().to_dict()
+    print(data)
     data["sessionId"].append(session_id)
     db.collection(u'userData').document(username).set(data)
 
@@ -251,6 +248,7 @@ def insert_user_details(details,session_id):
 
     except:
         print('Error inserting user details, does session id exist?')
+
 @app.route('/session/get', methods = ['GET'])
 def get_user_sessions():
     if 'username' in request.args:
@@ -328,11 +326,11 @@ if __name__ == '__main__':
     #--------------------------------------CONNECT TO FIREBASE-------------------------------
     print('Connecting to firebase')
     if (not len(firebase_admin._apps)):
-        
+
         # Use the application default credentials
         # Use a service account
         # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
-        cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
+        cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
@@ -342,6 +340,7 @@ if __name__ == '__main__':
 
     # #--------------------------------------CONNECT TO DATABASE-------------------------------
     #Run the App
-    app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
+    #app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
+    app.run()
     # app.run(host='0.0.0.0', debug=True, use_reloader=False)
     crsr.close()
