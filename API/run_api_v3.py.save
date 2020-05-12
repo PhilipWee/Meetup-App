@@ -89,7 +89,7 @@ Use case: Will be triggered when the join room function is called
 -> Event: 'swipe_details'
 Sample Data: {'sessionID': 123456,
               'swipeIndex': 5,
-              'userIdentifier':'abc123',
+              'userIdentifier':abc123,
               'selection':'true'/'false'}
 Use case: Emitted by user whenever swiping
 """
@@ -196,13 +196,11 @@ def manage_details(session_id):
                                 'price':int(content.get('price', 0))
                             }}
 
-        print(new_user_details)
-        print(session_id)
         #Upload the details of the new user
         insert_user_details(new_user_details,session_id)
         
         #Emit using socketio the details of the new user
-        socketio.emit('user_joined_room',new_user_details,room=session_id)
+        emit('user_joined_room',new_user_details,room=session_id)
         
         
         return jsonify({'updated_info_for_session_id':session_id})
@@ -277,27 +275,13 @@ def on_swipe_details(data):
                 break
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
-                socketio.emit('location_found',{'swipeIndex':swipeIndex},room=sessionID)
+                emit('location_found',{'swipeIndex':swipeIndex},room=sessionID)
         
     except KeyError:
         #Create the session details
         swipe_details = [{userIdentifier:selection}]
         
     doc_ref.update({'swipe_details':swipe_details})
-
-@app.route('/session/get', methods = ['GET'])
-def get_user_sessions():
-    if 'username' in request.args:
-        print("this is username args: " + request.args["username"])
-        print("doing query...")
-        data = db.collection(u'userData').document(request.args["username"]).get().to_dict()
-        print("finished query!")
-        print(data["sessionId"])
-        sessionIdDict = { i : i for i in data["sessionId"]}
-        return sessionIdDict
-
-    else:
-        return "Error: no username is provided."
 
 
 def create_firebase_session(content,meeting_type,username):
@@ -315,55 +299,52 @@ def create_firebase_session(content,meeting_type,username):
 
     details = {'users':[host_user_details],'meeting_type':meeting_type}
     
+    print('hey')
+    
     #Generate session id
     session_id = str(uuid.uuid1())
 
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
+    print(doc_ref)
     doc_ref.set({'info':details})
 
     #Update userData sessionId
-    update_userdata_sessionid(host_user_details,session_id)
+    data = db.collection(u'userData').document(username).get().to_dict()
+    data["sessionId"].append(session_id)
+    db.collection(u'userData').document(username).set(data)
 
     #Return the session id
     return session_id
 
-
-
 def insert_user_details(details,session_id):
-    # try:
-    doc_ref = get_doc_ref_for_id(session_id)
-    doc_dict = doc_ref.get().to_dict()
-    doc_dict['info']['users'].append(details)
-    doc_ref.set(doc_dict)
+    try:
+        doc_ref = get_doc_ref_for_id(session_id)
+        doc_dict = doc_ref.get().to_dict()
+        doc_dict['info']['users'].append(details)
+        doc_ref.set(doc_dict)
 
-    print(details)
+        #Update userData sessionId
+        data = db.collection(u'userData').document(details["username"]).get().to_dict()
+        data["sessionId"].append(session_id)
+        db.collection(u'userData').document(details["username"]).set(data)
 
-    update_userdata_sessionid(details,session_id)
-
-    # except:
-    #     print('Error inserting user details, does session id exist?')
-
-def update_userdata_sessionid(details,session_id):
-    print(details)
-    #Update userData sessionId
-    if 'username' in details:
-        username = details["username"]
-    elif 'identifier' in details:
-        username = details["identifier"]
-
-    data = db.collection(u'userData').document(username).get().to_dict()
-
-    if data is None:
-        data = {}
-    if 'sessionId' in data:
-        data['sessionId'].append(session_id)
-    else:
-        data["sessionId"] = [session_id]
-
-    db.collection(u'userData').document(username).set(data)
+    except:
+        print('Error inserting user details, does session id exist?')
         
+@app.route('/session/get', methods = ['GET'])
+def get_user_sessions():
+    if 'username' in request.args:
+        print("this is username args: " + request.args["username"])
+        print("doing query...")
+        data = db.collection(u'userData').document(request.args["username"]).get().to_dict()
+        print("finished query!")
+        print(data["sessionId"])
+        sessionIdDict = { i : i for i in data["sessionId"]}
+        return sessionIdDict
 
+    else:
+        return "Error: no username is provided."
 
 def set_calculate_flag(session_id):
 #    try:
@@ -430,7 +411,7 @@ if __name__ == '__main__':
         # Use a service account
         # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
         # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-        cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+	cred = cred
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
