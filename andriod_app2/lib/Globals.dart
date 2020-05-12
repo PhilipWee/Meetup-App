@@ -22,7 +22,7 @@ Map<String,dynamic> tempData = {
   "meetupname" : "Default Name",
   "meetingType": "Recreation",
   "sessionid" : 0,
-  "link" : "",
+  "link" : "default link",
   "joinlink": "",
   "username" : "",
   "userplace" : "",

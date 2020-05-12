@@ -418,7 +418,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
   Future<void> _shareText() async {
     try {
-      Share.text('Link', "", 'text/plain');
+      Share.text('Link', globals.tempData["link"], 'text/plain');
     } catch (e) {
       print('error: $e');
     }
