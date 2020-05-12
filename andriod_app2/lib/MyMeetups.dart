@@ -68,8 +68,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
+    print(globals.tempMeetingDetails);
     }
-
   @override
   //Creates a list view with buildCustomButtons inside
 

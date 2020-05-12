@@ -47,15 +47,15 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     String address = globals.serverAddress;
 
     String url = '$address/session/create';
-    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "${globals.tempData["username"]}"}';
+    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "philip"}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     try{
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
       int statusCode = response.statusCode;
-      String errorMessage = response.body;
+      String message = response.body;
 
       if (statusCode != 200){
-        print(errorMessage);
+//        print(message);
         Scaffold.of(context).showSnackBar(
             SnackBar(
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
@@ -436,7 +436,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                     Expanded(
                       flex: 2,
                       child: TextField(
-                          controller: TextEditingController(text:""),
+                          controller: TextEditingController(text:globals.tempData["link"]),
                           decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
                       ),
                     ),

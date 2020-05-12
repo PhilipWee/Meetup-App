@@ -8,6 +8,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
+String uuid = "";
+
 String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
 
 String userLocationName = "Jalan Membina, Singapore";
@@ -49,6 +51,8 @@ void saveMyLocationName() async{
   String myLocationName = "$name, $locality";
   print("User's Current Location $myLocationName." );
   userLocationName = myLocationName;
+  tempData["lat"] = mylat;
+  tempData["long"] = mylong;
 }
 
 Future<String> getplacefromcoor(double givenlat, double givenlong) async{

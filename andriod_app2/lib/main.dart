@@ -30,7 +30,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => CheckNetworkPage(),
+//        '/': (context) => MeetupPage(),
+        '/': (context) => GoogleSignInPage(),
       },
     );
   }
