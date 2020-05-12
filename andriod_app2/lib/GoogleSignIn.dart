@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
     print("user " + user.uid + " is connected to firebase.");
+    globals.uuid = user.uid;
 
     try {
       QuerySnapshot docs = await Firestore.instance.collection('userData').where('uid',isEqualTo: user.uid).getDocuments();

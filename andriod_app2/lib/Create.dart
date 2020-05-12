@@ -44,9 +44,22 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
     String address = globals.serverAddress;
-
     String url = '$address/session/create';
-    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "philip"}';
+
+    String jsonpackage = '{ '
+        '"uuid":"${globals.uuid}", '
+        '"meetupname":"${globals.tempData["meetupname"]}", '
+        '"username":"${globals.username}", '
+        '"meetingtype":"${globals.tempData["meetingtype"]}", '
+        '"lat":${globals.tempData["lat"]}, '
+        '"long":${globals.tempData["long"]}, '
+        '"userplace":"${globals.tempData["userplace"]}", '
+        '"transport_mode":"${globals.tempData["transportmode"]}", '
+        '"quality":${globals.tempData["quality"]}, '
+        '"price":${globals.tempData["price"]}, '
+        '"speed":${globals.tempData["speed"]}'
+        '}';
+
     print("Sending Jsonpackage To Server >>> $jsonpackage");
 
     try{
@@ -55,7 +68,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       String message = response.body;
 
       if (statusCode != 200){
-//        print(message);
+        print(response.body);
         Scaffold.of(context).showSnackBar(
             SnackBar(
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
@@ -64,11 +77,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       }
       else{
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
-        print("PostData successfull with statuscode: $statusCode");
-        print("Get Session ID successfull with body : $body");
         Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
         var sessionid = sessionidjsonversion['session_id'];
         globals.tempData["sessionid"] = sessionid;
+        print("SESSION ID : ${globals.tempData["sessionid"]}");
         globals.tempData["link"] = "$address/session/$sessionid/get_details";
         print('Link Created[ ${globals.tempData["link"]} ]');
       }
@@ -115,7 +127,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   onPressed: () async{
                     globals.tempData["meetupname"] = _meetupNameController.text;
                     globals.tempData["userplace"] = _locationNameController.text;
-                    print(globals.tempData);
+//                    print(globals.tempData);
                     await sessionCreate();
                     showPopup(context, _popupBody());
                     },
@@ -272,10 +284,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value2 = newValue;
-                          if (value2=="Walk"){globals.tempData["transportMode"]="Walk";}
-                          else if (value2=="Driving"){globals.tempData["transportMode"]="Driving";}
-                          else if (value2=="Riding"){globals.tempData["transportMode"]="Riding";}
-                          else {globals.tempData["transportMode"]="Public Transit";}
+                          if (value2=="Walk"){globals.tempData["transportmode"]="Walk";}
+                          else if (value2=="Driving"){globals.tempData["transportmode"]="Driving";}
+                          else if (value2=="Riding"){globals.tempData["transportmode"]="Riding";}
+                          else {globals.tempData["transportmode"]="Public Transit";}
                         });
                       },
                       items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
@@ -388,7 +400,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             ],
           ), //for price
           Divider(height: 40,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
-          Container(child: buttonSection),
+          Container(child: buttonSection), //for creating meetup
         ], //children of ListView
       ),
     );

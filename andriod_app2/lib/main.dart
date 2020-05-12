@@ -137,6 +137,7 @@ class _HomeState extends State<Home> {
   }
 
   void onTabTapped(int index) async{
+    globals.resetempData();
     setState(() {_currentIndex = index;});
   }
 

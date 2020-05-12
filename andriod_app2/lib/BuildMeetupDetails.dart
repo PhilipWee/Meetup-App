@@ -104,7 +104,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
               if (index == 0){ //means it is the meetup creator a.k.a first user on the list
                 return ListTile(
                     leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                    title: Text(globals.userGoogleData["name"]), //TODO
+                    title: Text(globals.username), //TODO
                     subtitle: Text(listofmembers[index]["transport_mode"].toString()),
                     trailing: Text(globals.userLocationName)
                 );

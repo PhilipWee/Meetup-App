@@ -59,8 +59,18 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
   sessionJoin() async {
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
-    String url = '${globals.serverAddress}/session/${globals.tempData["sessionid"]}';
-    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "philip"}';
+    String url = globals.tempData["joinlink"];
+    String jsonpackage = '{ '  //this package has no MeetupName and MeetupType
+        '"uuid":"${globals.uuid}", '
+        '"username":"${globals.username}", '
+        '"lat":${globals.tempData["lat"]}, '
+        '"long":${globals.tempData["long"]}, '
+        '"userplace":"${globals.tempData["userplace"]}", '
+        '"transport_mode":"${globals.tempData["transportmode"]}", '
+        '"quality":${globals.tempData["quality"]}, '
+        '"price":${globals.tempData["price"]}, '
+        '"speed":${globals.tempData["speed"]}'
+        '}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     print("Using Link: $url");
     try{
@@ -82,7 +92,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         print("Get Session ID successfull with body : $body");
       }
     }
-    catch(e){print("Error caught at SessioCreate(): $e");}
+    catch(e){print("Error caught at SessionCreate(): $e");}
   }
 
   @override
@@ -108,6 +118,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                     globals.tempData["userplace"] = _locationNameController.text;
                     print(globals.tempData);
                     await sessionJoin();
+                    Navigator.pop(context);
                   },
                   child: Text('Join Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
@@ -138,7 +149,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                     padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
-                    child: Text("F07 Class Outing",
+                    child: Text("DefaultMeetingName",
                       style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
                   )
               )
@@ -152,7 +163,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                       padding:const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 8),
-                      child: Text("Recreation",
+                      child: Text("DefaultMeetingType",
                         style: TextStyle(fontFamily: "QuickSand", fontSize: 15, fontWeight: FontWeight.bold),)
                   )
               )
@@ -229,10 +240,10 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value2 = newValue;
-                          if (value2=="Walk"){globals.tempData["transportMode"]="Walk";}
-                          else if (value2=="Driving"){globals.tempData["transportMode"]="Driving";}
-                          else if (value2=="Riding"){globals.tempData["transportMode"]="Riding";}
-                          else {globals.tempData["transportMode"]="Public Transit";}
+                          if (value2=="Walk"){globals.tempData["transportmode"]="Walk";}
+                          else if (value2=="Driving"){globals.tempData["transportmode"]="Driving";}
+                          else if (value2=="Riding"){globals.tempData["transportmode"]="Riding";}
+                          else {globals.tempData["transportmode"]="Public Transit";}
                         });
                       },
                       items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {

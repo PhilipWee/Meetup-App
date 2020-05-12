@@ -8,51 +8,81 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
-String uuid = "";
-
 String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
-
-String userLocationName = "Jalan Membina, Singapore";
 
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
 Map<String, dynamic> tempMeetingDetails = {};
 
 Map<String,dynamic> tempData = {
+
   "meetupname" : "Default Name",
-  "meetingType": "Recreation",
-  "sessionid" : 0,
-  "link" : "default link",
-  "joinlink": "",
-  "username" : "",
-  "userplace" : "",
+  "meetingtype": "Recreation",
+
   "lat" : 0.0,
   "long" : 0.0,
-  "transportMode" : "Public Transit",
-  "quality" : 0,
-  "price" : 0,
-  "speed" :0,
-};
+  "username" : "",
+  "userplace" : "",
 
-Map<String,dynamic> userGoogleData = {
-  "name" : "Stephen",
-};
+  "transportmode" : "Public Transit",
+  "quality" : 1,
+  "price" : 1,
+
+
+  "sessionid" : 01234567,
+  "link" : "LinkNotUpdated",
+  "joinlink": "",
+
+//    "speed" :0,
+}; //tempDATA
+
+String uuid = "defaultUser";
+String username = "defaultName";
+
+String userLocationName = "defaultLocation";
+double phonelat = 0.0;
+double phonelong = 0.0;
+
+void resetempData() {
+  tempData = {
+
+    "meetupname" : "Default Name",
+
+    "meetingtype": "Recreation",
+
+    "lat" : 0.0,
+    "long" : 0.0,
+    "userplace" : "",
+
+    "transportmode" : "Public Transit",
+    "quality" : 1,
+    "price" : 0,
+
+    "sessionid" : 01234567,
+    "link" : "CreationLinkNotUpdated",
+    "joinlink": "JoinLinkNotUpdated",
+
+    "speed" :0, //not used anymore but just send anyway
+  };
+  print("tempData reset!");
+}
 
 void saveMyLocationName() async{
   var location = Location();
   LocationData currentLocation = await location.getLocation();
-  double mylat = currentLocation.latitude;
-  double mylong = currentLocation.longitude;
-  print("User's Current Coordinates: $mylat,$mylong");
-  List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(mylat,mylong);
+
+  phonelat = currentLocation.latitude;
+  phonelong = currentLocation.longitude;
+
+  print("User's Current Coordinates: $phonelat,$phonelong");
+  List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(phonelat,phonelong);
   Placemark placeMark = myplacemark[0];
   String name = myplacemark[0].thoroughfare.toString();
   String locality = placeMark.locality;
   String myLocationName = "$name, $locality";
   print("User's Current Location $myLocationName." );
+
   userLocationName = myLocationName;
-  tempData["lat"] = mylat;
-  tempData["long"] = mylong;
 }
 
 Future<String> getplacefromcoor(double givenlat, double givenlong) async{
@@ -88,6 +118,6 @@ class fakeData {
       "images" : images,
     };
   }
-}
+} //for swipe page
 
 
