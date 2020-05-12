@@ -1,23 +1,37 @@
 library meetupmouse.globals;
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
+import 'socketiohelper.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+
+String uuid = "";
 
 String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
 
 String userLocationName = "Jalan Membina, Singapore";
 
+CustomSocketIO socketIO = CustomSocketIO(serverAddress);
+
+Map<String, dynamic> tempMeetingDetails = {};
+
 Map<String,dynamic> tempData = {
-  "meetupname" : "",
-  "meetingType": 0,
+  "meetupname" : "Default Name",
+  "meetingType": "Recreation",
   "sessionid" : 0,
   "link" : "",
+  "joinlink": "",
   "username" : "",
   "userplace" : "",
   "lat" : 0.0,
   "long" : 0.0,
-  "transportMode" : "",
+  "transportMode" : "Public Transit",
   "quality" : 0,
   "price" : 0,
+  "speed" :0,
 };
 
 Map<String,dynamic> userGoogleData = {
@@ -37,6 +51,8 @@ void saveMyLocationName() async{
   String myLocationName = "$name, $locality";
   print("User's Current Location $myLocationName." );
   userLocationName = myLocationName;
+  tempData["lat"] = mylat;
+  tempData["long"] = mylong;
 }
 
 Future<String> getplacefromcoor(double givenlat, double givenlong) async{
@@ -52,4 +68,24 @@ Future<String> getplacefromcoor(double givenlat, double givenlong) async{
   String memberLocationName = "$name, $locality";
   print("Member Location $memberLocationName." );
   return memberLocationName;
+}
+
+class fakeData {
+  String name;
+  String address;
+  String details;
+  double rating;
+  List images;
+
+  fakeData({this.name, this.address, this.details, this.rating, this.images});
+
+  Map<String,dynamic> get dataMap {
+    return {
+      "name" : name,
+      "address" : address,
+      "details" : details,
+      "rating" : rating,
+      "images" : images,
+    };
+  }
 }

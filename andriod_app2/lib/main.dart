@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:andriod_app2/ResultsSwipePage.dart';
+
 import 'GoogleSignIn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +9,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'MyMeetups.dart';
-import 'JoinCreate.dart';
+import 'Create.dart';
 import 'Profile.dart';
-import 'TinderPopUp.dart';
+import 'PopUp.dart';
 import 'BuildMeetupDetails.dart';
+import 'Globals.dart' as globals;
+import 'Join.dart';
 
 
 void main() => runApp(MyApp());
@@ -26,6 +30,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
+//        '/': (context) => MeetupPage(),
         '/': (context) => GoogleSignInPage(),
       },
     );
@@ -99,6 +104,8 @@ class _HomeState extends State<Home> {
     ProfilePage()
 
   ];
+
+
 
 
   @override
