@@ -56,6 +56,35 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
 //    super.dispose();
 //  }
 
+  sessionJoin() async {
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String url = '${globals.serverAddress}/session/${globals.tempData["sessionid"]}';
+    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "philip"}';
+    print("Sending Jsonpackage To Server >>> $jsonpackage");
+    print("Using Link: $url");
+    try{
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+      String message = response.body;
+
+      if (statusCode != 200){
+        print(response.body);
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error. StatusCode:$statusCode"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+      else{
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+        print("PostData successfull with statuscode: $statusCode");
+        print("Get Session ID successfull with body : $body");
+      }
+    }
+    catch(e){print("Error caught at SessioCreate(): $e");}
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -75,10 +104,10 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
-                  onPressed: () {
-//                    showPopup(context, _popupBody(), 'F07 Class Outing');
+                  onPressed: () async{
                     globals.tempData["userplace"] = _locationNameController.text;
-//                    print(globals.tempData);
+                    print(globals.tempData);
+                    await sessionJoin();
                   },
                   child: Text('Join Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
@@ -328,36 +357,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
     } catch (e) {
       print('error: $e');
     }
-  }
-
-  showPopup(BuildContext context, Widget widget, String title, {BuildContext popupContext}) {
-    Navigator.push(
-      context,
-      PopupLayout(
-        top: 30,
-        left: 30,
-        right: 30,
-        bottom: 50,
-        child: PopupContent(
-          content: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.black,
-              title: Center(child:Text(title),),
-              brightness: Brightness.light,
-              automaticallyImplyLeading: false,
-            ),
-            resizeToAvoidBottomPadding: false,
-            body: widget,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _popupBody() {
-    return Container(
-      child: Text('This is a popup window'),
-    );
   }
 
 }

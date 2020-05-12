@@ -40,8 +40,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     return "";
   }
 
-  Future<String> sessionCreate() async {
-
+  sessionCreate() async {
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
     String address = globals.serverAddress;
@@ -49,6 +48,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     String url = '$address/session/create';
     String jsonpackage = '{"lat":${globals.tempData["lat"]}, "lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "philip"}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
+
     try{
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
       int statusCode = response.statusCode;
@@ -66,17 +66,14 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
         print("PostData successfull with statuscode: $statusCode");
         print("Get Session ID successfull with body : $body");
-        //decode the string-map
         Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
         var sessionid = sessionidjsonversion['session_id'];
         globals.tempData["sessionid"] = sessionid;
-        globals.tempData["sessionid"] = "$address/session/$sessionid/get_details";
-        String theLink = globals.tempData["sessionid"];
-        print('Link Created[ $theLink ]');
-        return theLink;
+        globals.tempData["link"] = "$address/session/$sessionid/get_details";
+        print('Link Created[ ${globals.tempData["link"]} ]');
       }
     }
-    catch(e){print("Error caught at SessioCreate(): $e");}
+    catch(e){print("Error caught at SessionCreate(): $e");}
   }
 
 //  void initState() {
@@ -115,12 +112,12 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
-                  onPressed: () {
-                    showPopup(context, _popupBody());
+                  onPressed: () async{
                     globals.tempData["meetupname"] = _meetupNameController.text;
                     globals.tempData["userplace"] = _locationNameController.text;
                     print(globals.tempData);
-                    sessionCreate();
+                    await sessionCreate();
+                    showPopup(context, _popupBody());
                     },
                   child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),

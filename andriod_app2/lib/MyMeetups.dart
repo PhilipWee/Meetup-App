@@ -64,7 +64,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 //  }
 
   void saveSessionDetailsFromLink(String inputlink) async{
-    globals.tempData["joinlink"] = inputlink;
+    globals.tempData["joinlink"] = inputlink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
