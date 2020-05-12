@@ -34,11 +34,12 @@ dependencies:
   loading_indicator: ^1.0.0
   dropdown_banner: ^1.4.0
   flutter_socket_io: ^0.6.0
-
   cloud_firestore: 0.13.5
   firebase_auth: 0.16.0
   google_sign_in: 4.4.4
   firebase_core: 0.4.4+3
+  getflutter: ^1.0.11
+  flutter_rating_bar: ^3.0.1+1
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +59,11 @@ flutter:
     - images/Mouse_copy.png
     - images/food.jpg
     - images/outing.jpg
+    - images/zoo.jpg
+    - images/backyard.jpg
+    - images/sanf.jpg
+    - images/bikinibottom.jpg
+    - images/sanfrans.jpg
 
   fonts:
     - family: Pacifico

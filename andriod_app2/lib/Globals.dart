@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+
 String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
 
 String userLocationName = "Jalan Membina, Singapore";
@@ -65,4 +66,22 @@ Future<String> getplacefromcoor(double givenlat, double givenlong) async{
   return memberLocationName;
 }
 
+class fakeData {
+  String name;
+  String address;
+  String details;
+  double rating;
+  List images;
 
+  fakeData({this.name, this.address, this.details, this.rating, this.images});
+
+  Map<String,dynamic> get dataMap {
+    return {
+      "name" : name,
+      "address" : address,
+      "details" : details,
+      "rating" : rating,
+      "images" : images,
+    };
+  }
+}
