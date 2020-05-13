@@ -7,40 +7,68 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
-
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
+String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
+
+String uuid = "defaultUser";
+String username = "defaultName";
+String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icons/png/19339625881548233621-512.png";
+
+String userLocationName = "defaultLocation";
+double phonelat = 0.0;
+double phonelong = 0.0;
+
+List templistofmembers = [];
+
+List<dynamic> usersSessionsList = [];
+
+bool isCreator = true;
+
 Map<String, dynamic> tempMeetingDetails = {};
+
+List fakelistofmembers = [
+  {
+    "identifier" : "identifier",
+    "lat" : 0,
+    "long" : 0,
+    "transport_mode" : "driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+  {
+    "identifier" : "Julia Chua",
+    "lat" : 1.332319,
+    "long" : 103.672113,
+    "transport_mode" : "Driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+  {
+    "identifier" : "David Fan",
+    "lat" : 1.332319,
+    "long" : 103.672113,
+    "transport_mode" : "Driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+];
 
 Map<String,dynamic> tempData = {
 
   "meetupname" : "Default Name",
   "meetingtype": "outing",
-
   "lat" : 0.0,
   "long" : 0.0,
   "username" : "",
   "userplace" : "",
-
   "transportmode" : "public",
   "quality" : 1,
   "price" : 1,
-
-
   "sessionid" : 01234567,
   "link" : "LinkNotUpdated",
   "joinlink": "",
 
 //    "speed" :0,
-}; /////////////////////////////////////////////////tempDATA
+}; ///////////////////////////////////////////////////////////////////////////////////////////////////////tempDATA
 
-String uuid = "defaultUser";
-String username = "defaultName";
-
-String userLocationName = "defaultLocation";
-double phonelat = 0.0;
-double phonelong = 0.0;
 
 void resetempData() {
   tempData = {
@@ -118,33 +146,3 @@ class fakeData {
     };
   }
 } //for swipe page
-
-List fakelistofmembers = [
-  {
-    "identifier" : "identifier",
-    "lat" : 0,
-    "long" : 0,
-    "transport_mode" : "driving",
-    "metrics" : {"speed":0, "quality":0, "price":0}
-  },
-  {
-    "identifier" : "Julia Chua",
-    "lat" : 1.332319,
-    "long" : 103.672113,
-    "transport_mode" : "Driving",
-    "metrics" : {"speed":0, "quality":0, "price":0}
-  },
-  {
-    "identifier" : "David Fan",
-    "lat" : 1.332319,
-    "long" : 103.672113,
-    "transport_mode" : "Driving",
-    "metrics" : {"speed":0, "quality":0, "price":0}
-  },
-];
-
-List templistofmembers = [];
-
-List usersSessionsList = [];
-
-bool isCreator = true;

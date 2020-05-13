@@ -28,8 +28,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => MeetupPage(),
-//        '/': (context) => GoogleSignInPage(),
+//        '/': (context) => MeetupPage(),
+        '/': (context) => GoogleSignInPage(),
       },
     );
   }

@@ -36,7 +36,10 @@ class _LoginPageState extends State<LoginPage> {
     final FirebaseUser currentUser = await _auth.currentUser();
     assert(user.uid == currentUser.uid);
     print("user " + user.uid + " is connected to firebase.");
+
     globals.uuid = user.uid;
+    globals.username = user.displayName;
+    globals.profileurl = user.photoUrl;
 
     try {
       QuerySnapshot docs = await Firestore.instance.collection('userData').where('uid',isEqualTo: user.uid).getDocuments();
@@ -48,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
           'link': 'link',
           'price': 0,
           'quality': 'No Preference',
-          'sessionId': "ABCDE",
+          'sessionId': [],
           'transportMode': 'Public Transit',
           'userName': user.displayName,
           'uid': user.uid
@@ -56,11 +59,11 @@ class _LoginPageState extends State<LoginPage> {
             print("created userData for " + user.displayName));
       }
       else{
-        print("userData already exists.");
+        print("userData for ${user.displayName} already exists.");
 
       }
     }on PlatformException{
-      print("userData already exists.");
+      print("userData for ${user.displayName} already exists.");
     }
 
 

@@ -34,16 +34,17 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   final _joinController = TextEditingController();
 
-  final List<String> custLabels = [
-    "F07 Reunion",
-    "Dinner Date - Stacy",
-    "UROP Meeting",
-  ];
-  final List<String> custImgs = [
-    "images/outing.jpg",
-    "images/food.jpg",
-    "images/meetingButton.jpg",
-  ];
+  final List<String> custLabels = [];
+  final List<String> custImgs = [];
+  final List<String> custStates = [];
+
+//  final Map<String,dynamic> sessionsData = {
+//    "custLabels" : [],
+//    "custImgs" : [],
+//    "custStates" : []
+//  };
+
+
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
@@ -55,18 +56,57 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     print(globals.tempMeetingDetails);
     } //session details saved in global.tempMeetingDetals
 
-  void getAllUserSessions(String inputUserId) async{
+  void getAllUserSessionsData(String inputUserId) async{
+    Map tempMap = {};
+    var tempList = [];
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
     String body = response.body;
-    print(body);
-    globals.usersSessionsList = jsonDecode(body);
-    print(globals.usersSessionsList);
+    tempMap = jsonDecode(body);
+    tempMap.forEach((k, v) => tempList.add(k));
+    globals.usersSessionsList = tempList;
+
+    for( var i=0 ; i<tempList.length ; i++ ){
+      print(tempList[i]);
+      String url = '${globals.serverAddress}/session/${tempList[i]}';
+      http.Response response = await http.get(url);
+      String body = response.body;
+      Map map = jsonDecode(body);
+      print("map: $map");
+
+      //LABELS
+      custLabels.add(map["meetup_name"]);
+      print("custLabels: ${custLabels}");
+
+      //IMAGES
+      if (map["meeting_type"] == "outing"){
+        custImgs.add("images/outing.jpg");
+      }
+      else if (map["meeting_type"] == "food"){
+        custImgs.add("images/food.jpg");
+      }
+      else if (map["meeting_type"] == "meeting"){
+        custImgs.add("images/meetingButton.jpg");
+      }
+      else{custImgs.add(map["images/meetingButton.jpg"]);}
+
+      print("custImgs: $custImgs");
+
+      //STATES
+      if (map["session_status"] == "pending_members"){
+        custStates.add("Pending Members");
+      }
+      else if (map["session_status"] == "pending_swipes"){
+        custStates.add("Pending Swipes");
+      }
+      else if (map["session_status"] == "location_confirmed"){
+        custStates.add("Location Confirmed");
+      }
+      else{custStates.add("SessionStateError");}
+
+      print("custStates: ${custStates}");
+    }
   } // list of all sessionIds saved in
-
-  void getNameGetType (List inputUsersSessionsList) {
-
-  }
 
   /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
 
@@ -74,6 +114,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   @override
   //Creates a list view with buildCustomButtons inside
   Widget build(BuildContext context) {
+
+    getAllUserSessionsData(globals.uuid);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -107,10 +149,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       IconButton(
                         icon: Icon(Icons.person_add),
-                        onPressed: (){
+                        onPressed: () {
                           saveSessionDetailsFromLink(_joinController.text);
                           Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage2Widget()),);
-//                          getAllUserSessions(globals.uuid);
                           },
                         iconSize: 25,
                         color: Colors.black87,
@@ -131,7 +172,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                     child: FlatButton(
                       padding: EdgeInsets.all(0),
                       onPressed: (){},
-                      child:_buildCustomButton(custLabels[index], custImgs[index]) ,
+                      child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                     ),
                   );
                 },
@@ -145,7 +186,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   }
 
   //Helper method to create layout of the buttons
-  Container _buildCustomButton(String label, String imgName) {
+  Container _buildCustomButton(String label, String imgName, String state) {
     return Container(
       height: 150.0,
       decoration: BoxDecoration(
@@ -153,9 +194,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               image: AssetImage(imgName),
               fit: BoxFit.cover
           )
-      ),
+      ),// set image background
       child: Container(
-        height: 50.0,
+        height:57,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: <Color>[Colors.black54, Colors.white12],
@@ -163,13 +204,31 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         ),
         padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
-        child: Text(
-          label,
-          style: TextStyle(
-              fontFamily: "Quicksand",
-              color: Colors.white,
-//              fontWeight: FontWeight.bold,
-              fontSize: 17),
+        child: Column(
+          children: <Widget>[
+            Container(
+              alignment: Alignment.topLeft,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontFamily: "Quicksand",
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17),
+              ),
+            ),
+            Container(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                state,
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10),
+              ),
+            ),
+          ],
         ),
       ),
       alignment: Alignment.bottomLeft,

@@ -1,4 +1,5 @@
 //import 'dart:html';
+import 'Globals.dart' as globals;
 
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
@@ -18,7 +19,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final _width = MediaQuery.of(context).size.width;
     final _height = MediaQuery.of(context).size.height;
-    final String imgUrl = 'https://img-s-msn-com.akamaized.net/tenant/amp/entityid/BBYM6ZP.img?h=630&w=1200&m=6&q=60&o=t&l=f&f=jpg&x=2282&y=1331';
+    final String imgUrl = globals.profileurl;
 
     return new Scaffold(
         drawer: new Drawer(child: new Container(),),
@@ -70,7 +71,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 backgroundImage: NetworkImage(imgUrl),),
                             ),
                             Padding(padding: const EdgeInsets.symmetric(vertical:5.0)),
-                            Text('Justin Trudeau',
+                            Text(globals.username,
                               style: new TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 25,
