@@ -33,6 +33,7 @@ function submitbutton() {
   meetupForm = $('#createMeetup')
   //console.log(meetupForm);
   meetupData = meetupForm.serializeArray();
+  console.log(meetupData);
   //console.log(meetupData.length);
   if (meetupData.length != 8) {
     alert("Please choose the purpose of your meetup!");
