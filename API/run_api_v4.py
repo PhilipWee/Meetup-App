@@ -28,7 +28,7 @@ NUMBER_OF_RESULTS = 20
 #--------------------------------------CONNECT TO FIREBASE-------------------------------
 print('Connecting to firebase')
 if (not len(firebase_admin._apps)):
-    
+
     # Use the application default credentials
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
@@ -140,7 +140,7 @@ Room: sessionID
 
 
 Server Emitted Events:
-    
+
 -> Event:'user_joined_room'
 Sample Data: {'identifier':identifier,
             'lat':content.get('lat'),
@@ -196,8 +196,8 @@ def check_dict_correct_format(dct,schema_str):
                           ]
         x += random.choice(insult_options)
         return x
-        
-    
+
+
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -213,14 +213,17 @@ def index():
 @app.route('/session/<session_id>/get_details')
 def get_details(session_id):
     if request.method == "GET":
-        return render_template('Geoloc2.html', session_id = session_id)
+        return render_template('joinMeetupPage.html', session_id = session_id)
 
-@app.route('/login')
+@app.route('/loginPage')
 def login():
     if request.method == "GET":
-        return render_template('newpage.html')
+        return render_template('loginPage.html')
 
-
+@app.route('/swipe')
+def swipe():
+    if request.method == "GET":
+        return render_template('cardSwipe.html')
 
 @app.route('/session/create', methods=['POST', 'GET'])
 def create_session():
@@ -244,7 +247,7 @@ def create_session():
         }
         """
         content = request.get_json()
-        
+
         result = check_dict_correct_format(content,schema_str)
         if result != "":
             return result
@@ -253,7 +256,7 @@ def create_session():
         session_id = create_firebase_session(content)
 
         response = jsonify({'session_id':session_id})
-        
+
         print('Session [ ' + session_id + " ] created")
 
         return response
@@ -279,17 +282,17 @@ def manage_details(session_id):
             return result
 
         result = insert_user_details(content,session_id)
-        
+
         if result == "Error":
             jsonify({'error':'Problem inserting user details'})
-        
+
         #Emit using socketio the details of the new user
         socketio.emit('user_joined_room',content,room=session_id)
-        
+
         print('user [ ' + content['uuid'] + " ] joined session [ " + session_id + " ]")
-        
+
         return jsonify({'updated_info_for_session_id':session_id})
-    
+
     elif request.method == 'GET':
 
         #Get all the meetup details and return it to the user
@@ -298,7 +301,7 @@ def manage_details(session_id):
             return jsonify(info)
         else:
             return jsonify({'error':'Does session_id exist?'})
-        
+
 @app.route('/session/<session_id>/calculate', methods=['GET'])
 def calculate(session_id):
     ###Check the OAuth details
@@ -323,11 +326,11 @@ def results(session_id):
         return jsonify({'error':'sesson_id or username is wrong'})
     elif result == 'not_started':
         return jsonify({'info': 'session exists but calculation not started'})
-    
-#Function for checking if the calculation is done 
-    
+
+#Function for checking if the calculation is done
+
 def on_snapshot(col_snapshot, changes, read_time):
-    
+
     #TODO: Find a better solution
     if len(changes) > 10:
         print('Received query snapshot for more than 10 changes, assuming it is first update')
@@ -366,10 +369,10 @@ def get_user_sessions():
     else:
         return jsonify({'error':'no username is provided.'})
 
-#Room joining function    
+#Room joining function
 @socketio.on('join')
 def on_join(data):
-    
+
     #Verify the data is in the correct format
     schema_str = """
     {
@@ -379,7 +382,7 @@ def on_join(data):
     result = check_dict_correct_format(data,schema_str)
     if result != "":
         emit("Error",result)
-        
+
     room= data['room']
     join_room(room)
     emit('join_ack',{'message':'Someone has joined the room',
@@ -397,7 +400,7 @@ def on_swipe_details(data):
     result = check_dict_correct_format(data,schema_str)
     if result != "":
         emit("Error",result)
-    
+
     #Update firebase with the swipe details for that particular room
     sessionID = data['sessionID']
     swipeIndex = data['swipeIndex']
@@ -415,7 +418,7 @@ def on_swipe_details(data):
             swipe_details[swipeIndex][userIdentifier] = selection
         else:
             print("Warning: Someone's swipe index is more than 2 greater than the swipe details")
-        
+
         #Check if all the members of the session have agreed on a place
         number_of_meetup_members = len(doc_ref.get().get('info')['users'])
         for swipe_detail_index,swipe_detail in enumerate(swipe_details):
@@ -425,11 +428,11 @@ def on_swipe_details(data):
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
                 socketio.emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
-        
+
     except KeyError:
         #Create the session details
         swipe_details = [{userIdentifier:selection}]
-        
+
     doc_ref.update({'swipe_details':swipe_details})
 
 def check_calculate_done(session_id):
@@ -456,7 +459,7 @@ def get_calculate_done_details(session_id):
             return 'no_results'
     except:
         return 'Error'
-    
+
 def set_calculate_flag(session_id):
 #    try:
     doc_ref = get_doc_ref_for_id(session_id)
@@ -467,7 +470,7 @@ def set_calculate_flag(session_id):
         return 'Calculating'
     else:
         return 'Error'
-    
+
 def get_details_for_session_id(session_id):
     try:
         doc_ref = get_doc_ref_for_id(session_id)
@@ -481,12 +484,12 @@ def insert_user_details(details,session_id):
         doc_dict = doc_ref.get().to_dict()
         doc_dict['info']['users'].append(details)
         doc_ref.set(doc_dict)
-        
+
         update_userdata_sessionid(details,session_id)
     except:
         return "Error"
 
-    
+
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')
@@ -501,7 +504,7 @@ def create_firebase_session(content):
                'time_created':time_created,
                'meetup_name':meetup_name,
                'host_uuid':host_user_details['uuid']}
-    
+
     #Generate session id
     session_id = str(uuid.uuid1())
 
@@ -544,9 +547,9 @@ def send_bug_report(content):
     }
     database = firestore.client()
     database.collection(u'bugReports').add(report)
-    
+
 if __name__ == '__main__':
-   
+
 
     # #--------------------------------------CONNECT TO DATABASE-------------------------------
     #Run the App
