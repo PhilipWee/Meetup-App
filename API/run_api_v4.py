@@ -1,5 +1,6 @@
 #--------------------------------------REQUIREMENTS--------------------------------------
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
+from flask_api import status
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -33,9 +34,8 @@ if (not len(firebase_admin._apps)):
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -194,8 +194,12 @@ def check_dict_correct_format(dct,schema_str):
                           'PEOPLE WHO USE THE WRONG FORMAT ARE CLOWNS',
                           'YEARS OF ACADEMY TRAINING JUST TO USE THE WRONG FORMAT',
                           'I COULD BE PLAYING DOTA, BUT YOUR WRONG FORMAT IS WASTING TIME',
+                          'EVEN A TURTLE CAN USE THE CORRECT FORMAT',
+                          'DONALD TRUMP HAS MORE CONSISTENCY IN HIS TWEETS THAN YOU IN YOUR CODE',
+                          'DEAR STEPHEN/DAVID YOU CAN DO BETTER',
                           ]
         x += random.choice(insult_options)
+        print(x)
         return x
 
 
@@ -237,13 +241,14 @@ def create_session():
             "meetup_name":str,
             "lat":float,
             "long":float,
-            "transport_mode": lambda x: x in ["public","driving","walking"],
+            "transport_mode": lambda x: x in ["public","driving","walking","riding"],
             "metrics":{
                 "speed":int,
                 "quality":int,
                 "price":int},
             "username":str,
             "uuid":str,
+            "user_place":str,
             "meeting_type" : lambda x: x in ["food","outing","meeting"]
         }
         """
@@ -251,7 +256,7 @@ def create_session():
 
         result = check_dict_correct_format(content,schema_str)
         if result != "":
-            return result
+            return result, status.HTTP_400_BAD_REQUEST
 
         # Create new firebase document for new meeting
         session_id = create_firebase_session(content)
@@ -275,12 +280,13 @@ def manage_details(session_id):
                 "quality":int,
                 "price":int},
             "username":str,
-            "uuid":str
+            "uuid":str,
+            "user_place":str
         }"""
         content = request.get_json()
         result = check_dict_correct_format(content,schema_str)
         if result != "":
-            return result
+            return result, status.HTTP_400_BAD_REQUEST
 
         result = insert_user_details(content,session_id)
 
@@ -289,6 +295,8 @@ def manage_details(session_id):
 
         #Emit using socketio the details of the new user
         socketio.emit('user_joined_room',content,room=session_id)
+        print(content)
+        print(session_id)
 
         print('user [ ' + content['uuid'] + " ] joined session [ " + session_id + " ]")
 
@@ -495,10 +503,9 @@ def insert_user_details(details,session_id):
 
 def update_session_status(session_id,status):
     doc_ref = get_doc_ref_for_id(session_id)
-    data = doc_ref.get('info').to_dict()
+    data = doc_ref.get().get('info')
     data['session_status'] = status
     doc_ref.update({'info':data})
-
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')
