@@ -135,6 +135,13 @@ API important links explanation:
 /session/<session_id>/get_details (GET)\
 -> Returns the website for friends to input details
 
+/edit_session (POST)
+-> Can be used to remove a user from a session
+-> Sample Data:
+    {"action":"remove_user",
+    "session_id":"24c32235-9534-11ea-bdf2-94e6f79d3c9d",
+    "uuid":"testingUUID123"}
+
 SocketIO important stuff explanation:
 Namespace: '/'
 Room: sessionID
