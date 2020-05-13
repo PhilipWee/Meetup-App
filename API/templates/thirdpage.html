@@ -10,6 +10,9 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpE4hgWe71uVid7ZN2oGdHUTSy4jjky3A"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+  <script src="{{url_for('static', filename='js/thirdpage.js')}}"></script>
+
   <!--
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
     integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
@@ -51,14 +54,14 @@ img{
 
     h2 {
       margin-left: 20px;
-      font-family: 'Patrick Hand SC';
+      font-family: 'Quicksand';
       font-size: 3vw;
 
     }
 
     h3 {
      
-      font-family: 'Patrick Hand SC';
+      font-family: 'Quicksand';
       font-size: 2vw;
 
     }
@@ -79,28 +82,51 @@ input[type=text], select {
   box-sizing: border-box;
 }
 
-input[type=submit] {
-  width: 100%;
-  background-color: #4CAF50;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 input[type=submit]:hover {
   background-color: #45a049;
   width:100%;
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
 
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 140px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -75px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 0.3s;
+}
 
   </style>
-  <style>
-
-  </style>
+ 
 </head>
 
 <body>
@@ -131,31 +157,33 @@ input[type=submit]:hover {
     <div class='col-8'>
         <div class='row' style='margin-top:1%; margin-bottom:1%;margin-left:8%;margin-right:8%;'>
             <div style='width:70%;'>
-                <form action="/action_page.php">
+               
                     <div class='col' style='width:100%;'>
-                        <input style='width:100%;' class='block' type="text" id="fname" name="firstname" placeholder="SHARE LINK">
+                        <input style= 'font-family: Quicksand; font-size:1.2vw; color:grey;' type="text" value="Share link" id="myInput">
+                
                     </div>
                   
               </div>
 
                 <div class='col' align=left>
-                    <input type="Submit" value="Share">
+                    
+                    <button onclick="myFunction()" style='width: 100%; background-color: #4CAF50; color: white; padding: 14px 20px; margin: 8px 0;border: none;border-radius: 4px;cursor: pointer;'>Share</button>
                 </div>
             </form>
               </div>
 
     
-      <p style='margin-left:10%;font-family: Patrick Hand SC; font-size: 2vw; '>Mice Joining (number) </p>
+      <p style='margin-left:10%;font-family: Quicksand; font-size: 2vw; '>Mice Joining (number) </p>
       <hr style='margin-left:9%;margin-right:9%;' class="new5">
 
       <div class='row' style="justify-content: center;">
         
-        <button class="block" style='font-family: Patrick Hand SC; margin-top:1%;font-size: 2vw;text-align: center;justify-items: center;' > Generate Location</button>
+        <button class="block" style='font-family: Quicksand; margin-top:1%;font-size: 2vw;text-align: center;justify-items: center;' > Generate Location</button>
 
     </div>
 
 
-      <div class='row' style='font-family: Patrick Hand SC; margin-top:1%;margin-left:11%;margin-right:11%;background-color: #FFFBF5;border-radius: 15px;'>
+      <div class='row' style='font-family: Quicksand; margin-top:1%;margin-left:11%;margin-right:11%;background-color: #FFFBF5;border-radius: 15px;'>
          
         <div class='col col-2'>
           <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/Avatar.png" alt="Avatar">
@@ -172,7 +200,7 @@ input[type=submit]:hover {
         </div>
       </div>
 
-      <div class='row' style='font-family: Patrick Hand SC; margin-top:1%;margin-left:11%;margin-right:11%;background-color: #FFFBF5;border-radius: 15px;'>
+      <div class='row' style='font-family: Quicksand; margin-top:1%;margin-left:11%;margin-right:11%;background-color: #FFFBF5;border-radius: 15px;'>
          
         <div class='col col-2'>
           <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/Avatar.png" alt="Avatar">
@@ -189,7 +217,7 @@ input[type=submit]:hover {
         </div>
       </div>
 
-      <div class='row' style='font-family: Patrick Hand SC; margin-top:1%;margin-left:11%;margin-right:11%;background-color: #FFFBF5;border-radius: 15px;'>
+      <div class='row' style='font-family: Quicksand; margin-top:1%;margin-left:11%;margin-right:11%;background-color: #FFFBF5;border-radius: 15px;'>
          
         <div class='col col-2'>
           <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/Avatar.png" alt="Avatar">
@@ -211,9 +239,35 @@ input[type=submit]:hover {
     </div>  
   </div>
 
-  <div class='col-2'></div>
+  <div class='col-2'>
+   
+    
+    
+    
+    <script>
+    function myFunction() {
+      var copyText = document.getElementById("myInput");
+      copyText.select();
+      copyText.setSelectionRange(0, 99999)
+      document.execCommand("copy");
+      
+    }
+
+    var tooltip = document.getElementById("myTooltip");
+  tooltip.innerHTML = "Copied: " + copyText.value;
+}
+
+function outFunc() {
+  var tooltip = document.getElementById("myTooltip");
+  tooltip.innerHTML = "Copy to clipboard";
+}
+    </script>      
+</div>
+
 </div>
 
 
 
+
 </body>
+</html>
