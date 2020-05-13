@@ -49,11 +49,12 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         '"username":"${globals.username}", '
         '"lat":${globals.tempData["lat"]}, '
         '"long":${globals.tempData["long"]}, '
-        '"userplace":"${globals.tempData["userplace"]}", '
+        '"user_place":"${globals.tempData["userplace"]}", '
         '"transport_mode":"${globals.tempData["transportmode"]}", '
+        '"metrics": {'
         '"quality":${globals.tempData["quality"]}, '
         '"price":${globals.tempData["price"]}, '
-        '"speed":${globals.tempData["speed"]}'
+        '"speed":${globals.tempData["speed"]}}'
         '}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     print("Using Link: $url");

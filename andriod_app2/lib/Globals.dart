@@ -16,14 +16,14 @@ Map<String, dynamic> tempMeetingDetails = {};
 Map<String,dynamic> tempData = {
 
   "meetupname" : "Default Name",
-  "meetingtype": "Recreation",
+  "meetingtype": "outing",
 
   "lat" : 0.0,
   "long" : 0.0,
   "username" : "",
   "userplace" : "",
 
-  "transportmode" : "Public Transit",
+  "transportmode" : "public",
   "quality" : 1,
   "price" : 1,
 
@@ -47,13 +47,13 @@ void resetempData() {
 
     "meetupname" : "Default Name",
 
-    "meetingtype": "Recreation",
+    "meetingtype": "outing",
 
     "lat" : 0.0,
     "long" : 0.0,
-    "userplace" : "",
+    "user_place" : "",
 
-    "transportmode" : "Public Transit",
+    "transportmode" : "public",
     "quality" : 1,
     "price" : 0,
 
@@ -124,7 +124,7 @@ List fakelistofmembers = [
     "identifier" : "identifier",
     "lat" : 0,
     "long" : 0,
-    "transport_mode" : "Driving",
+    "transport_mode" : "driving",
     "metrics" : {"speed":0, "quality":0, "price":0}
   },
   {

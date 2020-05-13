@@ -19,7 +19,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final _meetupNameController = TextEditingController();
   final _locationNameController = TextEditingController(text: globals.userLocationName);
 
-  String value7 = "Recreation";
+  String value7 = "Outing";
   String value2 = "Public Transit";
   String value4 = "No Preference";
   double value5 = 0;
@@ -50,16 +50,17 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
     String jsonpackage = '{ '
         '"uuid":"${globals.uuid}", '
-        '"meetupname":"${globals.tempData["meetupname"]}", '
+        '"meetup_name":"${globals.tempData["meetupname"]}", '
         '"username":"${globals.username}", '
-        '"meetingtype":"${globals.tempData["meetingtype"]}", '
+        '"meeting_type":"${globals.tempData["meetingtype"]}", '
         '"lat":${globals.tempData["lat"]}, '
         '"long":${globals.tempData["long"]}, '
-        '"userplace":"${globals.tempData["userplace"]}", '
+        '"user_place":"${globals.tempData["userplace"]}", '
         '"transport_mode":"${globals.tempData["transportmode"]}", '
+        '"metrics": {'
         '"quality":${globals.tempData["quality"]}, '
         '"price":${globals.tempData["price"]}, '
-        '"speed":${globals.tempData["speed"]}'
+        '"speed":${globals.tempData["speed"]}}'
         '}';
 
     print("Sending Jsonpackage To Server >>> $jsonpackage");
@@ -117,6 +118,17 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     }
   }
 
+  //  static const kGoogleAPIKey = "AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g'";
+  GoogleMapsPlaces _selectedPlace = GoogleMapsPlaces(apiKey: "AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g'");
+
+  Future<Null> getLatLong(Prediction p) async {
+    PlacesDetailsResponse detail = await _selectedPlace.getDetailsByPlaceId(p.placeId);
+    globals.tempData["lat"] = detail.result.geometry.location.lat;
+    globals.tempData["long"] = detail.result.geometry.location.lng;
+  }
+
+  /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
+
   Widget _popupBody() {
 
     Widget linkSection = Container(
@@ -155,22 +167,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     );
 
     return Container(child: linkSection);
-  }
-
-  /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
-  static const kGoogleAPIKey = "AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g'";
-  GoogleMapsPlaces _selectedPlace = GoogleMapsPlaces(apiKey: kGoogleAPIKey);
-  double lat = 0.0;
-  double long = 0.0;
-
-  Future<Null> getLatLong(Prediction p) async {
-    if (p != null) {
-      PlacesDetailsResponse detail = await _selectedPlace.getDetailsByPlaceId(p.placeId);
-      lat = detail.result.geometry.location.lat;
-      long = detail.result.geometry.location.lng;
-      globals.tempData["lat"] = lat;
-      globals.tempData["long"] = long;
-    }
   }
 
   @override
@@ -264,12 +260,12 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value7 = newValue;
-                          if (value7=="Recreation"){globals.tempData["meetingType"]="Recreation";}
-                          else if (value7=="Food"){globals.tempData["meetingType"]="Food";}
-                          else {globals.tempData["meetingType"]="Meeting";}
+                          if (value7=="Outing"){globals.tempData["meetingtype"]="outing";}
+                          else if (value7=="Food"){globals.tempData["meetingtype"]="food";}
+                          else {globals.tempData["meetingtype"]="meeting";}
                         });
                       },
-                      items: <String>["Recreation", "Food", "Meeting"].map<DropdownMenuItem<String>>((String value) {
+                      items: <String>["Outing", "Food", "Meeting"].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -317,7 +313,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       mode: Mode.overlay,
                       onSelected: (selected) async {
                         getLatLong(selected);
-                        print("lat: $lat, long: $long");
+                        print("lat: ${globals.tempData["lat"]}, long: ${globals.tempData["lat"]}");
                       },
                     )
                 ),
@@ -355,10 +351,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value2 = newValue;
-                          if (value2=="Walk"){globals.tempData["transportmode"]="Walk";}
-                          else if (value2=="Driving"){globals.tempData["transportmode"]="Driving";}
-                          else if (value2=="Riding"){globals.tempData["transportmode"]="Riding";}
-                          else {globals.tempData["transportmode"]="Public Transit";}
+                          if (value2=="Walk"){globals.tempData["transportmode"]="walking";}
+                          else if (value2=="Driving"){globals.tempData["transportmode"]="driving";}
+                          else if (value2=="Riding"){globals.tempData["transportmode"]="riding";}
+                          else {globals.tempData["transportmode"]="public";}
                         });
                       },
                       items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
