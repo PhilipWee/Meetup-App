@@ -148,3 +148,5 @@ List templistofmembers = [];
 List usersSessionsList = [];
 
 bool isCreator = true;
+
+bool locationFound = false;
