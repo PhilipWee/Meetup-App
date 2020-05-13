@@ -160,6 +160,11 @@ def swipe():
     if request.method == "GET":
         return render_template('cardSwipe.html')
 
+@app.route('/thirdpage/')
+def thirdpage():
+    if request.method == "GET":
+        return render_template('thirdpage.html')
+
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     checkHost = request.args['isHost']
@@ -471,8 +476,14 @@ if __name__ == '__main__':
 
         # Use the application default credentials
         # Use a service account
+<<<<<<< HEAD
+        cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
+        # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
+        #cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+=======
         # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
         cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+>>>>>>> c21bf7709cb3a67eeade7fad0c86717959d4afc6
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:

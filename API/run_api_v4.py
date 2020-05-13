@@ -88,7 +88,7 @@ API important links explanation:
 -> Get all session details
 -> PLEASE USE THE SOCKET CONNECTION INSTEAD UNLESS FIRST PULL OF DATA
 -> Sample Data:
-    {
+    { "session_status": "pending_members",
       "meeting_type": "food",
       "meetup_name": "hi",
       "time_created": "2020-05-13 12:46:57.370295",
@@ -340,7 +340,9 @@ def on_snapshot(col_snapshot, changes, read_time):
             print(u'Calculation Done: {}'.format(change.document.id))
             session_id = change.document.id
             data = get_calculate_done_details(change.document.id)
+            update_session_status(session_id,'pending_swipes')
             socketio.emit('calculation_result',data,room=session_id)
+            
 
 col_query = db.collection(u'sessions').where(u'calculate', u'==', u'done')
 
@@ -427,6 +429,7 @@ def on_swipe_details(data):
                 break
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
+                update_session_status('location_confirmed')
                 socketio.emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
 
     except KeyError:
@@ -489,7 +492,16 @@ def insert_user_details(details,session_id):
     except:
         return "Error"
 
+<<<<<<< HEAD
 
+=======
+def update_session_status(session_id,status):
+    doc_ref = get_doc_ref_for_id(session_id)
+    data = doc_ref.get('info').to_dict()
+    data['session_status'] = status
+    doc_ref.update({'info':data})
+    
+>>>>>>> 24258d9b2caf1b32222f3a78ef2da779620991c7
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')
@@ -511,6 +523,9 @@ def create_firebase_session(content):
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
     doc_ref.set({'info':details})
+    
+    #Update the session status
+    update_session_status(session_id,'pending_members')
 
     #Update userData sessionId
     update_userdata_sessionid(host_user_details,session_id)
