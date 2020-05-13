@@ -14,13 +14,13 @@ function initMap() {
        });
 
 
-        
-     
+
+
 
      var defaultBounds = new google.maps.LatLngBounds(
         new google.maps.LatLng(1.233409,103.618691),
         new google.maps.LatLng(1.433855,104.063637));
-    
+
      var options = {
          bounds: defaultBounds
      };
@@ -38,13 +38,11 @@ function initMap() {
 
     if (places.geometry) {
         map.panTo(places.geometry.location);
-        console.log('location changed! search bar works')
+        //console.log('location changed! search bar works')
     }
-        
+
          }
 
      autocomplete.addListener('place_changed', onPlacesChanged);
 
 }
-
-
