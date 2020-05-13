@@ -33,7 +33,7 @@ Map<String,dynamic> tempData = {
   "joinlink": "",
 
 //    "speed" :0,
-}; //tempDATA
+}; /////////////////////////////////////////////////tempDATA
 
 String uuid = "defaultUser";
 String username = "defaultName";

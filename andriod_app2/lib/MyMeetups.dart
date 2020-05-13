@@ -57,8 +57,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   void getAllUserSessions(String inputUserId) async{
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
-    http.Response response = await http.get(globals.tempData["joinlink"]);
+    http.Response response = await http.get(url);
     String body = response.body;
+    print(body);
     globals.usersSessionsList = jsonDecode(body);
     print(globals.usersSessionsList);
   } // list of all sessionIds saved in
@@ -109,6 +110,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                         onPressed: (){
                           saveSessionDetailsFromLink(_joinController.text);
                           Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage2Widget()),);
+//                          getAllUserSessions(globals.uuid);
                           },
                         iconSize: 25,
                         color: Colors.black87,
