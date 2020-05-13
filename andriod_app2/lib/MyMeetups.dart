@@ -54,9 +54,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     print(globals.tempMeetingDetails);
     } //session details saved in global.tempMeetingDetals
 
-  Future getAllUserSessionsData(String inputUserId) async{
+  Future<int> getAllUserSessionsData(String inputUserId) async{
     Map tempMap = {};
-    var tempList = [];
+    List tempList = [];
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
     String body = response.body;
@@ -64,48 +64,51 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     tempMap.forEach((k, v) => tempList.add(k));
     globals.usersSessionsList = tempList;
 
-    for( var i=0 ; i<tempList.length ; i++ ){
-      print(tempList[i]);
-      String url = '${globals.serverAddress}/session/${tempList[i]}';
-      http.Response response = await http.get(url);
-      String body = response.body;
-      Map map = jsonDecode(body);
-      print("map: $map");
+    if (tempList.length == 0) {
+      return 0;
+    } else {
+      for( var i=0 ; i<tempList.length ; i++ ){
+        print(tempList[i]);
+        String url = '${globals.serverAddress}/session/${tempList[i]}';
+        http.Response response = await http.get(url);
+        String body = response.body;
+        Map map = jsonDecode(body);
+        print("map: $map");
 
-      //LABELS
-      custLabels.add(map["meetup_name"]);
-      print("custLabels: ${custLabels}");
+        //LABELS
+        custLabels.add(map["meetup_name"]);
+        print("custLabels: ${custLabels}");
 
-      //IMAGES
-      if (map["meeting_type"] == "outing"){
-        custImgs.add("images/outing.jpg");
-      }
-      else if (map["meeting_type"] == "food"){
-        custImgs.add("images/food.jpg");
-      }
-      else if (map["meeting_type"] == "meeting"){
-        custImgs.add("images/meetingButton.jpg");
-      }
-      else{custImgs.add(map["images/meetingButton.jpg"]);}
+        //IMAGES
+        if (map["meeting_type"] == "outing"){
+          custImgs.add("images/outing.jpg");
+        }
+        else if (map["meeting_type"] == "food"){
+          custImgs.add("images/food.jpg");
+        }
+        else if (map["meeting_type"] == "meeting"){
+          custImgs.add("images/meetingButton.jpg");
+        }
+        else{custImgs.add(map["images/meetingButton.jpg"]);}
 
-      print("custImgs: $custImgs");
+        print("custImgs: $custImgs");
 
-      //STATES
-      if (map["session_status"] == "pending_members"){
-        custStates.add("Pending Members");
-      }
-      else if (map["session_status"] == "pending_swipes"){
-        custStates.add("Pending Swipes");
-      }
-      else if (map["session_status"] == "location_confirmed"){
-        custStates.add("Location Confirmed");
-      }
-      else{custStates.add("SessionStateError");}
+        //STATES
+        if (map["session_status"] == "pending_members"){
+          custStates.add("Pending Members");
+        }
+        else if (map["session_status"] == "pending_swipes"){
+          custStates.add("Pending Swipes");
+        }
+        else if (map["session_status"] == "location_confirmed"){
+          custStates.add("Location Confirmed");
+        }
+        else{custStates.add("SessionStateError");}
 
-      print("custStates: ${custStates}");
+        print("custStates: ${custStates}");
+      }
+      return 1;
     }
-
-    return tempList;
   } // list of all sessionIds saved in
 
   /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
@@ -216,27 +219,43 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           ),//join text controller
           Container(
             child: Expanded(
-              child: FutureBuilder(
+              child: FutureBuilder<int>(
                 future: getAllUserSessionsData(globals.uuid),
-                builder: (BuildContext context, AsyncSnapshot snapshot){
-                  if (snapshot.hasData){
-                  return
-                  Container(
-                    child: ListView.builder(
-                      padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
-                      itemCount: custImgs.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          child: FlatButton(
-                            padding: EdgeInsets.all(0),
-                            onPressed: (){},
-                            child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+                builder: (BuildContext context, AsyncSnapshot<int> snapshot){
+                    if (snapshot.data == 1){
+                      return Container(
+                        child: ListView.builder(
+                          padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
+                          itemCount: custImgs.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              child: FlatButton(
+                                padding: EdgeInsets.all(0),
+                                onPressed: (){},
+                                child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    } else if(snapshot.data == 0){
+                      return Padding(
+                        padding: const EdgeInsets.only(left:40.0, right:40.0),
+                        child: Center(
+                          child: Text(
+                            "No Active Meetup!",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: "Quicksand",
+                              color: Colors.black45,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        );
-                      },
-                    ),
-                  );}
-                  else {return Center(child: CircularProgressIndicator());}
+                        ),
+                      );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
                   },
               ),
             ),
