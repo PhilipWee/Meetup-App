@@ -33,7 +33,7 @@ class DetailsState extends State<Details> {
       child: GFCarousel(
         items: images.map((img) {
           return Container(
-            child: Image.asset(img, fit: BoxFit.cover,),
+            child: Image.network(img, fit: BoxFit.cover,),
           );
         }).toList(),
         height: height,
@@ -85,14 +85,14 @@ class DetailsState extends State<Details> {
                       Hero(
                         tag: item.name,
                         child: Container(
-                          child: Image.asset(item.images[0], fit: BoxFit.cover,),
+                          child: Image.network(item.images[0], fit: BoxFit.cover,),
                         ),
                       ),
                       Container(
                         child: GFCarousel(
                           items: images.map((img) {
                             return Container(
-                              child: Image.asset(img, fit: BoxFit.cover,),
+                              child: Image.network(img, fit: BoxFit.cover,),
                             );
                           }).toList(),
                           height: imgHeight,

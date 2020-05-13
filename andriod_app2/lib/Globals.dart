@@ -146,3 +146,35 @@ class fakeData {
     };
   }
 } //for swipe page
+
+List fakelistofmembers = [
+  {
+    "identifier" : "identifier",
+    "lat" : 0,
+    "long" : 0,
+    "transport_mode" : "driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+  {
+    "identifier" : "Julia Chua",
+    "lat" : 1.332319,
+    "long" : 103.672113,
+    "transport_mode" : "Driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+  {
+    "identifier" : "David Fan",
+    "lat" : 1.332319,
+    "long" : 103.672113,
+    "transport_mode" : "Driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+];
+
+List templistofmembers = [];
+
+List usersSessionsList = [];
+
+bool isCreator = true;
+
+bool locationFound = false;
