@@ -351,7 +351,7 @@ def on_snapshot(col_snapshot, changes, read_time):
             data = get_calculate_done_details(change.document.id)
             update_session_status(session_id,'pending_swipes')
             socketio.emit('calculation_result',data,room=session_id)
-            
+
 
 col_query = db.collection(u'sessions').where(u'calculate', u'==', u'done')
 
@@ -506,7 +506,6 @@ def update_session_status(session_id,status):
     data = doc_ref.get().get('info')
     data['session_status'] = status
     doc_ref.update({'info':data})
-    
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')
@@ -528,7 +527,7 @@ def create_firebase_session(content):
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
     doc_ref.set({'info':details})
-    
+
     #Update the session status
     update_session_status(session_id,'pending_members')
 
