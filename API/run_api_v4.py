@@ -34,7 +34,8 @@ if (not len(firebase_admin._apps)):
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -342,7 +343,7 @@ def on_snapshot(col_snapshot, changes, read_time):
             data = get_calculate_done_details(change.document.id)
             update_session_status(session_id,'pending_swipes')
             socketio.emit('calculation_result',data,room=session_id)
-            
+
 
 col_query = db.collection(u'sessions').where(u'calculate', u'==', u'done')
 
@@ -492,16 +493,12 @@ def insert_user_details(details,session_id):
     except:
         return "Error"
 
-<<<<<<< HEAD
-
-=======
 def update_session_status(session_id,status):
     doc_ref = get_doc_ref_for_id(session_id)
     data = doc_ref.get('info').to_dict()
     data['session_status'] = status
     doc_ref.update({'info':data})
-    
->>>>>>> 24258d9b2caf1b32222f3a78ef2da779620991c7
+
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')
@@ -523,7 +520,7 @@ def create_firebase_session(content):
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
     doc_ref.set({'info':details})
-    
+
     #Update the session status
     update_session_status(session_id,'pending_members')
 
