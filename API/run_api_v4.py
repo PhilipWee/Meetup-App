@@ -374,7 +374,10 @@ def get_user_sessions():
         data = db.collection(u'userData').document(request.args["username"]).get().to_dict()
         # print("finished query!")
         # print(data["sessionId"])
-        sessionIdDict = { i : i for i in data["sessionId"]}
+        if data is None:
+            sessionIdDict = {}
+        else:
+            sessionIdDict = { i : i for i in data["sessionId"]}
         return sessionIdDict
 
     else:
@@ -543,12 +546,8 @@ def get_doc_ref_for_id(session_id):
 
 def update_userdata_sessionid(details,session_id):
     #Update userData sessionId
-    if 'username' in details:
-        username = details["username"]
-    elif 'identifier' in details:
-        username = details["identifier"]
 
-    data = db.collection(u'userData').document(username).get().to_dict()
+    data = db.collection(u'userData').document(details['uuid']).get().to_dict()
 
     if data is None:
         data = {}
@@ -557,7 +556,7 @@ def update_userdata_sessionid(details,session_id):
     else:
         data["sessionId"] = [session_id]
 
-    db.collection(u'userData').document(username).set(data)
+    db.collection(u'userData').document(details['uuid']).set(data)
 
 def send_bug_report(content):
     report = {
