@@ -28,6 +28,33 @@
       async defer></script>
     <script src="{{url_for('static', filename='js/maps.js')}}"></script>
 
+    <!-- Include firebase.js -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+         https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-firestore.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script> -->
+
+    <script>
+    // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyAJ__NSxJn-qEqWrHAVnH1duusK1rJPqx4",
+        authDomain: "meetup-mouse-265200.firebaseapp.com",
+        databaseURL: "https://meetup-mouse-265200.firebaseio.com",
+        projectId: "meetup-mouse-265200",
+        storageBucket: "meetup-mouse-265200.appspot.com",
+        messagingSenderId: "1052519191030",
+        appId: "1:1052519191030:web:90909ba515c20d766377d7",
+        measurementId: "G-FP46EYMK63"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      //firebase.analytics();
+      console.log("Firebase initialized!");
+    </script>
+
     <style>
 
     body {

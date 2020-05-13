@@ -1,3 +1,23 @@
+// Firebase
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    // User is signed in.
+    var isAnonymous = user.isAnonymous;
+    var uid = user.uid;
+    console.log(uid);
+    var db = firebase.firestore();
+
+  } else {
+    firebase.auth().signInAnonymously().catch(function(error) {
+      // Handle Errors here.
+      var errorCode = error.code;
+      var errorMessage = error.message;
+      // ...
+    });
+  }
+  // ...
+});
+
 var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
 //var session_id = window.location.pathname.split('/')[2]
 
@@ -9,7 +29,7 @@ $('#pricePreference').change(function() {
     $('#priceValue').text(values[this.value]);
 });
 
-  function success(pos) {
+function success(pos) {
       var crd = pos.coords;
       lat = crd.latitude;
       long = crd.longitude;
@@ -54,6 +74,9 @@ function submitbutton() {
                   window.session_id = response;
                   document.getElementById('shareLink').value = host_address_port + '/session/' + response + '/get_details';
       //window.location.href='results_display' //form submission
+              },
+              error: function(response_data) {
+                console.log(response_data);
               }
           })
 
