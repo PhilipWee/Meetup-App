@@ -1,4 +1,5 @@
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
@@ -157,9 +158,22 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   }
 
   /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
+  static const kGoogleAPIKey = "AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g'";
+  GoogleMapsPlaces _selectedPlace = GoogleMapsPlaces(apiKey: kGoogleAPIKey);
+  double lat = 0.0;
+  double long = 0.0;
+
+  Future<Null> getLatLong(Prediction p) async {
+    if (p != null) {
+      PlacesDetailsResponse detail = await _selectedPlace.getDetailsByPlaceId(p.placeId);
+      lat = detail.result.geometry.location.lat;
+      long = detail.result.geometry.location.lng;
+      globals.tempData["lat"] = lat;
+      globals.tempData["long"] = long;
+    }
+  }
 
   @override
-
   Widget build(BuildContext context) {
 
     Widget buttonSection = Container(
@@ -301,6 +315,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       leading: Icon(Icons.search, color: Colors.black),
                       hint: "Enter Location",
                       mode: Mode.overlay,
+                      onSelected: (selected) async {
+                        getLatLong(selected);
+                        print("lat: $lat, long: $long");
+                      },
                     )
                 ),
               ),
