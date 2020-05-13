@@ -30,21 +30,19 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
 
+
   bool invalidLink = false;
 
   final _joinController = TextEditingController();
 
-  final List<String> custLabels = [];
-  final List<String> custImgs = [];
-  final List<String> custStates = [];
+  List<String> custLabels = [];
+  List<String> custImgs = [];
+  List<String> custStates = [];
 
-//  final Map<String,dynamic> sessionsData = {
-//    "custLabels" : [],
-//    "custImgs" : [],
-//    "custStates" : []
-//  };
-
-
+  @override
+  initState(){
+    super.initState();
+  }
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
@@ -56,7 +54,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     print(globals.tempMeetingDetails);
     } //session details saved in global.tempMeetingDetals
 
-  void getAllUserSessionsData(String inputUserId) async{
+  Future getAllUserSessionsData(String inputUserId) async{
     Map tempMap = {};
     var tempList = [];
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
@@ -106,16 +104,70 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
       print("custStates: ${custStates}");
     }
+
+    return tempList;
   } // list of all sessionIds saved in
 
   /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
 
+  //Helper method to create layout of the buttons
+  Widget _buildCustomButton(String label, String imgName, String state) {
+    return Container(
+      height: 150.0,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage(imgName),
+              fit: BoxFit.cover
+          )
+      ),// set image background
+      child: Container(
+        height:57,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: <Color>[Colors.black54, Colors.white12],
+          ),
+        ),
+        padding: const EdgeInsets.all(10.0),
+        alignment: Alignment.bottomLeft,
+        child: Column(
+          children: <Widget>[
+            Container(
+              alignment: Alignment.topLeft,
+              child: Text(
+                label,
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17),
+              ),
+            ),
+            Container(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                state,
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10),
+              ),
+            ),
+          ],
+        ),
+      ),
+      alignment: Alignment.bottomLeft,
+      padding: const EdgeInsets.all(0.0),
+    );
+  }
 
   @override
   //Creates a list view with buildCustomButtons inside
   Widget build(BuildContext context) {
 
-    getAllUserSessionsData(globals.uuid);
+    custLabels = [];
+    custImgs = [];
+    custStates = [];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -164,18 +216,28 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           ),//join text controller
           Container(
             child: Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
-                itemCount: custImgs.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    child: FlatButton(
-                      padding: EdgeInsets.all(0),
-                      onPressed: (){},
-                      child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+              child: FutureBuilder(
+                future: getAllUserSessionsData(globals.uuid),
+                builder: (BuildContext context, AsyncSnapshot snapshot){
+                  if (snapshot.hasData){
+                  return
+                  Container(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
+                      itemCount: custImgs.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          child: FlatButton(
+                            padding: EdgeInsets.all(0),
+                            onPressed: (){},
+                            child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  );}
+                  else {return Center(child: CircularProgressIndicator());}
+                  },
               ),
             ),
           ),//list of stuff
@@ -184,57 +246,4 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
     );
   }
-
-  //Helper method to create layout of the buttons
-  Container _buildCustomButton(String label, String imgName, String state) {
-    return Container(
-      height: 150.0,
-      decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage(imgName),
-              fit: BoxFit.cover
-          )
-      ),// set image background
-      child: Container(
-        height:57,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: <Color>[Colors.black54, Colors.white12],
-          ),
-        ),
-        padding: const EdgeInsets.all(10.0),
-        alignment: Alignment.bottomLeft,
-        child: Column(
-          children: <Widget>[
-            Container(
-              alignment: Alignment.topLeft,
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontFamily: "Quicksand",
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17),
-              ),
-            ),
-            Container(
-              alignment: Alignment.bottomLeft,
-              child: Text(
-                state,
-                style: TextStyle(
-                    fontFamily: "Quicksand",
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10),
-              ),
-            ),
-          ],
-        ),
-      ),
-      alignment: Alignment.bottomLeft,
-      padding: const EdgeInsets.all(0.0),
-    );
-  }
-
-
 }
