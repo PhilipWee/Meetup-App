@@ -2,23 +2,14 @@
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
 from flask_cors import CORS
-<<<<<<< HEAD
-import psycopg2
-import sys, os
-import numpy as np
-#import pandas as pd
-import credentials as creds
-#import pandas.io.sql as psql
-=======
 from flask_socketio import SocketIO
 from flask_socketio import emit, send
 from flask_socketio import join_room, leave_room
 #import psycopg2
 import sys, os
 import numpy as np
-import pandas as pd
-import pandas.io.sql as psql
->>>>>>> master
+#import pandas as pd
+#import pandas.io.sql as psql
 import json
 import time
 import uuid
@@ -105,7 +96,7 @@ Room: sessionID
 
 
 Server Emitted Events:
-    
+
 -> Event:'user_joined_room'
 Sample Data: {'identifier':identifier,
             'lat':content.get('lat'),
@@ -251,11 +242,11 @@ def manage_details(session_id):
         print(session_id)
         #Upload the details of the new user
         insert_user_details(new_user_details,session_id)
-        
+
         #Emit using socketio the details of the new user
         socketio.emit('user_joined_room',new_user_details,room=session_id)
-        
-        
+
+
         return jsonify({'updated_info_for_session_id':session_id})
 
     elif request.method == 'GET':
@@ -291,8 +282,8 @@ def results(session_id):
         return jsonify({'error':'sesson_id or username is wrong'})
     elif result == 'not_started':
         return jsonify({'info': 'session exists but calculation not started'})
-    
-#Room joining function    
+
+#Room joining function
 @socketio.on('join')
 def on_join(data):
     room= data['room']
@@ -319,7 +310,7 @@ def on_swipe_details(data):
             swipe_details[swipeIndex][userIdentifier] = selection
         else:
             print("Warning: Someone's swipe index is more than 2 greater than the swipe details")
-        
+
         #Check if all the members of the session have agreed on a place
         number_of_meetup_members = len(doc_ref.get().get('info')['users'])
         for swipe_detail_index,swipe_detail in enumerate(swipe_details):
@@ -329,11 +320,11 @@ def on_swipe_details(data):
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
                 socketio.emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
-        
+
     except KeyError:
         #Create the session details
         swipe_details = [{userIdentifier:selection}]
-        
+
     doc_ref.update({'swipe_details':swipe_details})
 
 @app.route('/session/get', methods = ['GET'])
@@ -365,35 +356,17 @@ def create_firebase_session(content,meeting_type,username):
                         'time_created':str(datetime.datetime.now())}
 
     details = {'users':[host_user_details],'meeting_type':meeting_type}
-<<<<<<< HEAD
 
-    print('hey')
-    print(username)
-=======
-    
->>>>>>> master
     #Generate session id
     session_id = str(uuid.uuid1())
     print(session_id)
     print('Hello there')
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
-<<<<<<< HEAD
-    print(doc_ref)
-    print('wel well')
-    doc_ref.set({'info':details})
-
-    #Update userData sessionId
-    data = db.collection(u'userData').document(username).get().to_dict()
-    print(data)
-    data["sessionId"].append(session_id)
-    db.collection(u'userData').document(username).set(data)
-=======
     doc_ref.set({'info':details})
 
     #Update userData sessionId
     update_userdata_sessionid(host_user_details,session_id)
->>>>>>> master
 
     #Return the session id
     return session_id
@@ -409,21 +382,6 @@ def insert_user_details(details,session_id):
 
     print(details)
 
-<<<<<<< HEAD
-    except:
-        print('Error inserting user details, does session id exist?')
-
-@app.route('/session/get', methods = ['GET'])
-def get_user_sessions():
-    if 'username' in request.args:
-        print("this is username args: " + request.args["username"])
-        print("doing query...")
-        data = db.collection(u'userData').document(request.args["username"]).get().to_dict()
-        print("finished query!")
-        print(data["sessionId"])
-        sessionIdDict = { i : i for i in data["sessionId"]}
-        return sessionIdDict
-=======
     update_userdata_sessionid(details,session_id)
 
     # except:
@@ -438,7 +396,6 @@ def update_userdata_sessionid(details,session_id):
         username = details["identifier"]
 
     data = db.collection(u'userData').document(username).get().to_dict()
->>>>>>> master
 
     if data is None:
         data = {}
@@ -448,7 +405,7 @@ def update_userdata_sessionid(details,session_id):
         data["sessionId"] = [session_id]
 
     db.collection(u'userData').document(username).set(data)
-        
+
 
 
 def set_calculate_flag(session_id):
@@ -515,12 +472,7 @@ if __name__ == '__main__':
         # Use the application default credentials
         # Use a service account
         # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
-<<<<<<< HEAD
         cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
-=======
-        # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-        cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
->>>>>>> master
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
@@ -530,10 +482,5 @@ if __name__ == '__main__':
 
     # #--------------------------------------CONNECT TO DATABASE-------------------------------
     #Run the App
-<<<<<<< HEAD
-    #app.run(host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
-    app.run()
-=======
     socketio.run(app,host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
->>>>>>> master
     # app.run(host='0.0.0.0', debug=True, use_reloader=False)
