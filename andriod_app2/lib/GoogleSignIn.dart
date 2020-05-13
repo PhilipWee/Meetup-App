@@ -16,6 +16,8 @@ class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
+  /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
+
   Future<String> signInWithGoogle() async {
     final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
@@ -70,6 +72,7 @@ class _LoginPageState extends State<LoginPage> {
     print("User Sign Out");
   }
 
+  /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
   @override
   Widget build(BuildContext context) {

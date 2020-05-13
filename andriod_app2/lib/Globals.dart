@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-
 String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
 
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
@@ -85,7 +84,7 @@ void saveMyLocationName() async{
   userLocationName = myLocationName;
 }
 
-Future<String> getplacefromcoor(double givenlat, double givenlong) async{
+Future<String> getplacefromlatlong(double givenlat, double givenlong) async{
   var location = Location();
   LocationData currentLocation = await location.getLocation();
   double lat = givenlat;
@@ -120,4 +119,32 @@ class fakeData {
   }
 } //for swipe page
 
+List fakelistofmembers = [
+  {
+    "identifier" : "identifier",
+    "lat" : 0,
+    "long" : 0,
+    "transport_mode" : "Driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+  {
+    "identifier" : "Julia Chua",
+    "lat" : 1.332319,
+    "long" : 103.672113,
+    "transport_mode" : "Driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+  {
+    "identifier" : "David Fan",
+    "lat" : 1.332319,
+    "long" : 103.672113,
+    "transport_mode" : "Driving",
+    "metrics" : {"speed":0, "quality":0, "price":0}
+  },
+];
 
+List templistofmembers = [];
+
+List usersSessionsList = [];
+
+bool isCreator = true;

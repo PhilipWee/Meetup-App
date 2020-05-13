@@ -13,7 +13,6 @@ class DetailsPage extends StatelessWidget {
       body: Details(item: item,),
     );
   }
-
 }
 
 class Details extends StatefulWidget {

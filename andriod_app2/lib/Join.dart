@@ -22,7 +22,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
   String value4 = "No Preference";
   double value5 = 0;
 
-  //Method for the labels on the slider
   String labels() {
     switch (value5.floor()) {
       case 0:
@@ -37,24 +36,9 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         return "\$\$\$\$";
     }
     return "";
-  }
-//  void initState() {
-//    super.initState();
-//    _locationNameController.addListener(() {
-//      final text = _locationNameController.text.toLowerCase();
-//      _locationNameController.value = _locationNameController.value.copyWith(
-//        text: text,
-//        selection:
-//        TextSelection(baseOffset: text.length, extentOffset: text.length),
-//        composing: TextRange.empty,
-//      );
-//    });
-//  }
-//
-//  void dispose() {
-//    _locationNameController.dispose();
-//    super.dispose();
-//  }
+  } //Method for the labels on the slider
+
+  /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
 
   sessionJoin() async {
     //send json package to server as POST
@@ -94,6 +78,8 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
     }
     catch(e){print("Error caught at SessionCreate(): $e");}
   }
+
+  /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
   @override
   Widget build(BuildContext context) {

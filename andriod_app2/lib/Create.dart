@@ -23,7 +23,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   String value4 = "No Preference";
   double value5 = 0;
 
-  //Method for the labels on the slider
   String labels() {
     switch (value5.floor()) {
       case 0:
@@ -38,7 +37,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         return "\$\$\$\$";
     }
     return "";
-  }
+  } //Method for the labels on the slider
+
+  //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
   sessionCreate() async {
     //send json package to server as POST
@@ -88,25 +89,77 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     catch(e){print("Error caught at SessionCreate(): $e");}
   }
 
-//  void initState() {
-//    super.initState();
-//    _locationNameController.addListener(() {
-//      final text = _locationNameController.text.toLowerCase();
-//      _locationNameController.value = _locationNameController.value.copyWith(
-//        text: text,
-//        selection:
-//        TextSelection(baseOffset: text.length, extentOffset: text.length),
-//        composing: TextRange.empty,
-//      );
-//    });
-//  }
-//
-//  void dispose() {
-//    _locationNameController.dispose();
-//    super.dispose();
-//  }
+  showPopup(BuildContext context, Widget widget, {BuildContext popupContext}) {
+    Navigator.push(
+      context,
+      PopupLayout(
+        top: 565,
+        left: 0,
+        right: 0,
+        bottom: 57,
+        child: PopupContent(
+          content: Scaffold(
+              resizeToAvoidBottomPadding: false,
+              body: widget,
+              backgroundColor: Colors.white
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _shareText() async {
+    try {
+      Share.text('Link', globals.tempData["link"], 'text/plain');
+    } catch (e) {
+      print('error: $e');
+    }
+  }
+
+  Widget _popupBody() {
+
+    Widget linkSection = Container(
+        child: Padding(
+            padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: TextField(
+                          controller: TextEditingController(text:globals.tempData["link"]),
+                          decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.content_copy),
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
+                        Navigator.pop(context);
+                      },
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.share),
+                        onPressed: () async {
+                          await _shareText();
+                          Navigator.pop(context);
+                        }
+                    ),
+                  ],
+                ),
+              ],
+            )
+        )
+    );
+
+    return Container(child: linkSection);
+  }
+
+  /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
 
   @override
+
   Widget build(BuildContext context) {
 
     Widget buttonSection = Container(
@@ -405,72 +458,4 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       ),
     );
   }
-
-  showPopup(BuildContext context, Widget widget, {BuildContext popupContext}) {
-    Navigator.push(
-      context,
-      PopupLayout(
-        top: 565,
-        left: 0,
-        right: 0,
-        bottom: 57,
-        child: PopupContent(
-          content: Scaffold(
-            resizeToAvoidBottomPadding: false,
-            body: widget,
-            backgroundColor: Colors.white
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _shareText() async {
-    try {
-      Share.text('Link', globals.tempData["link"], 'text/plain');
-    } catch (e) {
-      print('error: $e');
-    }
-  }
-
-  Widget _popupBody() {
-
-    Widget linkSection = Container(
-        child: Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 2,
-                      child: TextField(
-                          controller: TextEditingController(text:globals.tempData["link"]),
-                          decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.content_copy),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
-                        Navigator.pop(context);
-                        },
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.share),
-                        onPressed: () async {
-                          await _shareText();
-                          Navigator.pop(context);
-                        }
-                    ),
-                  ],
-                ),
-              ],
-            )
-        )
-    );
-
-    return Container(child: linkSection);
-  }
-
 }

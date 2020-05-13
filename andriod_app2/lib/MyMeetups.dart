@@ -45,35 +45,35 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     "images/meetingButton.jpg",
   ];
 
-//  void initState() {
-//    super.initState();
-//    _joinController.addListener(() {
-//      final text = _joinController.text.toLowerCase();
-//      _joinController.value = _joinController.value.copyWith(
-//        text: text,
-//        selection:
-//        TextSelection(baseOffset: text.length, extentOffset: text.length),
-//        composing: TextRange.empty,
-//      );
-//    });
-//  }
-//
-//  void dispose() {
-//    _joinController.dispose();
-//    super.dispose();
-//  }
+  //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  void saveSessionDetailsFromLink(String inputlink) async{
-    globals.tempData["joinlink"] = inputlink.replaceAll(new RegExp(r'/get_details'), '');
+  void saveSessionDetailsFromLink(String inputLink) async{
+    globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
     print(globals.tempMeetingDetails);
-    }
+    } //session details saved in global.tempMeetingDetals
+
+  void getAllUserSessions(String inputUserId) async{
+    String url = '${globals.serverAddress}/session/get?username=$inputUserId';
+    http.Response response = await http.get(globals.tempData["joinlink"]);
+    String body = response.body;
+    globals.usersSessionsList = jsonDecode(body);
+    print(globals.usersSessionsList);
+  } // list of all sessionIds saved in
+
+  void getNameGetType (List inputUsersSessionsList) {
+
+  }
+
+  /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
+
+
   @override
   //Creates a list view with buildCustomButtons inside
-
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

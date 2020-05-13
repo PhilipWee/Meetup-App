@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:andriod_app2/ResultsSwipePage.dart';
-
 import 'GoogleSignIn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ import 'PopUp.dart';
 import 'BuildMeetupDetails.dart';
 import 'Globals.dart' as globals;
 import 'Join.dart';
-
 
 void main() => runApp(MyApp());
 
@@ -96,17 +94,12 @@ class _HomeState extends State<Home> {
   String myLocationName = "";
 
   final List<Widget> _children = [
-
     HomeUsernameWidget(),
-
     CustomizationPageWidget(),
-
     ProfilePage()
-
   ];
 
-
-
+  /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
   @override
   Widget build(BuildContext context) {
