@@ -96,7 +96,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     Navigator.push(
       context,
       PopupLayout(
-        top: 200,
+        top: MediaQuery.of(context).size.height - 170,
         left: 0,
         right: 0,
         bottom: 57,
@@ -125,6 +125,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   Widget _popupBody() {
 
     Widget linkSection = Container(
+      height: 100,
         child: Padding(
             padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
             child: Column(
