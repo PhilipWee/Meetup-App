@@ -471,7 +471,7 @@ def on_swipe_details(data):
                 break
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
-                update_session_status('location_confirmed')
+                update_session_status(sessionID,'location_confirmed')
                 socketio.emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
 
     except KeyError:
