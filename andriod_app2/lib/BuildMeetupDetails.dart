@@ -339,7 +339,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   ),
                 ])
               ),
-              makeHeader("Mice Joining (${globals.fakelistofmembers.length})"), //no. of members
+              makeHeader("Mice Joining (${globals.sessionData["users"].length})"), //no. of members
 
               SliverToBoxAdapter(
                 child: Center(child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),)),
