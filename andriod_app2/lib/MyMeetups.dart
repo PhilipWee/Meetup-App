@@ -158,6 +158,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     custLabels = [];
     custImgs = [];
     custStates = [];
+    sessionIDs = [];
+    allData = [];
 
     return Scaffold(
       backgroundColor: Colors.white,

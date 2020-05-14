@@ -24,6 +24,12 @@ bool locationFound = true;
 
 Map<String, dynamic> tempMeetingDetails = {};
 
+List<String> custLabels = [];
+List<String> custImgs = [];
+List<String> custStates = [];
+List<String> sessionIDs = [];
+List allData = [];
+
 Map sessionData = {};
 
 ///SESSION DATA SAMPLE
