@@ -20,8 +20,7 @@ double phonelat = 0.0;
 double phonelong = 0.0;
 
 bool isCreator = true;
-
-bool locationFound = false;
+bool locationFound = true;
 
 Map<String, dynamic> tempMeetingDetails = {};
 
@@ -30,7 +29,8 @@ Map sessionData = {};
 ///SESSION DATA SAMPLE
 //{
 //  host_uuid: NgBZTpHmO3X4xvm4msmMtku0wLz2,
-//  meeting_type: outing, meetup_name: ,
+//  meeting_type: outing,
+//  meetup_name: ,
 //  session_status: pending_members,
 //  time_created: 2020-05-13 08:05:03.486923,
 //  users: [

@@ -20,7 +20,7 @@ class MeetupPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text("Share Meetup!"),
+        title: Text(globals.sessionData["meetup_name"]),
 //        backgroundColor: Colors.black,
       ),
       body: MeetupPageWidget(),
