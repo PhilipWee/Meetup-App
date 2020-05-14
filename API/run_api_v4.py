@@ -32,10 +32,10 @@ if (not len(firebase_admin._apps)):
 
     # Use the application default credentials
     # Use a service account
-    cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -281,7 +281,7 @@ def manage_details(session_id):
         schema_str = """{
             "lat":float,
             "long":float,
-            "transport_mode": lambda x: x in ["public","driving","walking"],
+            "transport_mode": lambda x: x in ["public","driving","walking","riding"],
             "metrics":{
                 "speed":int,
                 "quality":int,
@@ -448,8 +448,8 @@ def on_swipe_details(data):
     #Update firebase with the swipe details for that particular room
     sessionID = data['sessionID']
     swipeIndex = data['swipeIndex']
-    userIdentifier = str(data['user'])
-    selection = bool(strtobool(data['selection']))
+    userIdentifier = str(data['userIdentifier'])
+    selection = data['selection']
     doc_ref = get_doc_ref_for_id(sessionID)
     try:
         #Update the session with the new details

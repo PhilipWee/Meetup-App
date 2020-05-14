@@ -141,14 +141,12 @@
             <div id='loginStatusButton' class='col-2' style='margin-top:2%;margin-left:0%'></div>
 
           </div>
-          </div>
-          </div>
+          
 
           <div class='row pl-2' style="background-color:white;">
             <h2 >Allow meetup mouse to access your location and squeak away!</h2>
           </div>
-        </div>
-        </div>
+       
 
     <div class='row justify-content-center'>
       <div class='col-1'></div>
@@ -172,13 +170,24 @@
                 <button style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="enterBugReport" onclick='submitBugReport()'>Submit</button>
               </div>
              
-
             </div>
             
+            
             <div class='col-2'></div>
-           
+          </div>
             <!--  -->
+            <hr  class="new5">
             <div class='row' style="justify-content: center;">
+              <div class='col col-2'></div>
+              
+              <div class='col'>
+                <div class='row'>
+                <p style='font-family: Patrick Hand SC;font-size: 3vw; margin-left:1.5%;'> My Meetups</p>
+              </div>
+            
+          </div>    
+            
+             
                 <script>
                   firebase.auth().onAuthStateChanged(function(user) {
                     if (user) {
@@ -190,7 +199,6 @@
                       console.log(username);
 
                       docUserData = db.collection("userData").doc(username);
-                      allSessions = db.collection("sessions");
 
                       docUserData.get().then(function(doc) {
                         if (doc.exists) {   // if User ID exists in the firebase
@@ -202,22 +210,49 @@
 
                           for (i in sessionsList) (function(i) {
                             // Open specific session document in Firebase
-                            docSession = allSessions.doc(sessionsList[i]);
+                            //console.log(sessionsList[i]);
+                            //Get request for session details
+                            details_url = window.location.origin + '/session/' + sessionsList[i];
 
-                            
-                            btn = document.createElement("BUTTON");
-                            btn.class = "block";
-                            btn.innerHTML = sessionsList[i];
-                            btn.id = "meetingID " + sessionsList[i];
-                            btn.onclick = function() {
+                            $.getJSON(details_url,function(result){
+                              sessionData = result;
+
+                              meetupName = sessionData['meetup_name'];
+                              console.log(sessionData);
+                              let sessionStatus = sessionData['session_status'];
+                              console.log(meetupName);
+
+                              div = document.createElement("div");
                               
-                              //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
-                              window.location.href = "/session/" + sessionsList[i] + "/swipe";
-                              console.log(sessionsList[i] + " clicked!")
-                            }
-                            btn.style = 'font-family: Patrick Hand SC; margin-top:1%;font-size: 2vw;text-align: center;justify-items: center;';
+                              btn = document.createElement("BUTTON");
+                              btn.class = "block";
+                              div.className= 'col col-2';
+                              div.style='margin-left: 2.5%; margin-bottom: 15%;'
+                              
+                              btn.innerHTML = meetupName;
+                              btn.id = sessionsList[i];
 
-                            document.getElementById('allSessionsDiv').appendChild(btn);
+                              btn.addEventListener('click', function(e) {
+                                if (sessionStatus == "pending_swipes") {
+                                  window.location.href = "/session/" + sessionsList[i] + "/swipe";
+                                } else if (sessionStatus == "pending_members") {
+                                  console.log("Pending members!");
+                                } else if (sessionStatus == "location_confirmed") {
+                                  console.log("Location confirmed!");
+                                }
+                                //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
+                              })
+
+                              btn.style = 'font-family: Patrick Hand SC; font-size: 2vw;text-align: center;justify-items: center; width:100%; height:300%;'
+                              
+                              div.appendChild(btn);
+                              document.getElementById('allSessionsDiv').appendChild(div);
+                              
+
+                            }).catch(function (error){
+                              console.log('Unable to get results, Error: ' + error)
+                            })
+                            
                           })(i);
                         } else {
                           console.log("No such document!");
@@ -237,79 +272,14 @@
                   });
                 </script>
 
-                <div id="allSessionsDiv"></div>
-            </div>
-
-    </div>
-    <hr  class="new5">
-    <div class='row' style="justify-content: center;">
-      <div class='col col-2'></div>
-      <div class='col'>
-        <div class='row'>
-        <p style='font-family: Patrick Hand SC;font-size: 3vw; margin-left:1.5%;'> My Meetups</p>
-      </div>
-
-      <div class='row' style='margin-left:0%;'>
-        <script>
-   
-          firebase.auth().onAuthStateChanged(function(user) {
-            if (user) {
-              var isAnonymous = user.isAnonymous;
-              var uid = user.uid;
-              console.log(uid);
-              var db = firebase.firestore();
-              var docRef = db.collection("userData").doc(uid);
-    
-              docRef.get().then(function(doc) {
-                if (doc.exists) {   // if User ID exists in the firebase
-                  savedData = doc.data();   // Retrieve user data
-                  // Check for user's meetings. If no meeting, returns empty array.
-                  // IMPORTANT: If new user and no sessionId is created, returns Undefined
-                  sessionsList = savedData['sessionId'];
-                  console.log(sessionsList);
-    
-                  for (i in sessionsList) (function(i) {
-                    console.log(sessionsList[i]);
-                    div = document.createElement("div");
-                    div.className = 'col';
-                    div.style = 'width:100%;'
-                    btn = document.createElement("BUTTON");
-                    btn.class = "block";
-                    btn.innerHTML = sessionsList[i];
-                    btn.id = "meetingID " + sessionsList[i];
-                    btn.onclick = function() {
-                      // Redirect to correct page; Pending users, Pending swipes or Confirmed
-                      console.log(sessionsList[i] + " clicked!")
-                    }
-                    btn.style = 'font-family: Patrick Hand SC; margin-top:1%; margin-right: 2%; margin-left: 2%; font-size: 2vw; width: 200px; height:200px;'
-                    div.appendChild(btn);
-                    document.getElementById('allSessionsDiv').appendChild(div);
-                  })(i);
-                } else {
-                  console.log("No such document!");
-                }
-              }).catch(function(error) {
-                console.log("Error getting document: ", error);
-              });
-    
-            } else {
-              firebase.auth().signInAnonymously().catch(function(error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-                // ...
-              });
-            }
-          });
-          </script>
-   
-          <div class='row' style='margin-bottom: 5%;' id="allSessionsDiv">
+               
+            
           </div>
-  
 
-      </div>
-     
-      </div>
+   
+          <div class='row' style='margin-left:14%;' id="allSessionsDiv"></div>
+ 
+
      
   </body>
 
