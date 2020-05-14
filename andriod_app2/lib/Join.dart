@@ -54,7 +54,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         '"metrics": {'
         '"quality":${globals.tempData["quality"]}, '
         '"price":${globals.tempData["price"]}, '
-        '"speed":${globals.tempData["speed"]}}'
+        '"speed":0}'
         '}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     print("Using Link: $url");
@@ -227,10 +227,10 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value2 = newValue;
-                          if (value2=="Walk"){globals.tempData["transportmode"]="Walk";}
-                          else if (value2=="Driving"){globals.tempData["transportmode"]="Driving";}
-                          else if (value2=="Riding"){globals.tempData["transportmode"]="Riding";}
-                          else {globals.tempData["transportmode"]="Public Transit";}
+                          if (value2=="Walk"){globals.tempData["transportmode"]="walking";}
+                          else if (value2=="Driving"){globals.tempData["transportmode"]="driving";}
+                          else if (value2=="Riding"){globals.tempData["transportmode"]="riding";}
+                          else {globals.tempData["transportmode"]="public";}
                         });
                       },
                       items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {

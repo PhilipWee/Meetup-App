@@ -1,5 +1,5 @@
 import 'package:flutter/rendering.dart';
-
+import 'dart:math' as math;
 import 'main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ class MeetupPage extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: true,
         title: Text(globals.sessionData["meetup_name"]),
-//        backgroundColor: Colors.black,
+        backgroundColor: Colors.deepOrange,
       ),
       body: MeetupPageWidget(),
     );
@@ -84,6 +84,34 @@ class MeetupPageState extends State<MeetupPageWidget> {
         print('error: $e');
       }
     }
+
+    //Function to create sub-headers within the page
+    SliverPersistentHeader makeHeader(String headerText) {
+      return SliverPersistentHeader(
+        pinned: true,
+        delegate: _SliverAppBarDelegate(
+          minHeight: 75.0,
+          maxHeight: 75.0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: MediaQuery.of(context).size.width,
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.only(top:25, bottom:5, left:15, right:8),
+                child: Text(headerText, style: TextStyle(fontSize: 18, fontFamily: "Quicksand")),
+                color: Colors.white,
+              ),
+              Container(
+                color: Colors.white,
+                child: Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,)
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
 
     //Function to generate the search button for host
     Widget _generateButton() {
@@ -208,112 +236,163 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
-    Widget listSection = FutureBuilder(
-      future: getMembers(),
-      builder: (BuildContext context, AsyncSnapshot snapshot){
+    //Function to build the list of members in current session
+    FutureBuilder membersList(BuildContext context, int index) {
+      return FutureBuilder(
+        future: getMembers(),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
 //        listofmembers = snapshot.data;
 
-        if(globals.sessionData["users"].isEmpty){
-          return
-            Container(
-                child: Center(
-                    child: Text("Loading...")
-                )
-            );
-        }
-        else {
-          return Container(child: RefreshIndicator(
-            child: ListView.builder(
-              itemCount: globals.sessionData["users"].length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
+          if(globals.sessionData["users"].isEmpty){
+            return
+              Container(
+                  child: Center(
+                      child: Text("Loading...")
+                  )
+              );
+          }
+          else {
+            List<Widget> members = [];
+            members.add(
+                ListTile(
                   leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                  title: Text(globals.sessionData["users"][index]["username"].toString()),
+                  title: Text(
+                    globals.sessionData["users"][index]["username"].toString(),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
                   subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
-                  trailing: Text(globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), '')),
-                );
-              },
-            ) ,
-            onRefresh: _refresh,
-          ));
-        }
-      },
-    );
+                  trailing: Container(
+                    width: MediaQuery.of(context).size.width*0.4,
+                    child: Text(
+                      globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), ''),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                    ),
+                  ),
+            ));
+            return Column(
+              children: members,
+            );
+          }
+        },
+      );
+    }
 
     /////////////////////////////////////////////////////////////////////// [SCAFFOLD]
 
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Visibility(
-            visible: _locationFound == false ? true : false,
-            child: Padding(
-              padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    flex: 2,
-                    child: TextField(
-                        controller: TextEditingController(text:globals.sessionData["url"]),
-                        decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-                    ),
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: RefreshIndicator(
+          child: CustomScrollView(
+            slivers: <Widget>[
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  Column(
+                    children: <Widget>[
+                      Visibility(
+                        visible: _locationFound == false ? true : false,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
+                          child: Row(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 2,
+                                child: TextField(
+                                    controller: TextEditingController(text:globals.sessionData["url"]),
+                                    decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.content_copy),
+                                onPressed: () {
+                                  Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
+                                },
+                              ),
+                              IconButton(
+                                  icon: Icon(Icons.share),
+                                  onPressed: () async {
+                                    await _shareText();
+                                  }
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),//copy or share link
+
+                      Visibility(
+                          visible: (_host == true && _locationFound == false) ? true : false,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: <Widget>[
+                                Container(child: _generateButton(),),
+                              ],
+                            ),
+                          )
+                      ),// generateButton
+
+                      Visibility(
+                        visible: _locationFound,
+                        child: _buildLocationDetails(locationDetails),
+                      ), //buildlocationdetails
+
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.content_copy),
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
+                ])
+              ),
+              makeHeader("Mice Joining (${globals.fakelistofmembers.length})"), //no. of members
+
+              SliverToBoxAdapter(
+                child: Center(child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),)),
+              ),
+
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      return membersList(context, index);
                     },
-                  ),
-                  IconButton(
-                      icon: Icon(Icons.share),
-                      onPressed: () async {
-                        await _shareText();
-                      }
-                  ),
-                ],
+                  childCount: globals.sessionData["users"].length,
               ),
             ),
-          ),//copy or share link
 
-          Visibility(
-              visible: (_host == true && _locationFound == false) ? true : false,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: <Widget>[
-                    Container(child: _generateButton(),),
-                  ],
-                ),
-              )
-          ),// generateButton
-
-          Visibility(
-            visible: _locationFound,
-            child: _buildLocationDetails(locationDetails),
-          ), //buildlocationdetails
-
-          Container(
-            child: Row(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(top:25, bottom:5, left:15, right:8),
-                  child: Text("Mice Joining (16)", style: TextStyle(fontSize: 18),),
-                ),
-              ],
-            ),
-          ), //no. of members
-
-          Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
-
-          Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
-
-          Row(
-            children: <Widget>[
-              Expanded(child: SizedBox(height: 400, child: listSection)),
-            ],
+            ]
           ),
-        ],
+
+          onRefresh: _refresh,
+        ),
       ),
     );
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate({
+    @required this.minHeight,
+    @required this.maxHeight,
+    @required this.child,
+  });
+  final double minHeight;
+  final double maxHeight;
+  final Widget child;
+  @override
+  double get minExtent => minHeight;
+  @override
+  double get maxExtent => maxHeight;
+  @override
+  Widget build(
+      BuildContext context,
+      double shrinkOffset,
+      bool overlapsContent)
+  {
+    return new SizedBox.expand(child: child);
+  }
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return maxHeight != oldDelegate.maxHeight ||
+        minHeight != oldDelegate.minHeight ||
+        child != oldDelegate.child;
   }
 }
