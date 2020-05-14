@@ -54,7 +54,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         '"metrics": {'
         '"quality":${globals.tempData["quality"]}, '
         '"price":${globals.tempData["price"]}, '
-        '"speed":${globals.tempData["speed"]}}'
+        '"speed":0}'
         '}';
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     print("Using Link: $url");
