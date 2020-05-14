@@ -72,7 +72,10 @@
 
       text-align: center;
     }
-
+    hr.new5 {
+  border: 2px solid rgb(214,129,137);
+  border-radius: 5px;
+}
   </style>
 
   </head>
@@ -150,28 +153,30 @@
     <div class='row justify-content-center'>
       <div class='col-1'></div>
             <div class='col-1 ' style='margin-top:2%;'>
-                <img class='row d-none d-lg-block' style="height:90%;width:250%;" src="/static/Map.png" alt="Map" class="map">
+                <img class='row d-none d-lg-block' style="height:90%;width:240%;" src="/static/Map.png" alt="Map" class="map">
             </div>
             <div class='col-8 '>
-              <div class='row justify-content-center' style='margin-top:20%; margin-bottom:1%;'>
-                <button style='font-family: Patrick Hand SC;font-size:2vw' onclick='createMeetup()'>Create New Meetup</button><br>
+              <div class='row justify-content-center' style='margin-top:10%; margin-bottom:1%;'>
+                <button style='font-family: Patrick Hand SC;font-size:2vw;width:30%;' onclick='createMeetup()'>Create New Meetup</button><br>
               </div>
 
               <div class='row justify-content-center' style='margin-top:1%; margin-bottom:1%;'>
-                <button style='font-family: Patrick Hand SC;font-size:2vw; ' onclick='joinMeetup()'>Join Meetup</button>
+                <button style='font-family: Patrick Hand SC;font-size:2vw; width:30%;' onclick='joinMeetup()'>Join Meetup</button>
                 <input type="text" id="inputSessionId" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' placeholder="Enter session id">
                 <button style='font-family: Patrick Hand SC;font-size:2vw; display:none; ' id="enterSessionId" onclick='submitButton()'>Enter</button>
               </div>
 
               <div class='row justify-content-center'>
-                <br><button style='font-family: Patrick Hand SC;font-size:2vw' onclick='reportBug()'>Feedback / Report a bug</button>
+                <br><button style='font-family: Patrick Hand SC;font-size:2vw;width:30%;' onclick='reportBug()'>Feedback / Report a bug</button>
                 <input type="text" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="inputReport" placeholder="What bugs did you meet?" >
                 <button style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="enterBugReport" onclick='submitBugReport()'>Submit</button>
               </div>
+             
 
             </div>
+            
             <div class='col-2'></div>
-
+           
             <!--  -->
             <div class='row' style="justify-content: center;">
                 <script>
@@ -236,8 +241,76 @@
             </div>
 
     </div>
+    <hr  class="new5">
+    <div class='row' style="justify-content: center;">
+      <div class='col col-2'></div>
+      <div class='col'>
+        <div class='row'>
+        <p style='font-family: Patrick Hand SC;font-size: 3vw; margin-left:1.5%;'> My Meetups</p>
+      </div>
 
+      <div class='row' style='margin-left:0%;'>
+        <script>
+   
+          firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+              var isAnonymous = user.isAnonymous;
+              var uid = user.uid;
+              console.log(uid);
+              var db = firebase.firestore();
+              var docRef = db.collection("userData").doc(uid);
+    
+              docRef.get().then(function(doc) {
+                if (doc.exists) {   // if User ID exists in the firebase
+                  savedData = doc.data();   // Retrieve user data
+                  // Check for user's meetings. If no meeting, returns empty array.
+                  // IMPORTANT: If new user and no sessionId is created, returns Undefined
+                  sessionsList = savedData['sessionId'];
+                  console.log(sessionsList);
+    
+                  for (i in sessionsList) (function(i) {
+                    console.log(sessionsList[i]);
+                    div = document.createElement("div");
+                    div.className = 'col';
+                    div.style = 'width:100%;'
+                    btn = document.createElement("BUTTON");
+                    btn.class = "block";
+                    btn.innerHTML = sessionsList[i];
+                    btn.id = "meetingID " + sessionsList[i];
+                    btn.onclick = function() {
+                      // Redirect to correct page; Pending users, Pending swipes or Confirmed
+                      console.log(sessionsList[i] + " clicked!")
+                    }
+                    btn.style = 'font-family: Patrick Hand SC; margin-top:1%; margin-right: 2%; margin-left: 2%; font-size: 2vw; width: 200px; height:200px;'
+                    div.appendChild(btn);
+                    document.getElementById('allSessionsDiv').appendChild(div);
+                  })(i);
+                } else {
+                  console.log("No such document!");
+                }
+              }).catch(function(error) {
+                console.log("Error getting document: ", error);
+              });
+    
+            } else {
+              firebase.auth().signInAnonymously().catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // ...
+              });
+            }
+          });
+          </script>
+   
+          <div class='row' style='margin-bottom: 5%;' id="allSessionsDiv">
+          </div>
+  
 
+      </div>
+     
+      </div>
+     
   </body>
 
   <script src="{{url_for('static', filename='js/mainpage.js')}}"></script>
