@@ -14,8 +14,6 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:getflutter/getflutter.dart';
 
 
-
-
 class MeetupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -41,19 +39,22 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   Future<List<dynamic>> getMembers() async{}
 
+  ///SOCKETS
+
   @override
   initState(){
     super.initState();
-    globals.socketIO.joinSession("3046db10-9404-11ea-8bde-06b6ade4a06c");
-    globals.socketIO.subscribe("user_joined_room", (data)=>{
-      //whatever is inside here will run when server sends stuff
-      print(data),
-      globals.fakelistofmembers.add(data),
-      print(globals.fakelistofmembers)
+    globals.socketIO.joinSession(globals.sessionData["sessionid"]);
+    globals.socketIO.subscribe("user_joined_room", (data)=>{ //whatever is inside here will run when server sends stuff
+      print("INCOMING SOCKETS DATA: $data"),
+      globals.sessionData["users"].add(data),
+      print("UPDATED SESSION'S USER DATA: ${globals.sessionData["users"]}"),
     });
   } //SOCKETS
 
+
   // TODO: Get details of location found from database
+
   globals.fakeData locationDetails = globals.fakeData(name: "Fisherman's Wharf",
       address: "39 San Francisco Bay Area",
       details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
@@ -73,7 +74,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     Future<Null> _refresh() async {
       setState((){});
-      return await Future.delayed(Duration(milliseconds: 1500));
+      return await Future.delayed(Duration(milliseconds: 1000));
     }
 
     Future<void> _shareText() async {
@@ -103,7 +104,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                     textColor: Colors.white,
                     onPressed: () async{
                     },
-                    child: Text('Search Places', style: TextStyle(fontFamily: "Quicksand")),
+                    child: Center(child: Text('Search Places', style: TextStyle(fontFamily: "Quicksand"))),
                   ),
                 ),
               ),
@@ -115,6 +116,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     //Function to build details of tabulated final location
     Widget _buildLocationDetails(globals.fakeData details) {
+
       List images = details.images;
 
       return Container(
@@ -211,38 +213,28 @@ class MeetupPageState extends State<MeetupPageWidget> {
       builder: (BuildContext context, AsyncSnapshot snapshot){
 //        listofmembers = snapshot.data;
 
-        if(globals.fakelistofmembers == null){
+        if(globals.sessionData["users"].isEmpty){
           return
-            Expanded(
-                child:
-                Container(
-                    child: Center(
-                        child: Text("Loading...")
-                    )
+            Container(
+                child: Center(
+                    child: Text("Loading...")
                 )
             );
         }
         else {
-          return Container(child: RefreshIndicator(child: ListView.builder(
-            itemCount: globals.fakelistofmembers.length,
-            itemBuilder: (BuildContext context, int index) {
-
-              if (index == 0){ //means it is the meetup creator a.k.a first user on the list
+          return Container(child: RefreshIndicator(
+            child: ListView.builder(
+              itemCount: globals.sessionData["users"].length,
+              itemBuilder: (BuildContext context, int index) {
                 return ListTile(
-                    leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                    title: Text(globals.username), //TODO
-                    subtitle: Text(globals.fakelistofmembers[index]["transport_mode"].toString()),
-                    trailing: Text(globals.userLocationName)
+                  leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                  title: Text(globals.sessionData["users"][index]["username"].toString()),
+                  subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
+                  trailing: Text(globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), '')),
                 );
-              }
-              return ListTile(
-                leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                title: Text(globals.fakelistofmembers[index]["identifier"].toString()),
-                subtitle: Text(globals.fakelistofmembers[index]["transport_mode"].toString()),
-                trailing: Text(""),
-              );
-            },
-          ) , onRefresh: _refresh,
+              },
+            ) ,
+            onRefresh: _refresh,
           ));
         }
       },
@@ -251,76 +243,77 @@ class MeetupPageState extends State<MeetupPageWidget> {
     /////////////////////////////////////////////////////////////////////// [SCAFFOLD]
 
     return Scaffold(
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: CustomScrollView(
-          slivers: <Widget>[
-            SliverList(
-              delegate: SliverChildListDelegate([
-
-                Visibility(
-                  visible: _locationFound == false ? true : false,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: TextField(
-                              controller: TextEditingController(text:globals.tempData["link"]),
-                              decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.content_copy),
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
-                            Navigator.pop(context);
-                          },
-                        ),
-                        IconButton(
-                            icon: Icon(Icons.share),
-                            onPressed: () async {
-                              await _shareText();
-                              Navigator.pop(context);
-                            }
-                        ),
-                      ],
+      body: Column(
+        children: <Widget>[
+          Visibility(
+            visible: _locationFound == false ? true : false,
+            child: Padding(
+              padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                        controller: TextEditingController(text:globals.sessionData["url"]),
+                        decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
                     ),
                   ),
-                ),//copy or share link
-
-                Visibility(
-                    visible: (_host == true && _locationFound == false) ? true : false,
-                    child: Container(child: _generateButton(),)
-                ),// generateButton
-
-                Visibility(
-                  visible: _locationFound,
-                  child: _buildLocationDetails(locationDetails),
-                ),
-
-                Container(
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(top:25, bottom:5, left:15, right:8),
-                        child: Text("Mice Joining (16)", style: TextStyle(fontSize: 18),),
-                      ),
-                    ],
+                  IconButton(
+                    icon: Icon(Icons.content_copy),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
+                    },
                   ),
-                ), //no. of members
-                Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
-
-//          Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
-//          Container(child: listSection),
-              ]),
+                  IconButton(
+                      icon: Icon(Icons.share),
+                      onPressed: () async {
+                        await _shareText();
+                      }
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),//copy or share link
+
+          Visibility(
+              visible: (_host == true && _locationFound == false) ? true : false,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: <Widget>[
+                    Container(child: _generateButton(),),
+                  ],
+                ),
+              )
+          ),// generateButton
+
+          Visibility(
+            visible: _locationFound,
+            child: _buildLocationDetails(locationDetails),
+          ), //buildlocationdetails
+
+          Container(
+            child: Row(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(top:25, bottom:5, left:15, right:8),
+                  child: Text("Mice Joining (16)", style: TextStyle(fontSize: 18),),
+                ),
+              ],
+            ),
+          ), //no. of members
+
+          Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
+
+          Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
+
+          Row(
+            children: <Widget>[
+              Expanded(child: SizedBox(height: 400, child: listSection)),
+            ],
+          ),
+        ],
       ),
     );
   }
-
 }

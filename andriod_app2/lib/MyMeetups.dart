@@ -38,6 +38,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   List<String> custLabels = [];
   List<String> custImgs = [];
   List<String> custStates = [];
+  List<String> sessionIDs = [];
+  List allData = [];
 
   @override
   initState(){
@@ -56,23 +58,20 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   Future<int> getAllUserSessionsData(String inputUserId) async{
     Map tempMap = {};
-    List tempList = [];
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
-    String body = response.body;
-    tempMap = jsonDecode(body);
-    tempMap.forEach((k, v) => tempList.add(k));
-    globals.usersSessionsList = tempList;
+    tempMap = jsonDecode(response.body);
+    tempMap.forEach((k, v) => sessionIDs.add(k));
 
-    if (tempList.length == 0) {
+    if (sessionIDs.length == 0) {
       return 0;
     } else {
-      for( var i=0 ; i<tempList.length ; i++ ){
-        print(tempList[i]);
-        String url = '${globals.serverAddress}/session/${tempList[i]}';
+      for( var i=0 ; i<sessionIDs.length ; i++ ){
+        print(sessionIDs[i]);
+        String url = '${globals.serverAddress}/session/${sessionIDs[i]}';
         http.Response response = await http.get(url);
-        String body = response.body;
-        Map map = jsonDecode(body);
+        Map map = jsonDecode(response.body);
+        allData.add(map);
         print("map: $map");
 
         //LABELS
@@ -80,32 +79,20 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         print("custLabels: ${custLabels}");
 
         //IMAGES
-        if (map["meeting_type"] == "outing"){
-          custImgs.add("images/outing.jpg");
-        }
-        else if (map["meeting_type"] == "food"){
-          custImgs.add("images/food.jpg");
-        }
-        else if (map["meeting_type"] == "meeting"){
-          custImgs.add("images/meetingButton.jpg");
-        }
+        if (map["meeting_type"] == "outing"){custImgs.add("images/outing.jpg");}
+        else if (map["meeting_type"] == "food"){custImgs.add("images/food.jpg");}
+        else if (map["meeting_type"] == "meeting"){custImgs.add("images/meetingButton.jpg");}
         else{custImgs.add(map["images/meetingButton.jpg"]);}
-
         print("custImgs: $custImgs");
 
         //STATES
-        if (map["session_status"] == "pending_members"){
-          custStates.add("Pending Members");
-        }
-        else if (map["session_status"] == "pending_swipes"){
-          custStates.add("Pending Swipes");
-        }
-        else if (map["session_status"] == "location_confirmed"){
-          custStates.add("Location Confirmed");
-        }
+        if (map["session_status"] == "pending_members"){custStates.add("Pending Members");}
+        else if (map["session_status"] == "pending_swipes"){custStates.add("Pending Swipes");}
+        else if (map["session_status"] == "location_confirmed"){custStates.add("Location Confirmed");}
         else{custStates.add("SessionStateError");}
-
         print("custStates: ${custStates}");
+
+        //
       }
       return 1;
     }
@@ -231,7 +218,13 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                             return Card(
                               child: FlatButton(
                                 padding: EdgeInsets.all(0),
-                                onPressed: (){},
+                                onPressed: (){
+                                  globals.sessionData = allData[index];
+                                  globals.sessionData["sessionid"] = sessionIDs[index];
+                                  globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+                                  print("Current Session Data ===> ${globals.sessionData}");
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                  },
                                 child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                               ),
                             );

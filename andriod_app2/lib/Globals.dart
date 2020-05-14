@@ -19,33 +19,51 @@ String userLocationName = "defaultLocation";
 double phonelat = 0.0;
 double phonelong = 0.0;
 
-List templistofmembers = [];
-
-List<dynamic> usersSessionsList = [];
-
 bool isCreator = true;
 
 bool locationFound = false;
 
 Map<String, dynamic> tempMeetingDetails = {};
 
+Map sessionData = {};
+
+///SESSION DATA SAMPLE
+//{
+//  host_uuid: NgBZTpHmO3X4xvm4msmMtku0wLz2,
+//  meeting_type: outing, meetup_name: ,
+//  session_status: pending_members,
+//  time_created: 2020-05-13 08:05:03.486923,
+//  users: [
+//    {
+//    lat: 0.0,
+//    long: 0.0,
+//    metrics: {price: 0, quality: 1, speed: 0},
+//    transport_mode: public,
+//    user_place: Jalan Membina, Singapore,
+//    username: defaultName,
+//    uuid: NgBZTpHmO3X4xvm4msmMtku0wLz2
+//    }
+//  ]
+//}
+
+
 List fakelistofmembers = [
   {
-    "identifier" : "identifier",
+    "username" : "identifier",
     "lat" : 0,
     "long" : 0,
     "transport_mode" : "driving",
     "metrics" : {"speed":0, "quality":0, "price":0}
   },
   {
-    "identifier" : "Julia Chua",
+    "username" : "Julia Chua",
     "lat" : 1.332319,
     "long" : 103.672113,
     "transport_mode" : "Driving",
     "metrics" : {"speed":0, "quality":0, "price":0}
   },
   {
-    "identifier" : "David Fan",
+    "username" : "David Fan",
     "lat" : 1.332319,
     "long" : 103.672113,
     "transport_mode" : "Driving",
