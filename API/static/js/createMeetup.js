@@ -1,22 +1,4 @@
-// Firebase
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    // User is signed in.
-    var isAnonymous = user.isAnonymous;
-    var uid = user.uid;
-    console.log(uid);
-    var db = firebase.firestore();
 
-  } else {
-    firebase.auth().signInAnonymously().catch(function(error) {
-      // Handle Errors here.
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      // ...
-    });
-  }
-  // ...
-});
 
 var host_address_port = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
 //var session_id = window.location.pathname.split('/')[2]
@@ -49,13 +31,35 @@ var options = {
     maximumAge: 0
 };
 
+function objectifyForm(formArray) {//serialize data function
+
+  var returnArray = {};
+  for (var i = 0; i < formArray.length; i++){
+    returnArray[formArray[i]['name']] = formArray[i]['value'];
+  }
+  return returnArray;
+}
+
 function submitbutton() {
   meetupForm = $('#createMeetup')
   //console.log(meetupForm);
-  meetupData = meetupForm.serializeArray();
+  meetupData = objectifyForm(meetupForm.serializeArray());
   console.log(meetupData);
-  //console.log(meetupData.length);
-  if (meetupData.length != 8) {
+  var metrics = {"speed":parseInt(meetupData['speed']), "quality":parseInt(meetupData['quality']), "price":parseInt(meetupData['price'])}
+  delete meetupData.speed;
+  delete meetupData.quality;
+  delete meetupData.price;
+  meetupData["metrics"] = metrics;
+  meetupData["lat"] = parseFloat(meetupData["lat"]);
+  meetupData["long"] = parseFloat(meetupData["long"]);
+  meetupData["user_place"] = "Singapore";
+  meetupData["uuid"] = uid;
+  if (isAnonymous == false) {
+    meetupData["username"] = username;
+  }
+
+  console.log(meetupData);
+  if (meetupData["meeting_type"] == "") {
     alert("Please choose the purpose of your meetup!");
   } else {
       if ($('#lat').val() == '') {
@@ -70,13 +74,14 @@ function submitbutton() {
               data: JSON.stringify(meetupData),
               contentType:'application/json',
               success: function (response_data) {
+                  console.log("Everything looks good!")
                   response = response_data['session_id'];
                   window.session_id = response;
                   document.getElementById('shareLink').value = host_address_port + '/session/' + response + '/get_details';
-      //window.location.href='results_display' //form submission
+                  //window.location.href='results_display' //form submission
               },
               error: function(response_data) {
-                console.log(response_data);
+                console.log(response_data['responseText']);
               }
           })
 

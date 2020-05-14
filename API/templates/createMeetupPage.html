@@ -153,18 +153,69 @@
         <div class='col col-2'></div>
         <div class='col col-6' style='background-color:rgb(255,245,238);'>
         <form id='createMeetup' method='POST'>
+          <script>
+          // Firebase
+          firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+              // User is signed in.
+              window.isAnonymous = user.isAnonymous;
+              window.uid = user.uid;
+              window.username = user.displayName;
+              console.log(uid);
+              console.log(username);
+              console.log();
+              window.db = firebase.firestore();
+
+              // Check if user is anonymous, if true, add a input name
+              if (isAnonymous) {
+                console.log("User is anonymous.");
+                var title = document.createElement("p");
+                var node = document.createTextNode("Enter your name");
+                title.appendChild(node);
+                title.style = 'margin-top:2%;font-size:2vw;margin-left:1%;';
+                document.getElementById('addName').appendChild(title);
+
+                var input = document.createElement("input");
+                input.type = "text";
+                input.innerHTML = "Enter your name";
+                input.name = "username"
+                document.getElementById('addName').appendChild(input);
+              } else {
+                console.log("User is signed in");
+              }
+
+            } else {
+              firebase.auth().signInAnonymously().catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // ...
+              });
+            }
+            // ...
+          });
+
+          console.log('Finished running name script');
+          </script>
+
+          <div id='addName'></div>
+
+          <p style='margin-top:2%;font-size:2vw;margin-left:1%;'>Name of Meetup</p>
+          <p style='font-size:1.5vw;margin-left:1%;'>
+            <input type="text" name="meetup_name"></input>
+          </p>
+
           <p style='margin-top:2%;font-size:2vw;margin-left:1%;'>What is the purpose of your meetup?</p>
           <p style='font-size:1.5vw;margin-left:1%;'>
-              <input type="radio" name="meeting_type" value="Recreation"> Recreation </input>
-              <input type="radio" name="meeting_type" value="Food"> Food </input>
-              <input type="radio" name="meeting_type" value="Meeting"> Meeting </input></p>
+              <input type="radio" name="meeting_type" value="outing"> Outing </input>
+              <input type="radio" name="meeting_type" value="food"> Food </input>
+              <input type="radio" name="meeting_type" value="meeting"> Meeting </input></p>
 
           <p style='font-size:2vw;margin-left:1%;'>Transport mode:</p>
           <p style='font-size:1.5vw;margin-left:1%;'><select name="transport_mode" id="transportPreference"></p>
             <option value='driving'> Driving </option>
-            <option value='publicTransport'> Public Transport </option>
-            <option value='walk'> Walk </option>
-            <option value='motorcycle'> Riding </option>
+            <option value='public'> Public Transport </option>
+            <option value='walking'> Walk </option>
           </select>
         <!--
           <p style='font-size:2vw;margin-left:1%;'>Speed:</p>
@@ -187,7 +238,6 @@
           <span  style='font-size:1.5vw;margin-left:1%; ' id='priceValue'>No Preference</span>
 
           <input name='speed' value='3' style="display:none"></input>
-          <input name='username' style="display:none"></input>
 
           <br>  <!-- Just a page break -->
           <button style= 'margin-left:1%; margin-bottom:3%;font-size:1.5vw;'type='button' id='submitbutton'>Submit</button>
