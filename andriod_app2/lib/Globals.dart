@@ -20,7 +20,7 @@ double phonelat = 0.0;
 double phonelong = 0.0;
 
 bool isCreator = true;
-bool locationFound = true;
+bool locationFound = false;
 
 Map<String, dynamic> tempMeetingDetails = {};
 

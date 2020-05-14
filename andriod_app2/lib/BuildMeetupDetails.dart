@@ -100,10 +100,10 @@ class MeetupPageState extends State<MeetupPageWidget> {
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.only(top:25, bottom:5, left:15, right:8),
                 child: Text(headerText, style: TextStyle(fontSize: 18, fontFamily: "Quicksand")),
-                color: Colors.white,
+                color: Colors.white60,
               ),
               Container(
-                color: Colors.white,
+                color: Colors.white60,
                 child: Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,)
               ),
             ],
@@ -326,11 +326,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                           visible: (_host == true && _locationFound == false) ? true : false,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: <Widget>[
-                                Container(child: _generateButton(),),
-                              ],
-                            ),
+                            child: Center(child: _generateButton(),),
                           )
                       ),// generateButton
 
