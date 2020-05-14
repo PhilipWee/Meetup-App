@@ -1,3 +1,16 @@
+//Get the url depending on where the server is hosted
+var base_url = window.location.origin;
+const socket = io(base_url)
+//Join a session
+console.log(document.location.pathname.split('/')[2]);
+socket.emit('join',{'room':'19820-8cn93-d32198jcds'})
+
+//Receive data from the socket
+socket.on('event', (data) => {
+	//handle the data
+	console.log(data)
+})
+
 //=================================== CAROUSEL =================================
 class Carousel {
 
@@ -23,7 +36,8 @@ class Carousel {
 		this.topCard = this.cards[this.cards.length-1]        // top card element
 
 		// get next card
-		this.nextCard = this.cards[this.cards.length-2]
+		this.nextCard = this.cards[this.cards.length-
+			2]
 
 		// if at least one card is present
 		if (this.cards.length > 0) {

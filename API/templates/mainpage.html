@@ -179,11 +179,15 @@
                     if (user) {
                       var isAnonymous = user.isAnonymous;
                       var uid = user.uid;
-                      console.log(uid);
+                      //console.log(uid);
                       var db = firebase.firestore();
+                      var username = user.displayName;
+                      console.log(username);
 
-                      docRef = db.collection("userData").doc(uid);
-                      docRef.get().then(function(doc) {
+                      docUserData = db.collection("userData").doc(username);
+                      allSessions = db.collection("sessions");
+
+                      docUserData.get().then(function(doc) {
                         if (doc.exists) {   // if User ID exists in the firebase
                           savedData = doc.data();   // Retrieve user data
                           // Check for user's meetings. If no meeting, returns empty array.
@@ -192,13 +196,18 @@
                           console.log(sessionsList);
 
                           for (i in sessionsList) (function(i) {
-                            console.log(sessionsList[i]);
+                            // Open specific session document in Firebase
+                            docSession = allSessions.doc(sessionsList[i]);
+
+                            
                             btn = document.createElement("BUTTON");
                             btn.class = "block";
                             btn.innerHTML = sessionsList[i];
                             btn.id = "meetingID " + sessionsList[i];
                             btn.onclick = function() {
-                              // Redirect to correct page; Pending users, Pending swipes or Confirmed
+                              
+                              //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
+                              window.location.href = "/session/" + sessionsList[i] + "/swipe";
                               console.log(sessionsList[i] + " clicked!")
                             }
                             btn.style = 'font-family: Patrick Hand SC; margin-top:1%;font-size: 2vw;text-align: center;justify-items: center;';
