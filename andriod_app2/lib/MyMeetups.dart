@@ -57,10 +57,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     } //session details saved in global.tempMeetingDetals
 
   Future<int> getAllUserSessionsData(String inputUserId) async{
-    Map tempMap = {};
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
-    tempMap = jsonDecode(response.body);
+    Map tempMap = jsonDecode(response.body);
     tempMap.forEach((k, v) => sessionIDs.add(k));
 
     if (sessionIDs.length == 0) {
@@ -72,28 +71,29 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         http.Response response = await http.get(url);
         Map map = jsonDecode(response.body);
         allData.add(map);
-        print("map: $map");
+//        print("map: $map");
 
         //LABELS
         custLabels.add(map["meetup_name"]);
-        print("custLabels: ${custLabels}");
+//        print("custLabels: ${custLabels}");
 
         //IMAGES
         if (map["meeting_type"] == "outing"){custImgs.add("images/outing.jpg");}
         else if (map["meeting_type"] == "food"){custImgs.add("images/food.jpg");}
         else if (map["meeting_type"] == "meeting"){custImgs.add("images/meetingButton.jpg");}
         else{custImgs.add(map["images/meetingButton.jpg"]);}
-        print("custImgs: $custImgs");
+//        print("custImgs: $custImgs");
 
         //STATES
         if (map["session_status"] == "pending_members"){custStates.add("Pending Members");}
         else if (map["session_status"] == "pending_swipes"){custStates.add("Pending Swipes");}
         else if (map["session_status"] == "location_confirmed"){custStates.add("Location Confirmed");}
         else{custStates.add("SessionStateError");}
-        print("custStates: ${custStates}");
+//        print("custStates: ${custStates}");
 
         //
       }
+
       return 1;
     }
   } // list of all sessionIds saved in

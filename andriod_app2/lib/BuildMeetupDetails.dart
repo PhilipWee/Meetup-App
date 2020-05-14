@@ -1,3 +1,4 @@
+import 'package:andriod_app2/ResultsSwipePage.dart';
 import 'package:flutter/rendering.dart';
 
 import 'main.dart';
@@ -39,21 +40,35 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   Future<List<dynamic>> getMembers() async{}
 
-  ///SOCKETS
+  void getSwipeData (String inputSessID) async{
+    String url = '${globals.serverAddress}/session/$inputSessID/calculate';
+    http.Response response = await http.get(url);
+    print(response.body);
+    Map calculate = jsonDecode(response.body);
+  }
 
+//  -> Event: 'calculation_result'
+//  Sample data provided in SampleResultsJSON.json
+//  Use case: Will be emitted when the calculation is completed
+
+  ///SOCKETS
   @override
   initState(){
     super.initState();
     globals.socketIO.joinSession(globals.sessionData["sessionid"]);
-    globals.socketIO.subscribe("user_joined_room", (data)=>{ //whatever is inside here will run when server sends stuff
+    globals.socketIO.subscribe("user_joined_room", (data)=>{
       print("INCOMING SOCKETS DATA: $data"),
       globals.sessionData["users"].add(data),
       print("UPDATED SESSION'S USER DATA: ${globals.sessionData["users"]}"),
     });
+    globals.socketIO.subscribe("calculation_result", (data)=>{
+      print("get ready for some results"),
+      print(data)
+    });
   } //SOCKETS
 
 
-  // TODO: Get details of location found from database
+  // TODO: Get details of final location found from database
 
   globals.fakeData locationDetails = globals.fakeData(name: "Fisherman's Wharf",
       address: "39 San Francisco Bay Area",
@@ -102,7 +117,10 @@ class MeetupPageState extends State<MeetupPageWidget> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                     color: Colors.deepOrange,
                     textColor: Colors.white,
-                    onPressed: () async{
+                    onPressed: () {
+                      print("Calculating for session id: ${globals.sessionData["sessionid"]}");
+                      getSwipeData(globals.sessionData["sessionid"]);
+//                      Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),);
                     },
                     child: Center(child: Text('Search Places', style: TextStyle(fontFamily: "Quicksand"))),
                   ),

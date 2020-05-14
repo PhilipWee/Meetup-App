@@ -12,29 +12,10 @@ import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'Globals.dart' as globals;
 
-
-class ResultSwipePage extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Choose a Place!"),
-      ),
-      body: ResultSwipeWidget(),
-    );
-  }
-}
-
-class ResultSwipeWidget extends StatefulWidget{
-
-  @override
-  ResultSwipeState createState() => ResultSwipeState();
-}
-
 //Fake data to generate cards
 // TODO: Get actual images and info of the results from database
-List myData = [
+
+List swipeData = [
   globals.fakeData(name: "Krusty Krab",
       address: "999 Bikini Bottom Boulevard",
       details: "Delicious burgers made by a sponge",
@@ -104,6 +85,24 @@ class _Description extends StatelessWidget {
   }
 }
 
+class ResultSwipePage extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Choose a Place!"),
+      ),
+      body: ResultSwipeWidget(),
+    );
+  }
+}
+
+class ResultSwipeWidget extends StatefulWidget{
+  @override
+  ResultSwipeState createState() => ResultSwipeState();
+}
+
 class ResultSwipeState extends State<ResultSwipeWidget> {
 //  var listLen = fakeImg.length;
   List<Color> colorsForLoad = [
@@ -117,7 +116,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   _addCard(dynamic item) {
     setState(() {
       // TODO: Communicate to backend it's a YES
-      myData.remove(item);
+      swipeData.remove(item);
       selectedCards.add(item);
     });
   }
@@ -125,7 +124,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   _dismissCard(dynamic item) {
     // TODO: Communicate to backend it's a NO
     setState(() {
-      myData.remove(item);
+      swipeData.remove(item);
     });
   }
 
@@ -135,7 +134,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
     return Scaffold(
       body: Container(
-        child: myData.length == 0
+        child: swipeData.length == 0
             ? Container(
           width: screen.width,
           height: screen.height,
@@ -153,7 +152,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
         )
             : Stack(
           alignment: AlignmentDirectional.center,
-          children: myData.map((item) {
+          children: swipeData.map((item) {
             return Dismissible(
               key: UniqueKey(),
               crossAxisEndOffset: -0.25,

@@ -20,7 +20,7 @@ double phonelat = 0.0;
 double phonelong = 0.0;
 
 bool isCreator = true;
-bool locationFound = true;
+bool locationFound = false;
 
 Map<String, dynamic> tempMeetingDetails = {};
 
@@ -50,6 +50,7 @@ Map sessionData = {};
 //    uuid: NgBZTpHmO3X4xvm4msmMtku0wLz2
 //    }
 //  ]
+//  sessionid : 12345678
 //}
 
 
@@ -172,3 +173,5 @@ class fakeData {
     };
   }
 } //for swipe page
+
+
