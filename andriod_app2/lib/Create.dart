@@ -1,5 +1,6 @@
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
@@ -95,7 +96,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     Navigator.push(
       context,
       PopupLayout(
-        top: 565,
+        top: 200,
         left: 0,
         right: 0,
         bottom: 57,
@@ -118,14 +119,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     }
   }
 
-  //  static const kGoogleAPIKey = "AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g'";
-  GoogleMapsPlaces _selectedPlace = GoogleMapsPlaces(apiKey: "AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g'");
-
-  Future<Null> getLatLong(Prediction p) async {
-    PlacesDetailsResponse detail = await _selectedPlace.getDetailsByPlaceId(p.placeId);
-    globals.tempData["lat"] = detail.result.geometry.location.lat;
-    globals.tempData["long"] = detail.result.geometry.location.lng;
-  }
 
   /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
 
@@ -312,8 +305,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       hint: "Enter Location",
                       mode: Mode.overlay,
                       onSelected: (selected) async {
-                        getLatLong(selected);
-                        print("lat: ${globals.tempData["lat"]}, long: ${globals.tempData["lat"]}");
+                        List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
+                        print("${placemark[0].position}");
+                        globals.tempData["lat"] = placemark[0].position.latitude;
+                        globals.tempData["long"] = placemark[0].position.longitude;
                       },
                     )
                 ),
