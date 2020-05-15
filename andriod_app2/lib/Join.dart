@@ -7,7 +7,6 @@ import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-
 class CustomizationPage2Widget extends StatefulWidget {
   @override
   CustomizationPage2State createState() => CustomizationPage2State();
@@ -85,6 +84,11 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
   @override
   Widget build(BuildContext context) {
 
+    String mtype = "";
+    if (globals.tempMeetingDetails["meeting_type"] == "food") {mtype = "Food";}
+    else if (globals.tempMeetingDetails["meeting_type"] == "outing") {mtype = "Outing";}
+    else if (globals.tempMeetingDetails["meeting_type"] == "meeting") {mtype = "Meeting";}
+    else {mtype = globals.tempMeetingDetails["meeting_type"];}
 
     Widget buttonSection = Container(
       height: 50.0,
@@ -127,7 +131,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
       ),
       body: ListView(
         children: [
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
@@ -136,7 +139,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                     padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
-                    child: Text("DefaultMeetingName",
+                    child: Text(globals.tempMeetingDetails["meetup_name"],
                       style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
                   )
               )
@@ -150,7 +153,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                       padding:const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 8),
-                      child: Text("DefaultMeetingType",
+                      child: Text(mtype,
                         style: TextStyle(fontFamily: "QuickSand", fontSize: 15, fontWeight: FontWeight.bold),)
                   )
               )

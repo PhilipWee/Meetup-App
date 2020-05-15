@@ -8,21 +8,6 @@ import 'Globals.dart' as globals;
 import 'Join.dart';
 
 
-class Homescreen extends StatelessWidget {
-  static final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Center(
-            child: Text('My Meetups', style: TextStyle(fontFamily: "Quicksand"))),
-        backgroundColor: Colors.deepOrange,
-      ),
-    );
-  }
-}
-
 class HomeUsernameWidget extends StatefulWidget {
   @override
   HomeUsernameState createState() => HomeUsernameState();
@@ -33,7 +18,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   bool invalidLink = false;
 
-  final _joinController = TextEditingController();
+  final _joinController = TextEditingController(text: "");
 
   List<String> custLabels = [];
   List<String> custImgs = [];
@@ -53,7 +38,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
-    print(globals.tempMeetingDetails);
+    print("Current Session Details ===> ${globals.tempMeetingDetails}");
     } //session details saved in global.tempMeetingDetals
 
   Future<int> getAllUserSessionsData(String inputUserId) async{
@@ -66,30 +51,31 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       return 0;
     } else {
       for( var i=0 ; i<sessionIDs.length ; i++ ){
-        print(sessionIDs[i]);
+        print("Session ID: ${sessionIDs[i]}");
         String url = '${globals.serverAddress}/session/${sessionIDs[i]}';
         http.Response response = await http.get(url);
         Map map = jsonDecode(response.body);
         allData.add(map);
-//        print("map: $map");
+        print("Time Created: ${map["time_created"]}");
 
         //LABELS
         custLabels.add(map["meetup_name"]);
-//        print("custLabels: ${custLabels}");
+        print("Meetup Name: ${custLabels[i]}");
 
         //IMAGES
         if (map["meeting_type"] == "outing"){custImgs.add("images/outing.jpg");}
         else if (map["meeting_type"] == "food"){custImgs.add("images/food.jpg");}
         else if (map["meeting_type"] == "meeting"){custImgs.add("images/meetingButton.jpg");}
         else{custImgs.add(map["images/meetingButton.jpg"]);}
-//        print("custImgs: $custImgs");
+        print("Meeting Image: ${custImgs[i]}");
 
         //STATES
         if (map["session_status"] == "pending_members"){custStates.add("Pending Members");}
         else if (map["session_status"] == "pending_swipes"){custStates.add("Pending Swipes");}
         else if (map["session_status"] == "location_confirmed"){custStates.add("Location Confirmed");}
         else{custStates.add("SessionStateError");}
-//        print("custStates: ${custStates}");
+        print("Session State: ${custStates[i]}");
+        print(""); //for println spacing
 
         //
       }
@@ -193,8 +179,11 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       IconButton(
                         icon: Icon(Icons.person_add),
-                        onPressed: () {
+                        onPressed: () async{
+                          globals.saveMyLocationName();
                           saveSessionDetailsFromLink(_joinController.text);
+                          await Future.delayed(Duration(milliseconds: 2000)); //TODO TIME.SLEEP FOR JOINING SESSION
+                          _joinController.clear();
                           Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage2Widget()),);
                           },
                         iconSize: 25,

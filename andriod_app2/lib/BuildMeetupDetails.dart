@@ -85,7 +85,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
     bool _host = globals.isCreator;
     bool _locationFound = globals.locationFound;
 
-    /////////////////////////////////////////////////////////////////////// [BUILDERS]
+  /////////////////////////////////////////////////////////////////////// [BUILDERS]
 
     Future<Null> _refresh() async {
       setState((){});
@@ -94,7 +94,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     Future<void> _shareText() async {
       try {
-        Share.text('Link', "inseretlink", 'text/plain'); //TODO
+        Share.text('Link', globals.sessionData["url"], 'text/plain'); //TODO
       } catch (e) {
         print('error: $e');
       }
@@ -126,7 +126,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
         ),
       );
     }
-
 
     //Function to generate the search button for host
     Widget _generateButton() {
@@ -326,7 +325,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                               IconButton(
                                 icon: Icon(Icons.content_copy),
                                 onPressed: () {
-                                  Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
+                                  Clipboard.setData(ClipboardData(text: globals.sessionData["url"]));
                                 },
                               ),
                               IconButton(

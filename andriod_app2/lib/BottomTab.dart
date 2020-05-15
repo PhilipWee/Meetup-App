@@ -62,6 +62,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   void _onItemTapped(int index) {
     setState(() {
+      globals.saveMyLocationName();
+      globals.resetempData();
       _selectedPage = index;
     });
   }

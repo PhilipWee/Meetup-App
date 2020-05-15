@@ -16,13 +16,11 @@ String username = "defaultName";
 String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icons/png/19339625881548233621-512.png";
 
 String userLocationName = "defaultLocation";
-double phonelat = 0.0;
-double phonelong = 0.0;
 
 bool isCreator = true;
 bool locationFound = false;
 
-Map<String, dynamic> tempMeetingDetails = {};
+Map<String, dynamic> tempMeetingDetails = {"meetup_name": "meetup_name", "meeting_type":"meeting_type"};
 
 List<String> custLabels = [];
 List<String> custImgs = [];
@@ -92,8 +90,7 @@ Map<String,dynamic> tempData = {
   "sessionid" : 01234567,
   "link" : "LinkNotUpdated",
   "joinlink": "",
-
-//    "speed" :0,
+//  "speed" :0,
 }; ///////////////////////////////////////////////////////////////////////////////////////////////////////tempDATA
 
 
@@ -116,20 +113,20 @@ void resetempData() {
     "link" : "CreationLinkNotUpdated",
     "joinlink": "JoinLinkNotUpdated",
 
-    "speed" :0, //not used anymore but just send anyway
+//    "speed" :0, //not used anymore but just send anyway
   };
-  print("tempData reset!");
+  print("tempData cache cleared!");
 }
 
 void saveMyLocationName() async{
   var location = Location();
   LocationData currentLocation = await location.getLocation();
 
-  phonelat = currentLocation.latitude;
-  phonelong = currentLocation.longitude;
+  tempData["lat"] = currentLocation.latitude;
+  tempData["long"] = currentLocation.longitude;
 
-  print("User's Current Coordinates: $phonelat,$phonelong");
-  List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(phonelat,phonelong);
+  print("User's Current Coordinates: ${tempData["lat"]},${tempData["long"]}");
+  List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(tempData["lat"],tempData["long"]);
   Placemark placeMark = myplacemark[0];
   String name = myplacemark[0].thoroughfare.toString();
   String locality = placeMark.locality;

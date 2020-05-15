@@ -101,7 +101,6 @@ class _LoginPageState extends State<LoginPage> {
     return FlatButton(
       color: Colors.white,
       onPressed: () async {
-        globals.saveMyLocationName();
         signInWithGoogle().whenComplete(() {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(

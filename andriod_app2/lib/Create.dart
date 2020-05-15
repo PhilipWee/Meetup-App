@@ -61,7 +61,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         '"metrics": {'
         '"quality":${globals.tempData["quality"]}, '
         '"price":${globals.tempData["price"]}, '
-        '"speed":${globals.tempData["speed"]}}'
+        '"speed":0'
+        '}'
         '}';
 
     print("Sending Jsonpackage To Server >>> $jsonpackage");
@@ -69,7 +70,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     try{
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
       int statusCode = response.statusCode;
-      String message = response.body;
 
       if (statusCode != 200){
         print(response.body);
@@ -307,7 +307,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       mode: Mode.overlay,
                       onSelected: (selected) async {
                         List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
-                        print("${placemark[0].position}");
+//                        print("${placemark[0].position}");
                         globals.tempData["lat"] = placemark[0].position.latitude;
                         globals.tempData["long"] = placemark[0].position.longitude;
                       },
