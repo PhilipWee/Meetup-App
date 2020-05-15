@@ -1,4 +1,4 @@
-#Sun May 10 23:50:47 SGT 2020
+#Fri May 15 15:28:59 SGT 2020
 base.0=C\:\\Users\\Philip Wee\\Documents\\Meetup-App\\socket_testing\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

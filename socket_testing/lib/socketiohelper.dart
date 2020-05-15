@@ -6,7 +6,7 @@ class CustomSocketIO {
   String url;
   String sessionID;
   SocketIO socketIO;
-
+  List<String> subscribedEvents;
 
   ///Create a Socket Class that will work with the flask back end.
   ///
@@ -15,14 +15,24 @@ class CustomSocketIO {
   ///Example:
   ///```socketIO = CustomSocketIO('http://10.0.2.2:5000');```
   CustomSocketIO(String url) {
-    this.url = url;
-    //Create the socket connection
-    this.socketIO = SocketIOManager().createSocketIO(
+    if (this.socketIO == null) {
+      this.subscribedEvents = [];
+      this.url = url;
+      //Create the socket connection
+      this.socketIO = SocketIOManager().createSocketIO(
         url,
         '/',
       );
-    this.socketIO.init();
-    this.socketIO.connect();
+      this.socketIO.init();
+      this.socketIO.connect();
+    } else {
+      print("Socket already exists, why are you trying to recreate it?");
+    }
+  }
+
+  _unSubscribeAll() {
+    this.socketIO.unSubscribesAll();
+    this.subscribedEvents = [];
   }
 
   ///For joining a particular room
@@ -33,8 +43,13 @@ class CustomSocketIO {
   ///Example:
   ///```socketIO.joinSession('1111');```
   joinSession(String sessionID) {
+    if (this.sessionID != null) {
+      //Leave the session
+      this.socketIO.sendMessage('leave', {'room': this.sessionID});
+      this._unSubscribeAll();
+    }
     this.sessionID = sessionID;
-    socketIO.sendMessage('join',json.encode({'room':this.sessionID}));
+    this.socketIO.sendMessage('join', json.encode({'room': this.sessionID}));
   }
 
   ///For subscribing to events emitted by the server
@@ -51,8 +66,10 @@ class CustomSocketIO {
   ///in this case a print statement
   ///
   subscribe(String event, Function runOnEvent) {
-    socketIO.subscribe(event, (jsonData){
-      Map<String,dynamic> data = json.decode(jsonData);
+    this.socketIO.unSubscribe(event);
+    this.subscribedEvents.add(event);
+    this.socketIO.subscribe(event, (jsonData) {
+      Map<String, dynamic> data = json.decode(jsonData);
       runOnEvent(data);
     });
   }
@@ -63,7 +80,7 @@ class CustomSocketIO {
   ///
   ///Example:
   ///```socketIO.sendMessage('send_message', {'hello':'there'});```
-  sendMessage(String event, Map<String,dynamic> data) {
+  sendMessage(String event, Map<String, dynamic> data) {
     socketIO.sendMessage(event, json.encode(data));
   }
 }
