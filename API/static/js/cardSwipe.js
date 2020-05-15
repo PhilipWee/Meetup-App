@@ -1,7 +1,41 @@
 //=================================== CAROUSEL =================================
 class Carousel {
 
-    constructor(element) {
+	constructor(element) {
+		//TODO: Get the user uuid
+		this.uuid = "TESTINGUUID"
+
+		this.curIndex = 0;
+		//Get the url depending on where the server is hosted
+		this.base_url = window.location.origin;
+		this.socket = io(this.base_url)
+
+		//Join a session
+		this.session_id = document.location.pathname.split('/')[2]
+		this.socket.emit('join',{'room':this.session_id})
+
+		//Double check that there is an acknowledgement for joining
+		this.socket.on('join_ack', (data) => {
+			//handle the data
+			console.log(data)
+		})
+
+		//Connect the socket to listen for errors
+		this.socket.on("Error",(data)=>{
+			console.log(data)
+		})
+
+		//temp session_id for testing
+		this.session_id = '008ab900-3838-11ea-bf52-06b6ade4a06c'
+
+		var results_url = this.base_url + '/session/' + this.session_id + '/results';
+
+		// Get the data for the particular session id
+		$.getJSON(results_url,function(result){
+			console.log(result)
+		}).catch(function (error){
+			console.log('Unable to get results, Error: ' + error)
+		})
 
 		this.board = element
 
@@ -17,13 +51,14 @@ class Carousel {
 	handle() {
 
 		// list all cards
-		this.cards = this.board.querySelectorAll('.card')     // this.cards is a list
+		this.cards = this.board.querySelectorAll('.swipeCard')     // this.cards is a list
 
 		// get top card
 		this.topCard = this.cards[this.cards.length-1]        // top card element
 
 		// get next card
-		this.nextCard = this.cards[this.cards.length-2]
+		this.nextCard = this.cards[this.cards.length-
+			2]
 
 		// if at least one card is present
 		if (this.cards.length > 0) {
@@ -52,14 +87,29 @@ class Carousel {
 
 	checkDirection(posX) {
 
+		// -> Event: 'swipe_details'
+		// Sample Data: {'sessionID': 123456,
+		// 			'swipeIndex': 5,
+		// 			'userIdentifier':'abc123',
+		// 			'selection':'true'/'false'}
+		// Use case: Emitted by user whenever swiping
+
     	var socket = io();
 
+		var data = {'sessionID':this.session_id,
+				'swipeIndex':this.curIndex,
+				'userIdentifier':this.uuid}
+		console.log(data)
     	if (posX > 0) {
-        	socket.emit('my event', {data: 'RIGHT'});
+			data['selection'] = true
     	}
     	else if (posX < 0) {
-           	socket.emit('my event', {data: 'LEFT'});
-       	}
+			data['selection'] = false
+		}
+
+		socket.emit('swipe_details', data);
+
+		this.curIndex++;
 	}
 
 	onTap(e) {
@@ -202,7 +252,7 @@ class Carousel {
 
 		let card = document.createElement('div')
 
-    	card.classList.add('card')
+    	card.classList.add('swipeCard')
 
 		card.style.backgroundImage =
 			"url('https://picsum.photos/320/320/?random=" + Math.round(Math.random()*1000000) + "')"

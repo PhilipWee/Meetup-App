@@ -7,6 +7,35 @@
   <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
   <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Include firebase.js -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-firestore.js"></script>
+  <!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script> -->
+
+  <script>
+  // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAJ__NSxJn-qEqWrHAVnH1duusK1rJPqx4",
+      authDomain: "meetup-mouse-265200.firebaseapp.com",
+      databaseURL: "https://meetup-mouse-265200.firebaseio.com",
+      projectId: "meetup-mouse-265200",
+      storageBucket: "meetup-mouse-265200.appspot.com",
+      messagingSenderId: "1052519191030",
+      appId: "1:1052519191030:web:90909ba515c20d766377d7",
+      measurementId: "G-FP46EYMK63"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    //firebase.analytics();
+    console.log("Firebase initialized!");
+  </script>
+
+
   <style>
 
 
@@ -170,7 +199,7 @@ div.example {
       <h2 >Allow meetup mouse to access your location and squeak away!</h2>
     </div>
   </div>
-  </div>
+
   <div class="container-fluid" >
     <div class="row justify-content-center" style="margin-right:20%;" >
 
@@ -178,19 +207,60 @@ div.example {
       <div class="col col-8" style='background-color:rgb(255,245,238); ' >
         <div class="row" >
         <form action=''+'/get_details?isHost=false' id='meetupData' method='POST'>
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw; " >
+          <script>
+          // Firebase
+          firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+              // User is signed in.
+              window.isAnonymous = user.isAnonymous;
+              window.uid = user.uid;
+              window.username = user.displayName;
+              console.log(uid);
+              console.log(username);
+              console.log();
+              window.db = firebase.firestore();
 
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;margin-left:22.5%;" >
-            <p >What is your mode of transport?</p>
-          </div>
+              // Check if user is anonymous, if true, add a input name
+              if (isAnonymous) {
+                console.log("User is anonymous.");
+                var title = document.createElement("p");
+                var node = document.createTextNode("Enter your name");
+                title.appendChild(node);
+                title.style = 'margin-top:2%;font-size:2vw;margin-left:1%;';
+                document.getElementById('addName').appendChild(title);
+
+                var input = document.createElement("input");
+                input.type = "text";
+                input.innerHTML = "Enter your name";
+                input.name = "username"
+                document.getElementById('addName').appendChild(input);
+              } else {
+                console.log("User is signed in");
+              }
+
+            } else {
+              firebase.auth().signInAnonymously().catch(function(error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // ...
+              });
+            }
+            // ...
+          });
+
+          console.log('Finished running name script');
+          </script>
+
+          <div id='addName'></div>      <!-- Ask for anonymouse name -->
+
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;" >
             <!-- MADE CHANGES START -->
-            <p><select name="transport_mode" id="transportPreference" ></p>
+            <p style='font-size:2vw;margin-left:1%;'>Transport mode:</p>
+            <p style='font-size:1.5vw;margin-left:1%;'><select name="transport_mode" id="transportPreference"></p>
               <option value='driving'> Driving </option>
-              <option value='publicTransport'> Public Transport </option>
-              <option value='walk'> Walk </option>
-              <option value='motorcycle'> Riding </option>
+              <option value='public'> Public Transport </option>
+              <option value='walking'> Walk </option>
             </select>
             <!-- MADE CHANGES END -->
           </div>
@@ -211,31 +281,20 @@ div.example {
 
           </div>
         -->
-
-          <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;margin-left:22.5%;" >
-            <p>What about the ratings?</p>
-          </div>
           <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;" >
-            <!-- MADE CHANGES START -->
-            <p><select name='quality' id="ratingsPreference" ></p>
+            <p style='font-size:2vw;margin-left:1%;'>Ratings:</p>
+            <p style='font-size:1.5vw;margin-left:1%;'><select name='quality' id="ratingsPreference"></p>
               <option value="1">No Preference</option>
               <option value="2">Regular</option>
               <option value="3">Best</option>
             </select>
-            <!-- MADE CHANGES END -->
           </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:2.5vw;font-weight: bold;margin-left:22.5%;">
-            <p>What about the price?</p>
-          </div>
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;">
-            <!-- MADE CHANGES START -->
-            <input name='price' type="range" min="0" max="4" value="0" id="pricePreference" ></input>
-            <span style='margin-left:4%;' id = 'priceValue'>No Preference</span>
 
-            <input name='speed' value='3' style="display:none"></input>
-            <!-- MADE CHANGES END -->
-          </div>
-        </div>
+          <p style='font-size:2vw;margin-left:1%;'>Price:</p>
+          <input style='font-size:1.5vw;margin-left:1%;' name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
+          <span  style='font-size:1.5vw;margin-left:1%; ' id='priceValue'>No Preference</span>
+
+          <input name='speed' value='3' style="display:none"></input>
 
           <div class="row" style='margin-right:25%;' >
            <input id="pac-input" style="font-family: Patrick Hand SC;margin-top:2%;margin-left:22.5%;margin-right:-25%;" class="controls" type="text" placeholder="   Search Location">
@@ -248,11 +307,11 @@ div.example {
       </div>
         <div class='row' style='margin-left:15.5%;'>
             <div style='font-size: 2.2vw;font-family: Patrick Hand SC;width:400px;' ><button type='button'  id='submitbutton'>Submit</button></div>
-
+        </div>
       </div>
-  </div>
     </div>
   </div>
+</div>
 
 </form>
 

@@ -39,14 +39,35 @@ var options = {
     maximumAge: 0
 };
 
+function objectifyForm(formArray) { //serialize data function
 
+  var returnArray = {};
+  for (var i = 0; i < formArray.length; i++){
+    returnArray[formArray[i]['name']] = formArray[i]['value'];
+  }
+  return returnArray;
+}
 
 function submitButton() {
 
     meetupForm = $('#meetupData')
-    meetupData = meetupForm.serializeArray()
-    //console.log(meetupData);
+    meetupData = objectifyForm(meetupForm.serializeArray());;
+    console.log(meetupData);
 
+    var metrics = {"speed":parseInt(meetupData['speed']), "quality":parseInt(meetupData['quality']), "price":parseInt(meetupData['price'])}
+    delete meetupData.speed;
+    delete meetupData.quality;
+    delete meetupData.price;
+    meetupData["metrics"] = metrics;
+    meetupData["lat"] = parseFloat(meetupData["lat"]);
+    meetupData["long"] = parseFloat(meetupData["long"]);
+    meetupData["user_place"] = "Singapore";
+    meetupData["uuid"] = uid;
+    if (isAnonymous == false) {
+      meetupData["username"] = username;
+    }
+
+    console.log(meetupData);
     if ($('#lat').val() == '') {
         alert("Please use the map to select your location!")
     } else {
@@ -60,8 +81,11 @@ function submitButton() {
             data: JSON.stringify(meetupData),
             contentType:'application/json',
             success: function (response_data) {
-                console.log("running redirect")
-    window.location.href='results_display' + '?isHost=false' //form submission
+                console.log("Everything looks good!")
+                window.location.href='/' //form submission
+            },
+            error: function(response_data) {
+              console.log(response_data['responseText']);
             }
         })
 

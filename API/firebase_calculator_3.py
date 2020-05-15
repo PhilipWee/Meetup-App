@@ -18,6 +18,7 @@ import copy
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+import socketio
 import pprint
 import threading
 #--------------------------------------REQUIREMENTS--------------------------------------
@@ -301,6 +302,10 @@ def upload_calculated_route(sess_id,result):
 #         info = get_details_for_session_id(sess_id)
 #         results = calculate(sess_id,info)
 #         upload_calculated_route(sess_id,results)
+    
+sio = socketio.Client()
+sio.connect('http://localhost:5000')
+
 
 # Create a callback on_snapshot function to capture changes
 def on_snapshot(col_snapshot, changes, read_time):
@@ -312,6 +317,8 @@ def on_snapshot(col_snapshot, changes, read_time):
             info = get_details_for_session_id(sess_id)
             results = calculate(sess_id,info)
             upload_calculated_route(sess_id,results)
+            #Send a message to the server saying that the calculation is done
+            sio.emit('calculation_done',{'session_id':sess_id})
         elif change.type.name == 'MODIFIED':
             print(u'Modification Made: {}'.format(change.document.id))
         elif change.type.name == 'REMOVED':

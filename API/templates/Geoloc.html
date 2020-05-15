@@ -65,6 +65,12 @@ img{
       padding: 2px;
       position: relative;
     }
+
+    hr.new5 {
+  border: 2px solid rgb(214,129,137);
+  border-radius: 5px;
+}
+
   </style>
   <style>
 
@@ -97,32 +103,99 @@ img{
   <div  class='row'>
     <div class='col-2'></div>
     <div class='col-8'>
-    <div
-      style='background-color:rgb(255,245,238); width: 100%; align-items: center; justify-content: center;margin-top:2%; margin-bottom:2%;height: 400px;border:5px dotted rgb(214,129,137);border-radius:12px;position:relative;'
-      class="round3" id="map">
+      <div class='row' style='margin-top:5%;'>
+        <button style='margin-left:2%;margin-right:2%;'>
+          <div class='row' >
+            <div class="col" style='margin-left:2%;'>
+
+            
+              <p style='font-family: Patrick Hand SC;font-size:2vw;line-height: 0.7; margin-top:4%;' align=left> Mew Mouse Cafe</p>
+              <p style='font-family: Patrick Hand SC;font-size:2vw;line-height: 0.7;margin-bottom:4%;' align=left>Location</p>
+   
+            </div>
+
+            <div class="col">
+              <img style='width:40%;height:40%;margin-top:6%;margin-right:4%;' align=right  src="/static/Ratings.png"
+              alt="Ratings" >
+            </div>
+
+          </div>
+
+        </button>
+       </div>
+   
+    <img
+      style='background-color:rgb(255,245,238); width: 100%;height: 50%; align-items: center; justify-content: center;margin-top:2%; margin-bottom:2%;border:5px dotted rgb(214,129,137);border-radius:12px;position:relative;'
+      class="round3"  src="/static/Cafe.png" alt='Cafe'>
+
+      <div class='row' style='margin-left:1%;'>
+        <p style='font-family: Patrick Hand SC;font-size:2vw;line-height: 0.7; margin-top:4%;' align=left> Mice Joining</p>
+        </div>
+        <hr  class="new5">
+
+
+        <div class='row' style='font-family: Patrick Hand SC; margin-top:1%;margin-left:2%;margin-right:2%;background-color: #FFFBF5;border-radius: 15px;'>
+         
+          <div class='col col-2'>
+            <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/Avatar.png" alt="Avatar">
+          </div>
+          <div class='col' style='justify-content:left;align-items:left;' align=left>
+            <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>davidsunmber1fan</p>
+            <p>David Fan</p>
+          </div>
+          <div class='col col-2'>
+            <button type='button' style='margin-top: 35%;'>
+              Remove
+            </button>
+            
+          </div>
+        </div>
+        <div class='row' style='font-family: Patrick Hand SC; margin-top:1%;margin-left:2%;margin-right:2%;background-color: #FFFBF5;border-radius: 15px;'>
+         
+          <div class='col col-2'>
+            <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/Avatar.png" alt="Avatar">
+          </div>
+          <div class='col' style='justify-content:left;align-items:left;' align=left>
+            <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>davidsunmber1fan</p>
+            <p>David Fan</p>
+          </div>
+          <div class='col col-2'>
+            <button type='button' style='margin-top: 35%;'>
+              Remove
+            </button>
+            
+          </div>
+        </div>
+        <div class='row' style='font-family: Patrick Hand SC; margin-top:1%;margin-left:2%;margin-right:2%;margin-bottom:5%;background-color: #FFFBF5;border-radius: 15px;'>
+         
+          <div class='col col-2'>
+            <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/Avatar.png" alt="Avatar">
+          </div>
+          <div class='col' style='justify-content:left;align-items:left;' align=left>
+            <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>davidsunmber1fan</p>
+            <p>David Fan</p>
+          </div>
+          <div class='col col-2'>
+            <button type='button' style='margin-top: 35%;'>
+              Remove
+            </button>
+            
+          </div>
+        </div>
+
     </div>
-  </div>
-  <div class='col-2'></div>
-</div>
-<div class='row justify-content-center'>
-    <script src="{{url_for('static', filename='js/application.js') }}"></script>
-    <button style='font-family: Patrick Hand SC; margin-top:1%;' id='jayson' onclick=jayson()>SQUEAK PEEK</button>
-  </div>
-  <div class='row justify-content-center' style='font-family: Patrick Hand SC;font-size:1.5vw'>
-<p id='loader'>See who's in the session!</p></div>
-  <div></div>
-  <div class="container-fluid" style='height:10%; font-family:Patrick Hand SC;'>
-    <div class='row align-items-center' style='align-items: center;justify-content: space-evenly;'>
-      <div style='font-family: Patrick Hand SC;' id='buttons_div'>
-      </div>
-    </div>
+
+    
   </div>
 
-  <div class="container-fluid">
-    <h2 id=checkIfHost style=display:None>{{ifHost}}</h2>
-    <div style='font-family: Patrick Hand SC;' id='calculateButton_div'>
-    </div>
-  </div>
+  <div class='col-2'></div>
+</div>
+
+ 
+  
+ 
+
+ 
 
 
 

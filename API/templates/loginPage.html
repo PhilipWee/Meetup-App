@@ -106,7 +106,6 @@
         <div class='row' style="justify-content: center;">
 
           <button id="signIn">Sign in with Google</button>
-          <button id="signOut">Sign out</button>
 
           <script>
             document.querySelector('#signIn').addEventListener('click', function(e) {
@@ -115,6 +114,7 @@
               e.stopPropagation();
 
               var provider = new firebase.auth.GoogleAuthProvider();
+              
               firebase.auth().signInWithPopup(provider).then(function(result) {
                 // This gives you a Google Access Token. You can use it to access the Google API.
                 var token = result.credential.accessToken;
@@ -134,13 +134,6 @@
                 // ...
               });
             });
-
-            document.querySelector('#signOut').addEventListener('click', function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-              firebase.auth().signOut();
-            });
-
           </script>
 
         </div>
