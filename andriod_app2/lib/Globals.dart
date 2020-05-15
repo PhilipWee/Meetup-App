@@ -17,8 +17,9 @@ String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icon
 
 String userLocationName = "defaultLocation";
 
-bool isCreator = true;
+bool isCreator = false;
 bool locationFound = false;
+bool isCalculating = false;
 
 Map<String, dynamic> tempMeetingDetails = {"meetup_name": "meetup_name", "meeting_type":"meeting_type"};
 
@@ -124,14 +125,14 @@ void saveMyLocationName() async{
 
   tempData["lat"] = currentLocation.latitude;
   tempData["long"] = currentLocation.longitude;
+  print("Current Coordinates: ${tempData["lat"]},${tempData["long"]}");
 
-  print("User's Current Coordinates: ${tempData["lat"]},${tempData["long"]}");
   List<Placemark> myplacemark = await Geolocator().placemarkFromCoordinates(tempData["lat"],tempData["long"]);
   Placemark placeMark = myplacemark[0];
   String name = myplacemark[0].thoroughfare.toString();
   String locality = placeMark.locality;
   String myLocationName = "$name, $locality";
-  print("User's Current Location $myLocationName." );
+  print("Current Location $myLocationName." );
 
   userLocationName = myLocationName;
 }
@@ -151,14 +152,14 @@ Future<String> getplacefromlatlong(double givenlat, double givenlong) async{
   return memberLocationName;
 }
 
-class fakeData {
+class FakeData {
   String name;
   String address;
   String details;
   double rating;
   List images;
 
-  fakeData({this.name, this.address, this.details, this.rating, this.images});
+  FakeData({this.name, this.address, this.details, this.rating, this.images});
 
   Map<String,dynamic> get dataMap {
     return {
@@ -172,3 +173,30 @@ class fakeData {
 } //for swipe page
 
 
+//List swipeData = [
+//  globals.fakeData(name: "",
+//      address: "",
+//      details: "Delicious burgers made by a sponge",
+//      rating: 3.0,
+//      images: ["https://marcusgohmarcusgoh.com/wp/wp-content/uploads/2017/03/GE-Maths00003.jpg",
+//        "https://media.tenor.com/images/efb52cc0e4b02ac8c5d0d71e659df8f4/tenor.png",]),
+//  globals.fakeData(name: "Singapore Zoo",
+//      address: "123 Mandai Rd",
+//      details: "Dining for the wild, experience what it's like to be the prey",
+//      rating: 3.2,
+//      images: ["https://blog.headout.com/wp-content/uploads/2018/10/Singapore-Zoo-Breakfast-With-Orangutans-e1539864638230-1200x900.jpg",
+//        "https://pix10.agoda.net/hotelImages/9643334/-1/8a2bfba69eb9d639885182e5cc9e6c07.jpg"]),
+//  globals.fakeData(name: "Chez Platypus",
+//      address: "33 Tri-state Area Ave 1",
+//      details: "MOM! Phineas and Ferb are running a restaurant!",
+//      rating: 4.3,
+//      images: ["https://vignette.wikia.nocookie.net/phineasandferb/images/0/0d/Chez_Platypus.jpg/revision/latest?cb=20090717044333",
+//        "https://vignette.wikia.nocookie.net/phineasandferb/images/f/fd/Romance_at_last.jpg/revision/latest?cb=20120701091616"]),
+//  globals.fakeData(name: "Fisherman's Wharf",
+//      address: "39 San Francisco Bay Area",
+//      details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
+//      rating: 4.6,
+//      images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
+//        "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
+//        "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]),
+//];

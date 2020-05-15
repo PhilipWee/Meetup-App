@@ -102,6 +102,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                 minWidth: 150,
                 height: 50,
                 child: FlatButton(
+                  child: Text('Join Meetup', style: TextStyle(fontFamily: "Quicksand")),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
@@ -111,7 +112,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                     await sessionJoin();
                     Navigator.pop(context);
                   },
-                  child: Text('Join Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
               ),
             ),

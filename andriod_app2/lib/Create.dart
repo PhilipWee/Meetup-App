@@ -65,7 +65,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         '}'
         '}';
 
-    print("Sending Jsonpackage To Server >>> $jsonpackage");
+    print("[sessionCreate] Sending Jsonpackage To Server >>> $jsonpackage");
 
     try{
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
@@ -182,12 +182,28 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   color: Colors.deepOrange,
                   textColor: Colors.white,
                   onPressed: () async{
-                    globals.tempData["meetupname"] = _meetupNameController.text;
-                    globals.tempData["userplace"] = _locationNameController.text;
-//                    print(globals.tempData);
-                    await sessionCreate();
-                    showPopup(context, _popupBody());
-                    },
+                    if (_meetupNameController.text.isEmpty) {
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Enter Meetup Name!",
+                              style: TextStyle(
+                                fontFamily: "Quicksand",
+                                fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.center,
+                            ),
+                            duration: Duration(seconds: 1),
+                          ));
+                    }
+                    else {
+                      globals.tempData["meetupname"] =
+                          _meetupNameController.text;
+                      globals.tempData["userplace"] =
+                          _locationNameController.text;
+                      await sessionCreate();
+                      showPopup(context, _popupBody());
+                    }
+                  },
                   child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
               ),

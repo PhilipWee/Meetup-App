@@ -40,37 +40,50 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   Future<List<dynamic>> getMembers() async{}
 
-  void getSwipeData (String inputSessID) async{
+  void calculateSession (String inputSessID) async{
     String url = '${globals.serverAddress}/session/$inputSessID/calculate';
     http.Response response = await http.get(url);
     print(response.body);
     Map calculate = jsonDecode(response.body);
   }
 
-//  -> Event: 'calculation_result'
-//  Sample data provided in SampleResultsJSON.json
-//  Use case: Will be emitted when the calculation is completed
+  void getSessionResults (String inputSessID) async{
+    String url = '${globals.serverAddress}/session/$inputSessID/results';
+    http.Response response = await http.get(url);
+    Map results = jsonDecode(response.body);
+    print(results);
+    Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),);
+  }
 
   ///SOCKETS
   @override
   initState(){
     super.initState();
+
+    // ignore: unnecessary_statements
+    if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
+    else{globals.isCreator = false;}
+
     globals.socketIO.joinSession(globals.sessionData["sessionid"]);
+
     globals.socketIO.subscribe("user_joined_room", (data)=>{
       print("INCOMING SOCKETS DATA: $data"),
       globals.sessionData["users"].add(data),
       print("UPDATED SESSION'S USER DATA: ${globals.sessionData["users"]}"),
     });
+
     globals.socketIO.subscribe("calculation_result", (data)=>{
-      print("get ready for some results"),
-      print(data)
+      print("Calculation Done!"),
+//      setState((){}),
+//      getSessionResults(globals.sessionData["sessionid"]),
+      Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()))
     });
   } //SOCKETS
 
 
   // TODO: Get details of final location found from database
 
-  globals.fakeData locationDetails = globals.fakeData(name: "Fisherman's Wharf",
+  globals.FakeData locationDetails = globals.FakeData(name: "Fisherman's Wharf",
       address: "39 San Francisco Bay Area",
       details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
       rating: 4.6,
@@ -82,8 +95,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    bool _host = globals.isCreator;
-    bool _locationFound = globals.locationFound;
 
   /////////////////////////////////////////////////////////////////////// [BUILDERS]
 
@@ -127,9 +138,30 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
+    //Function to generate the search button for the host
+    Widget _calculatingText() {
+      return Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
+        child: Center(child: Text("Calculating")),
+      );
+    }
+
     //Function to generate the search button for host
     Widget _generateButton() {
-      return Container(
+      if (globals.isCalculating ==  true) {
+        return SizedBox(
+            width: 22,
+            height: 22,
+            child: Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.deepOrange,
+                  strokeWidth: 3,
+                )
+            )
+        );
+      }
+      else {
+        return Container(
         height: 50.0,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -141,15 +173,16 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   minWidth: 150,
                   height: 50,
                   child: FlatButton(
+                    child: Center(child: Text("Search Places", style: TextStyle(fontFamily: "Quicksand"))),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                     color: Colors.deepOrange,
                     textColor: Colors.white,
                     onPressed: () {
+                      setState(() {globals.isCalculating = true;});
                       print("Calculating for session id: ${globals.sessionData["sessionid"]}");
-                      getSwipeData(globals.sessionData["sessionid"]);
+                      calculateSession(globals.sessionData["sessionid"]);
 //                      Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),);
                     },
-                    child: Center(child: Text('Search Places', style: TextStyle(fontFamily: "Quicksand"))),
                   ),
                 ),
               ),
@@ -157,13 +190,13 @@ class MeetupPageState extends State<MeetupPageWidget> {
           ],
         ) ,
       );
+      }
+
     }
 
     //Function to build details of tabulated final location
-    Widget _buildLocationDetails(globals.fakeData details) {
-
+    Widget _buildLocationDetails(globals.FakeData details) {
       List images = details.images;
-
       return Container(
         width: MediaQuery.of(context).size.width,
         height: 380,
@@ -258,8 +291,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
       return FutureBuilder(
         future: getMembers(),
         builder: (BuildContext context, AsyncSnapshot snapshot){
-//        listofmembers = snapshot.data;
-
           if(globals.sessionData["users"].isEmpty){
             return
               Container(
@@ -303,6 +334,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: RefreshIndicator(
+          onRefresh: _refresh,
           child: CustomScrollView(
             slivers: <Widget>[
               SliverList(
@@ -310,7 +342,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   Column(
                     children: <Widget>[
                       Visibility(
-                        visible: _locationFound == false ? true : false,
+                        visible: globals.locationFound == false ? true : false,
                         child: Padding(
                           padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
                           child: Row(
@@ -340,7 +372,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),//copy or share link
 
                       Visibility(
-                          visible: (_host == true && _locationFound == false) ? true : false,
+                          visible: (globals.isCreator == true && globals.locationFound == false) ? true : false,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Center(child: _generateButton(),),
@@ -348,9 +380,9 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),// generateButton
 
                       Visibility(
-                        visible: _locationFound,
+                        visible: globals.locationFound,
                         child: _buildLocationDetails(locationDetails),
-                      ), //buildlocationdetails
+                      ), //build confirmed location details
 
                     ],
                   ),
@@ -360,7 +392,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
               SliverToBoxAdapter(
                 child: Center(child: Padding(
-                  padding: const EdgeInsets.only(bottom:5.0),
+                  padding: const EdgeInsets.all(2),
                   child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
                 )),
               ),
@@ -376,8 +408,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
             ]
           ),
-
-          onRefresh: _refresh,
         ),
       ),
     );

@@ -39,6 +39,10 @@ class _MyHomePageState extends State<MyHomePage> {
         children: pageList,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.deepOrange,
+        selectedItemColor: Colors.white,
+        selectedFontSize: 15,
+        unselectedItemColor: Colors.white70,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -50,12 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle),
-              title: Text('Profile', style: TextStyle(fontFamily: "Quicksand"))
+            icon: Icon(Icons.account_circle),
+            title: Text('Profile', style: TextStyle(fontFamily: "Quicksand"))
           )
         ],
         currentIndex: _selectedPage,
-        selectedItemColor: Colors.blue,
         onTap: _onItemTapped,
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );

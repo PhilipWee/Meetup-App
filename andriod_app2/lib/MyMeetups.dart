@@ -33,7 +33,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  void saveSessionDetailsFromLink(String inputLink) async{
+  void sessionEnter(String inputLink) async{
     globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
@@ -83,6 +83,44 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       return 1;
     }
   } // list of all sessionIds saved in
+
+  Future<Null> _refresh() async {
+    setState((){});
+    return await Future.delayed(Duration(milliseconds: 5000));
+  }
+
+  sessionRemove(String inputSessionID) async {
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String url = '${globals.serverAddress}/edit_session';
+
+    String jsonpackage = '{ '
+        '"action":"remove_user", '
+        '"session_id":"$inputSessionID", '
+        '"uuid":"${globals.uuid}" '
+        '}';
+
+    print("[sessionRemove] Sending Jsonpackage To Server >>> $jsonpackage");
+    print("Removing $inputSessionID");
+
+    try{
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+
+      if (statusCode != 200){
+        print(response.body);
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error. StatusCode:$statusCode"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+      else{
+        print(response.body);
+      }
+    }
+    catch(e){print("Error caught at sessionRemove(): $e");}
+  }
 
   /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
 
@@ -172,7 +210,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                         child: TextFormField(
                           controller: _joinController,
                           decoration: InputDecoration(
-                            labelText: "Joining meetup? Enter Meeting ID or Link",
+                            labelText: "Joining meetup? Place meeting link here!",
                             border: OutlineInputBorder(gapPadding: 0),
                           ),
                         ),
@@ -180,11 +218,25 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       IconButton(
                         icon: Icon(Icons.person_add),
                         onPressed: () async{
-                          globals.saveMyLocationName();
-                          saveSessionDetailsFromLink(_joinController.text);
-                          await Future.delayed(Duration(milliseconds: 2000)); //TODO TIME.SLEEP FOR JOINING SESSION
-                          _joinController.clear();
-                          Navigator.push(context,MaterialPageRoute(builder: (context) => CustomizationPage2Widget()),);
+                          if (_joinController.text.isEmpty) {
+                            Scaffold.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Enter Link!",
+                                    style: TextStyle(fontWeight: FontWeight.w400, fontFamily: "Quicksand",),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  duration: Duration(seconds: 1),
+                                ));
+                          }
+                          else{
+                              globals.saveMyLocationName();
+                              sessionEnter(_joinController.text);
+                              await Future.delayed(Duration(milliseconds:2000)); //TODO TIME.SLEEP FOR JOINING SESSION
+                              _joinController.clear();
+                              Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),
+                              );
+                            }
                           },
                         iconSize: 25,
                         color: Colors.black87,
@@ -196,49 +248,66 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
             ],
           ),//join text controller
           Container(
+            child: Padding(
+              padding: const EdgeInsets.all(1),
+              child: Center(child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w200),)),
+            ),
+          ),
+          Container(
             child: Expanded(
               child: FutureBuilder<int>(
                 future: getAllUserSessionsData(globals.uuid),
                 builder: (BuildContext context, AsyncSnapshot<int> snapshot){
                     if (snapshot.data == 1){
-                      return Container(
-                        child: ListView.builder(
-                          padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
-                          itemCount: custImgs.length,
-                          itemBuilder: (context, index) {
-                            return Card(
+                    return RefreshIndicator(
+                      onRefresh: _refresh,
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
+                        itemCount: custLabels.length,
+                        itemBuilder: (context, index) {
+                          final item = custLabels[index];
+                          return Dismissible(
+                            child: Card(
                               child: FlatButton(
                                 padding: EdgeInsets.all(0),
                                 onPressed: (){
+                                  globals.isCalculating = false;
                                   globals.sessionData = allData[index];
                                   globals.sessionData["sessionid"] = sessionIDs[index];
                                   globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
                                   print("Current Session Data ===> ${globals.sessionData}");
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
-                                  },
+                                },
                                 child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                               ),
-                            );
-                          },
-                        ),
-                      );
-                    } else if(snapshot.data == 0){
-                      return Padding(
-                        padding: const EdgeInsets.only(left:40.0, right:40.0),
-                        child: Center(
-                          child: Text(
-                            "No Active Meetup!",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontFamily: "Quicksand",
-                              color: Colors.black45,
                             ),
-                            textAlign: TextAlign.center,
+                            key: Key(item),
+                            onDismissed: (direction){
+                              sessionRemove(sessionIDs[index]);
+                              setState(() {custLabels.removeAt(index);});
+                              Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted $item"),));
+                            }
+                          );
+                        },
+                      ),
+                    );
+                  } else if(snapshot.data == 0){
+                    return Padding(
+                      padding: const EdgeInsets.only(left:40.0, right:40.0),
+                      child: Center(
+                        child: Text(
+                          "No Active Meetup!",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: "Quicksand",
+                            color: Colors.black45,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                      );
-                    } else {
-                      return Center(child: CircularProgressIndicator());
+                      ),
+                    );
+                  } else {
+                    return Center(child: CircularProgressIndicator());
                     }
                   },
               ),

@@ -12,39 +12,14 @@ import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'Globals.dart' as globals;
 
+
 //Fake data to generate cards
 // TODO: Get actual images and info of the results from database
 
-List swipeData = [
-  globals.fakeData(name: "Krusty Krab",
-      address: "999 Bikini Bottom Boulevard",
-      details: "Delicious burgers made by a sponge",
-      rating: 3.0,
-      images: ["https://marcusgohmarcusgoh.com/wp/wp-content/uploads/2017/03/GE-Maths00003.jpg",
-        "https://media.tenor.com/images/efb52cc0e4b02ac8c5d0d71e659df8f4/tenor.png",]),
-  globals.fakeData(name: "Singapore Zoo",
-      address: "123 Mandai Rd",
-      details: "Dining for the wild, experience what it's like to be the prey",
-      rating: 3.2,
-      images: ["https://blog.headout.com/wp-content/uploads/2018/10/Singapore-Zoo-Breakfast-With-Orangutans-e1539864638230-1200x900.jpg",
-        "https://pix10.agoda.net/hotelImages/9643334/-1/8a2bfba69eb9d639885182e5cc9e6c07.jpg"]),
-  globals.fakeData(name: "Chez Platypus",
-      address: "33 Tri-state Area Ave 1",
-      details: "MOM! Phineas and Ferb are running a restaurant!",
-      rating: 4.3,
-      images: ["https://vignette.wikia.nocookie.net/phineasandferb/images/0/0d/Chez_Platypus.jpg/revision/latest?cb=20090717044333",
-        "https://vignette.wikia.nocookie.net/phineasandferb/images/f/fd/Romance_at_last.jpg/revision/latest?cb=20120701091616"]),
-  globals.fakeData(name: "Fisherman's Wharf",
-      address: "39 San Francisco Bay Area",
-      details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
-      rating: 4.6,
-      images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
-        "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
-        "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]),
-];
-
 //User's selected places
 List selectedCards = [];
+
+List swipeData = [];
 
 //Build the individual card description
 class _Description extends StatelessWidget {
@@ -91,6 +66,7 @@ class ResultSwipePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.deepOrange,
         title: Text("Choose a Place!"),
       ),
       body: ResultSwipeWidget(),
@@ -104,6 +80,26 @@ class ResultSwipeWidget extends StatefulWidget{
 }
 
 class ResultSwipeState extends State<ResultSwipeWidget> {
+
+  Future<int> getSessionResults (String inputSessID) async{
+    String url = '${globals.serverAddress}/session/$inputSessID/results';
+    http.Response response = await http.get(url);
+    Map results = jsonDecode(response.body);
+    List possibleLocations = results["possible_locations"];
+    for( var i=0 ; i<possibleLocations.length ; i++ ){
+      globals.FakeData placeInfo =
+      globals.FakeData(
+        name: possibleLocations[i],
+        address: results[possibleLocations[i]["address"]], //string
+        details: results[possibleLocations[i]["writeup"]], //string
+        rating: results[possibleLocations[i]["rating"]], //integer
+        images: results[possibleLocations[i]["images"]], //list
+      );
+      swipeData.add(placeInfo);
+    }
+    return 1;
+  }
+
 //  var listLen = fakeImg.length;
   List<Color> colorsForLoad = [
     Colors.red,
@@ -133,107 +129,130 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     Size screen = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: Container(
-        child: swipeData.length == 0
-            ? Container(
-          width: screen.width,
-          height: screen.height,
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200)),
-              Padding(
-                  padding: const EdgeInsets.only(top: 15, bottom: 10),
-                  child: Text("Waiting for results")
-              ),
-            ],
-          ),
-        )
-            : Stack(
-          alignment: AlignmentDirectional.center,
-          children: swipeData.map((item) {
-            return Dismissible(
-              key: UniqueKey(),
-              crossAxisEndOffset: -0.25,
-              onDismissed: (DismissDirection direction) {
-                if (direction == DismissDirection.endToStart) {
-                  _dismissCard(item);
-                } else {
-                  _addCard(item);
-                }
-              },
-              child: Container(
-                color: Colors.white,
+      body: FutureBuilder(
+        future: getSessionResults(globals.sessionData["sessionid"]),
+        builder: (BuildContext context, AsyncSnapshot<int> snapshot){
+        if (snapshot.data == 1) {
+              return Container(
+                child: swipeData.length == 0
+                    ? Container(
+                        width: screen.width,
+                        height: screen.height,
+                        alignment: Alignment.center,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            ColorLoader(
+                                colors: colorsForLoad,
+                                duration: Duration(milliseconds: 1200)),
+                            Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 15, bottom: 10),
+                                child: Text("Waiting for results")),
+                          ],
+                        ),
+                      )
+                    : Stack(
+                        alignment: AlignmentDirectional.center,
+                        children: swipeData.map((item) {
+                          return Dismissible(
+                            key: UniqueKey(),
+                            crossAxisEndOffset: -0.25,
+                            onDismissed: (DismissDirection direction) {
+                              if (direction == DismissDirection.endToStart) {
+                                _dismissCard(item);
+                              } else {
+                                _addCard(item);
+                              }
+                            },
+                            child: Container(
+                              color: Colors.white,
 //                      elevation: 0.5,
 //                      shape: RoundedRectangleBorder(
 //                          borderRadius: BorderRadius.all(Radius.circular(0))
 //                      ),
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 12,
-                        child: Hero(
-                            tag: item.name,
-                            child: GestureDetector(
                               child: Container(
-                                child: Image.network(item.images[0], fit: BoxFit.cover,),
-                              ),
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(item: item,)));
-                              },
-                            )
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Row(
-                          children: <Widget>[
-                            Expanded(
-                              flex: 6,
-                              child: Padding(
-                                  padding: const EdgeInsets.only(left:10.0, top: 20.0, bottom: 15, right: 20.0),
-                                  child: _Description(name: item.name, address: item.address,)
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                item.rating.toString(),
-                                style: TextStyle(
-                                    fontSize: 15.0
+                                child: Column(
+                                  children: <Widget>[
+                                    Expanded(
+                                      flex: 12,
+                                      child: Hero(
+                                          tag: item.name,
+                                          child: GestureDetector(
+                                            child: Container(
+                                              child: Image.network(
+                                                item.images[0],
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          DetailsPage(
+                                                            item: item,
+                                                          )));
+                                            },
+                                          )),
+                                    ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            flex: 6,
+                                            child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10.0,
+                                                    top: 20.0,
+                                                    bottom: 15,
+                                                    right: 20.0),
+                                                child: _Description(
+                                                  name: item.name,
+                                                  address: item.address,
+                                                )),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
+                                            child: Text(
+                                              item.rating.toString(),
+                                              style: TextStyle(fontSize: 15.0),
+                                            ),
+                                          ),
+                                          Expanded(
+                                              flex: 2,
+                                              child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    right: 10.0),
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: RatingBarIndicator(
+                                                  rating: item.rating,
+                                                  itemBuilder:
+                                                      (context, index) => Icon(
+                                                    Icons.star,
+                                                    color: Colors.black,
+                                                  ),
+                                                  itemCount: 5,
+                                                  itemSize: 15,
+                                                ),
+                                              ))
+                                        ],
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
-                            Expanded(
-                                flex: 2,
-                                child: Container(
-                                  padding: const EdgeInsets.only(right: 10.0),
-                                  alignment: Alignment.centerRight,
-                                  child: RatingBarIndicator(
-                                    rating: item.rating,
-                                    itemBuilder: (context, index) => Icon(
-                                      Icons.star,
-                                      color: Colors.black,
-                                    ),
-                                    itemCount: 5,
-                                    itemSize: 15,
-                                  ),
-                                )
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
+                          );
+                        }).toList(),
+                      ),
+              );
+            }
+        else{return Center(child: CircularProgressIndicator());}
+          }),
     );
   }
-
 }
