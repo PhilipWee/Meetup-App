@@ -34,8 +34,8 @@ if (not len(firebase_admin._apps)):
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -281,7 +281,7 @@ def manage_details(session_id):
         schema_str = """{
             "lat":float,
             "long":float,
-            "transport_mode": lambda x: x in ["public","driving","walking"],
+            "transport_mode": lambda x: x in ["public","driving","walking","riding"],
             "metrics":{
                 "speed":int,
                 "quality":int,
@@ -302,8 +302,7 @@ def manage_details(session_id):
 
         #Emit using socketio the details of the new user
         socketio.emit('user_joined_room',content,room=session_id)
-        print(content)
-        print(session_id)
+        
 
         print('user [ ' + content['uuid'] + " ] joined session [ " + session_id + " ]")
 
@@ -344,7 +343,6 @@ def results(session_id):
         return jsonify({'info': 'session exists but calculation not started'})
 
 #Function for checking if the calculation is done
-
 def on_snapshot(col_snapshot, changes, read_time):
 
     #TODO: Find a better solution
@@ -622,5 +620,5 @@ if __name__ == '__main__':
 
     # #--------------------------------------CONNECT TO DATABASE-------------------------------
     #Run the App
-    socketio.run(app,host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
+    socketio.run(app,host='0.0.0.0', debug=False, use_reloader=False,port = 5000)
     # app.run(host='0.0.0.0', debug=True, use_reloader=False)
