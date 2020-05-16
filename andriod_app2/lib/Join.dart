@@ -6,6 +6,7 @@ import 'PopUp.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 
 class CustomizationPage2Widget extends StatefulWidget {
   @override
@@ -194,6 +195,12 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                       leading: Icon(Icons.search, color: Colors.black),
                       hint: "Enter Location",
                       mode: Mode.overlay,
+                      onSelected: (selected) async {
+                        List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
+                        await Future.delayed(Duration(milliseconds: 1000));
+                        globals.tempData["lat"] = placemark[0].position.latitude;
+                        globals.tempData["long"] = placemark[0].position.longitude;
+                      },
                     )
                 ),
               ),

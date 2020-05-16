@@ -19,7 +19,7 @@ import 'Globals.dart' as globals;
 //User's selected places
 List selectedCards = [];
 
-List swipeData = [];
+List<globals.FakeData> swipeData = [];
 
 //Build the individual card description
 class _Description extends StatelessWidget {
@@ -85,15 +85,29 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     String url = '${globals.serverAddress}/session/$inputSessID/results';
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
+//    print(results);
     List possibleLocations = results["possible_locations"];
+
     for( var i=0 ; i<possibleLocations.length ; i++ ){
+
+      Map oneLocation = results[possibleLocations[i]];
+
+      print("");
+      print(possibleLocations);
+//      print(possibleLocations[i]);
+//      print(oneLocation);
+//      print(oneLocation["address"]);
+//      print(oneLocation["writeup"]);
+//      print(oneLocation["rating"]);
+//      print(oneLocation["pictures"]);
+
       globals.FakeData placeInfo =
       globals.FakeData(
         name: possibleLocations[i],
-        address: results[possibleLocations[i]["address"]], //string
-        details: results[possibleLocations[i]["writeup"]], //string
-        rating: results[possibleLocations[i]["rating"]], //integer
-        images: results[possibleLocations[i]["images"]], //list
+        address: oneLocation["address"], //string
+        details: oneLocation["writeup"], //string
+        rating: oneLocation["rating"], //integer
+        images: oneLocation["pictures"], //list
       );
       swipeData.add(placeInfo);
     }

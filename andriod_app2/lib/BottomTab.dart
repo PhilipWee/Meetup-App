@@ -34,10 +34,14 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedPage,
-        children: pageList,
-      ),
+
+      body: pageList[_selectedPage],
+
+//      body: IndexedStack(
+//        index: _selectedPage,
+//        children: pageList,
+//      ),
+
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.deepOrange,
         selectedItemColor: Colors.white,

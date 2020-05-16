@@ -323,7 +323,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       mode: Mode.overlay,
                       onSelected: (selected) async {
                         List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
-//                        print("${placemark[0].position}");
+                        await Future.delayed(Duration(milliseconds: 1000));
                         globals.tempData["lat"] = placemark[0].position.latitude;
                         globals.tempData["long"] = placemark[0].position.longitude;
                       },
