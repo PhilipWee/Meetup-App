@@ -81,7 +81,8 @@ class ResultSwipeWidget extends StatefulWidget{
 
 class ResultSwipeState extends State<ResultSwipeWidget> {
 
-  Future<int> getSessionResults (String inputSessID) async{
+  Future getSessionResults (String inputSessID) async{
+    swipeData = [];
     String url = '${globals.serverAddress}/session/$inputSessID/results';
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
@@ -92,7 +93,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
       Map oneLocation = results[possibleLocations[i]];
 
-      print("");
+//      print("");
       print(possibleLocations);
 //      print(possibleLocations[i]);
 //      print(oneLocation);
@@ -106,12 +107,11 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
         name: possibleLocations[i],
         address: oneLocation["address"], //string
         details: oneLocation["writeup"], //string
-        rating: oneLocation["rating"], //integer
+        rating: double.parse(oneLocation["rating"]), //integer
         images: oneLocation["pictures"], //list
       );
       swipeData.add(placeInfo);
-    }
-    return 1;
+    } //for loop ends here!
   }
 
 //  var listLen = fakeImg.length;
@@ -124,18 +124,19 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   ];
 
   _addCard(dynamic item) {
-    setState(() {
+
+//    setState(() {
       // TODO: Communicate to backend it's a YES
       swipeData.remove(item);
       selectedCards.add(item);
-    });
+//    });
   }
 
   _dismissCard(dynamic item) {
     // TODO: Communicate to backend it's a NO
-    setState(() {
+//    setState(() {
       swipeData.remove(item);
-    });
+//    });
   }
 
   @override
@@ -145,8 +146,8 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     return Scaffold(
       body: FutureBuilder(
         future: getSessionResults(globals.sessionData["sessionid"]),
-        builder: (BuildContext context, AsyncSnapshot<int> snapshot){
-        if (snapshot.data == 1) {
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+        if (snapshot.connectionState == ConnectionState.done) {
               return Container(
                 child: swipeData.length == 0
                     ? Container(
