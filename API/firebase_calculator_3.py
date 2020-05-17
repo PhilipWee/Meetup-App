@@ -251,8 +251,10 @@ def calculate(sess_id,info):
                 results_dict[location]['address'] = str(results_df[results_df['name']==location]['address'].values[0]) 
                 results_dict[location]['postal_code'] = str(results_df[results_df['name']==location]['postal_code'].values[0])
                 results_dict[location]['operating_hours'] = str(results_df[results_df['name']==location]['operating_hours'].values[0])
-                results_dict[location]['pictures'] = results_df[results_df['name']==location]['pictures_url'].values[0]
-                # print(results_dict[location]['pictures'])
+                pictures_unparsed = results_df[results_df['name']==location]['pictures_url'].values[0]
+                
+                results_dict[location]['pictures'] = pictures_unparsed[1:-1].split(',')
+                print(results_dict[location]['pictures'])
                 results_dict[location]['writeup'] = str(results_df[results_df['name']==location]['writeup'].values[0])
                 
                 #Make a dictionary for each use
@@ -304,7 +306,12 @@ def upload_calculated_route(sess_id,result):
 #         upload_calculated_route(sess_id,results)
     
 sio = socketio.Client()
-sio.connect('http://localhost:5000')
+# sio.connect('http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000')
+sio.connect('http://127.0.0.1:5000')
+
+# info = get_details_for_session_id('000000')
+# results = calculate('000000',info)
+# upload_calculated_route('000000',results)
 
 
 # Create a callback on_snapshot function to capture changes

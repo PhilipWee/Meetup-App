@@ -26,6 +26,30 @@
 	<!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-firestore.js"></script> -->
 	<!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script> -->
 	<style>
+		.stars-outer {
+			display: inline-block;
+			position: relative;
+			font-family: FontAwesome;
+		}
+
+		.stars-outer::before {
+			content: "\f006 \f006 \f006 \f006 \f006";
+		}
+
+		.stars-inner {
+			position: absolute;
+			top: 0;
+			left: 0;
+			white-space: nowrap;
+			overflow: hidden;
+			width: 50%;
+		}
+
+		.stars-inner::before {
+			content: "\f005 \f005 \f005 \f005 \f005";
+			color: #f8ce0b;
+		}
+
 		#board {
 			/* width: 100%;
 			height: 100vh; */
@@ -41,14 +65,17 @@
 		}
 
 		.swipeCard {
-			width: 720px;
-			height: 100vh;
+			width: 100%;
+			height: 100%;
 			position: absolute;
 			top: 50%;
 			left: 50%;
 			border-radius: 1%;
 			box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
-			background-color: white;
+			background-color: rgb(255, 240, 199);
+			background-size: contain;
+			background-position: center;
+			background-repeat: no-repeat;
 			transform: translateX(-50%) translateY(-50%) scale(0.95);
 		}
 
@@ -103,45 +130,33 @@
 			</div>
 			<div id='loginStatusButton' class='col' style='margin-top:2%;margin-left:0%'></div>
 		</div>
-		<div class='row pl-2' style="background-color:white;">
+		<div class='row pl-2' style="background-color: #fff3cd;">
 			<h2 class='w-100 mb-0 text-center'>MEW MOUSE MEETUP</h2>
 		</div>
-		<div class='row pl-2' style="background-color:white;text-align: center">
+		<div class='row pl-2' style="background-color:#fff3cd;text-align: center">
 			<h3 class='w-100'>19 December 2019</h3>
 		</div>
 		<div class="row">
 			<!-- Members in meetup -->
 			<div class="col-2 pr-0" id="meetup_members">
-				<div class="list-group list-group-flush h-100">
-					<li href="#" class="list-group-item" style="text-align: center">
+				<div class="list-group list-group-flush h-100" id="meetup_members_list">
+					<li href="#" class="list-group-item" style="text-align: center" id="meetup_members_title">
 						Members
 					</li>
-					<a href="#" class="list-group-item list-group-item-action">
-						<div class="row">
-							<div class="col-4">
-								<img class="img-fluid" src="/static/mouseAvatar1.png" />
-							</div>
-							<div class="col-8 pl-0">
-								Philip
-							</div>
-						</div>
-					</a>
-					<a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
-					<a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
 					<li class="list-group-item h-100" tabindex="-1" aria-disabled="true"></li>
 				</div>
 			</div>
 			<!-- Additional Images for particular location -->
-			<div class="col-2 ml-1 mr-1 mt-1 align-self-center" id="additional_images">
-				<div class="row mt-3">
+			<div class="col-2 ml-2 mr-2 mt-2 align-self-center" id="additional_images">
+				<div class="row mb-2">
 					<img class="img-fluid"
 						src="https://sethlui.com/wp-content/uploads/2019/03/Misato-Restaurant-9049.jpg">
 				</div>
-				<div class="row mt-3">
+				<div class="row mb-2">
 					<img class="img-fluid"
 						src="https://sethlui.com/wp-content/uploads/2019/03/Misato-Restaurant-9049.jpg">
 				</div>
-				<div class="row mt-3">
+				<div class="row">
 					<img class="img-fluid"
 						src="https://sethlui.com/wp-content/uploads/2019/03/Misato-Restaurant-9049.jpg">
 				</div>
@@ -150,32 +165,83 @@
 			<!-- Initialise the board -->
 			<div class="col-5 mt-2" id="board"></div>
 			<!-- Aditional details for particular location -->
-			<div class="col ml-2 mr-2" id="additional_info">
+			<div class="col ml-2 mr-2 pl-0 pr-0" id="additional_info">
 				<div class="h-100">
-					<div class="col h-100">
-						<div class="row">
-							<h2>
+					<div class="list-group list-group-flush h-100">
+						<li href="#" class="list-group-item" style="text-align: left">
+							<h2 id='location_name'>
 								New Mouse Cafe
 							</h2>
-						</div>
-						<div class="row"> Rating</div>
-						<div class="row">
-							<span class="fa fa-star starChecked"></span>
-							<span class="fa fa-star starChecked"></span>
-							<span class="fa fa-star starChecked"></span>
-							<span class="fa fa-star"></span>
-							<span class="fa fa-star"></span>
-						</div>
-						<div class="row"> Price</div>
-						<div class="row"> Way too high dude</div>
-						<div class="row h-100">
-							<div class="card">
-								<div class="card-body">
-									Writeup etc
+						</li>
+						<li class="list-group-item list-group-item-action">
+							<div class="row pl-2"> Rating</div>
+							<div class="row pl-2" id="stars_container">
+								<div class="stars-outer">
+									<div class="stars-inner"></div>
 								</div>
 							</div>
-						</div>
+						</li>
+						<li class="list-group-item list-group-item-action">
+							<div class="row pl-2"> Price</div>
+							<div class="row pl-2" id='price_div'></div>
+						</li>
+
+						<li class="list-group-item" style="max-height:60vh" tabindex="-1">
+							<div class="pl-2 overflow-auto" style="max-height:100%" id='writeup_div'>
+								the quick brown fox jumped over the lazy dog
+								the quick brown fox jumped over the lazy dog
+								the quick brown fox jumped over the lazy dog
+								the quick brown fox jumped over the lazy dog
+								the quick brown fox jumped over the lazy dog
+								the quick brown fox jumped over the lazy dog
+
+								the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox
+								the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the
+								quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the
+								quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the
+								quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the
+								quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the
+								quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the
+								quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy
+								dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the
+								lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+								the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+								over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox
+								fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick
+
+							</div>
+
+						</li>
 					</div>
+
 				</div>
 
 			</div>

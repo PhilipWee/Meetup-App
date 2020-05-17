@@ -17,7 +17,7 @@ import uuid
 import datetime
 import firebase_admin
 import random
-import eventlet
+# import eventlet
 from distutils.util import strtobool
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -35,8 +35,8 @@ if (not len(firebase_admin._apps)):
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -361,9 +361,9 @@ def results(session_id):
 def results_display(session_id):
     checkHost = request.args['isHost']
     if checkHost == 'true':
-        return render_template('Geoloc.html', session_id = session_id, ifHost=True)
+        return render_template('pendingUsers.html', session_id = session_id, ifHost=True)
     else:
-        return render_template('Geoloc.html', session_id = session_id, ifHost=False)
+        return render_template('pendingUsers.html', session_id = session_id, ifHost=False)
 
 @app.route('/edit_session',methods = ['POST'])
 def edit_session_details():
@@ -642,5 +642,5 @@ if __name__ == '__main__':
 
     # #--------------------------------------CONNECT TO DATABASE-------------------------------
     #Run the App
-    socketio.run(app,host='0.0.0.0', debug=False, use_reloader=False,port = 5000)
+    socketio.run(app,host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
     # app.run(host='0.0.0.0', debug=True, use_reloader=False)
