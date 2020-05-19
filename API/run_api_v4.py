@@ -490,7 +490,7 @@ def on_swipe_details(data):
                 break
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
-                update_session_status(sessionID,'location_confirmed')
+                update_session_status(sessionID,'location_confirmed',index=swipe_detail_index)
                 socketio.emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
 
     except KeyError:
@@ -566,10 +566,12 @@ def edit_user_details(details,session_id,remove=False):
         print(e)
         return "Error"
 
-def update_session_status(session_id,status):
+def update_session_status(session_id,status,index=None):
     doc_ref = get_doc_ref_for_id(session_id)
     data = doc_ref.get().get('info')
     data['session_status'] = status
+    if index is not None:
+        data['confirmed_place_index'] = index
     doc_ref.update({'info':data})
     
 

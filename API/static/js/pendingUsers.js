@@ -43,11 +43,48 @@ function generate_page(results) {
     results['users'].forEach(function (user) {
         add_user_to_list(user)
     })
+    confirmed_place_index = results['confirmed_place_index']
     if (session_status == "pending_members") {
 
-    } else {
+    } else if (session_status == "location_confirmed"){
         //unhide the location
+        display_location_details(confirmed_place_index);
     }
+}
+
+function display_location_details(confirmed_place_index){
+    $.getJSON(results_url, function (results) {
+        location_name = results['possible_locations'][confirmed_place_index]
+        location_details = results[location_name]
+        console.log(location_details)
+
+        var img_url = location_details['pictures'][0]
+        var rating = location_details['rating']
+        var address = location_details['address']
+		rating = rating == 'nan' ? 3 : parseFloat(rating)
+		// var price = location_details['price']
+		// price = price == 'nan' ? 'Unknown' : price
+		// var writeup = location_details['writeup']
+        //Update the image
+        $('#location_image').attr('src',img_url)
+		//Update the location name
+		$('#location_name').text(location_name)
+		//Update the number of stars
+		const starTotal = 5;
+		const starPercentage = (rating / starTotal) * 100;
+		const starPercentageRounded = `${(Math.round(starPercentage / 10) * 10)}%`;
+		document.querySelector(`.stars-inner`).style.width = starPercentageRounded;
+		//Update the price
+		// $('#price_div').text(price)
+		//Update the writeup
+        // $('#writeup_div').text(writeup)
+        //Update the address
+        $('#address').text(address);
+
+        $('#location_details_div').show()
+    }).catch(function (error) {
+        console.log('Unable to get details, Error: ' + error)
+    })
 }
 
 function add_user_to_list(user) {
