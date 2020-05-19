@@ -17,6 +17,7 @@ import uuid
 import datetime
 import firebase_admin
 import random
+# import eventlet
 from distutils.util import strtobool
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -35,17 +36,32 @@ if (not len(firebase_admin._apps)):
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+<<<<<<< HEAD
     # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+=======
+    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+>>>>>>> 3fbf0cb73acfcf3006014efe81fef2c76d792b06
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
     db = firestore.client()
 print('Connected!')
 #--------------------------------------CONNECT TO FIREBASE-------------------------------
-
+# eventlet.monkey_patch()
 app = Flask(__name__)
+# socketio = SocketIO(app,logger=True,engineio_logger=True)
 socketio = SocketIO(app)
+
+# def bg_emit():
+#     socketio.emit('bg_emit', dict(foo='bar'))
+
+# def listen():
+#     while True:
+#         # bg_emit()
+#         eventlet.sleep(5)
+
+# eventlet.spawn(listen)
 
 #The secret key is necessary for session to work
 app.secret_key = 'super dsagbrjuyki64y5tg4fd key'
@@ -163,7 +179,7 @@ Sample Data: {'identifier':identifier,
 Use case: Will be emitted whenever a new user joins the room
 
 -> Event: 'calculation_result'
-Sample data provided in SampleResultsJSON.json
+Sample Data: {"info" : "done"}
 Use case: Will be emitted when the calculation is completed
 
 -> Event: 'location_found'
@@ -172,6 +188,10 @@ Use case: Will be emitted when all there is a matching location
 
 
 Client Emitted Events:
+    
+-> Event: 'leave'
+Sample Data: {'room' : <session_id> }
+Use case: Will be triggered when the leave room function is called
 
 -> Event: 'join'
 Sample Data: {'room' : <session_id> }
@@ -233,10 +253,10 @@ def login():
     if request.method == "GET":
         return render_template('loginPage.html')
 
-@app.route('/swipe')
-def swipe():
+@app.route('/session/<session_id>/swipe')
+def swipe(session_id):
     if request.method == "GET":
-        return render_template('cardSwipe.html')
+        return render_template('cardSwipe.html', session_id = session_id)
 
 @app.route('/session/create', methods=['POST', 'GET'])
 def create_session():
@@ -282,7 +302,7 @@ def manage_details(session_id):
         schema_str = """{
             "lat":float,
             "long":float,
-            "transport_mode": lambda x: x in ["public","driving","walking"],
+            "transport_mode": lambda x: x in ["public","driving","walking","riding"],
             "metrics":{
                 "speed":int,
                 "quality":int,
@@ -303,8 +323,6 @@ def manage_details(session_id):
 
         #Emit using socketio the details of the new user
         socketio.emit('user_joined_room',content,room=session_id)
-        print(content)
-        print(session_id)
 
         print('user [ ' + content['uuid'] + " ] joined session [ " + session_id + " ]")
 
@@ -344,35 +362,13 @@ def results(session_id):
     elif result == 'not_started':
         return jsonify({'info': 'session exists but calculation not started'})
 
-#Function for checking if the calculation is done
-
-def on_snapshot(col_snapshot, changes, read_time):
-
-    #TODO: Find a better solution
-    if len(changes) > 10:
-        print('Received query snapshot for more than 10 changes, assuming it is first update')
-        return
-    for change in changes:
-        if change.type.name == 'ADDED':
-            print(u'Calculation Done: {}'.format(change.document.id))
-            session_id = change.document.id
-            data = get_calculate_done_details(change.document.id)
-            update_session_status(session_id,'pending_swipes')
-            socketio.emit('calculation_result',data,room=session_id)
-
-
-col_query = db.collection(u'sessions').where(u'calculate', u'==', u'done')
-
-# Watch the collection query
-query_watch = col_query.on_snapshot(on_snapshot)
-
 @app.route('/session/<session_id>/results_display')
 def results_display(session_id):
     checkHost = request.args['isHost']
     if checkHost == 'true':
-        return render_template('Geoloc.html', session_id = session_id, ifHost=True)
+        return render_template('pendingUsers.html', session_id = session_id, ifHost=True)
     else:
-        return render_template('Geoloc.html', session_id = session_id, ifHost=False)
+        return render_template('pendingUsers.html', session_id = session_id, ifHost=False)
 
 @app.route('/edit_session',methods = ['POST'])
 def edit_session_details():
@@ -417,6 +413,7 @@ def get_user_sessions():
 #Room joining function
 @socketio.on('join')
 def on_join(data):
+    
 
     #Verify the data is in the correct format
     schema_str = """
@@ -429,9 +426,35 @@ def on_join(data):
         emit("Error",result)
 
     room= data['room']
+    print("Socket Room [ " + room + " ] has been joined")
     join_room(room)
     emit('join_ack',{'message':'Someone has joined the room',
                      'room':room},room=room)
+    
+@socketio.on('leave')
+def on_leave(data):
+    
+
+    #Verify the data is in the correct format
+    schema_str = """
+    {
+         "room":str
+    }
+    """
+    result = check_dict_correct_format(data,schema_str)
+    if result != "":
+        emit("Error",result)
+
+    room= data['room']
+    print("Socket Room [ " + room + " ] has been joined")
+    leave_room(room)
+    emit('join_ack',{'message':'Someone has left the room',
+                     'room':room},room=room)
+    
+@socketio.on('calculation_done')
+def test(data):
+    print("Session ID [ " + data['session_id'] + " ] has been calculated")
+    socketio.emit('calculation_result',{"info":'done'},room=data['session_id'])
 
 @socketio.on('swipe_details')
 def on_swipe_details(data):
@@ -449,8 +472,8 @@ def on_swipe_details(data):
     #Update firebase with the swipe details for that particular room
     sessionID = data['sessionID']
     swipeIndex = data['swipeIndex']
-    userIdentifier = str(data['user'])
-    selection = bool(strtobool(data['selection']))
+    userIdentifier = str(data['userIdentifier'])
+    selection = data['selection']
     doc_ref = get_doc_ref_for_id(sessionID)
     try:
         #Update the session with the new details
@@ -553,6 +576,7 @@ def update_session_status(session_id,status):
     data = doc_ref.get().get('info')
     data['session_status'] = status
     doc_ref.update({'info':data})
+    
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')

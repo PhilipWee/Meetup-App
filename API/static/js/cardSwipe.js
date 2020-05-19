@@ -1,12 +1,56 @@
 //=================================== CAROUSEL =================================
 class Carousel {
 
-    constructor(element) {
+	constructor(element) {
+		this.reachedLastCard = false;
+		this.result_details;
+		//TODO: Get the user uuid
+		this.uuid = "TESTINGUUID";
+
+		this.curIndex = -1;
+		//Get the url depending on where the server is hosted
+		this.base_url = window.location.origin;
+		this.socket = io(this.base_url)
+
+		//Join a session
+		this.session_id = document.location.pathname.split('/')[2]
+		this.socket.emit('join', { 'room': this.session_id })
+
+		//Double check that there is an acknowledgement for joining
+		this.socket.on('join_ack', (data) => {
+			//handle the data
+			console.log(data)
+		})
+
+		//Connect the socket to listen for errors
+		this.socket.on("Error", (data) => {
+			console.log(data)
+		})
+
+		//temp session_id for testing
+		this.session_id = window.location.pathname.split('/')[2]
+
+		var results_url = this.base_url + '/session/' + this.session_id + '/results';
+		var details_url = this.base_url + '/session/' + this.session_id;
+
+		var that = this;
+		// Get the location data for the particular session id
+		$.getJSON(results_url, function (result) {
+			that.display_location_details(result);
+		}).catch(function (error) {
+			console.log('Unable to get results, Error: ' + error)
+		})
+
+		// Get the user data for the particular session id
+		$.getJSON(details_url, function (result) {
+			that.display_meetup_details(result);
+		}).catch(function (error) {
+			console.log('Unable to get meetup details, Error: ' + error)
+		})
 
 		this.board = element
 
-    	// add first two cards programmatically
-		this.push()
+		// add first card programmatically
 		this.push()
 
 		// handle gestures
@@ -14,16 +58,64 @@ class Carousel {
 
 	}
 
+	display_meetup_details(result) {
+		var host_uuid = result['host_uuid'];
+		var that = this;
+		result['users'].forEach(member_details => {
+			let list_element = that.create_member_list_element(member_details, host_uuid)
+			$('#meetup_members_title').after(list_element);
+		})
+		console.log(result)
+		//Change the meetup name
+		//Update the members list
+
+	}
+
+	create_member_list_element(member_details, host_uuid) {
+		var src;
+		var username = member_details['username']
+		if (member_details['uuid'] == host_uuid) {
+			src = '"/static/mouseAvatar1.png"'
+		} else {
+			src = '"/static/mouseAvatar2.png"'
+		}
+		//Start creating the element
+		var list_item = document.createElement('a')
+		list_item.classList.add('list-group-item', 'list-group-item-action')
+		list_item.href = "#"
+		list_item.innerHTML = `
+			<div class="row">
+				<div class="col-4">
+					<img class="img-fluid" src=${src} />
+				</div>
+				<div class="col-8 pl-0">
+					${username}
+				</div>
+			</div>
+		`
+		return list_item
+	}
+
+	display_location_details(result) {
+		this.result_details = result;
+		console.log(this.result_details)
+		//push the next two cards
+		// this.push()
+		// this.push()
+		//update each card, etc
+	}
+
 	handle() {
 
 		// list all cards
-		this.cards = this.board.querySelectorAll('.card')     // this.cards is a list
+		this.cards = this.board.querySelectorAll('.swipeCard')     // this.cards is a list
 
 		// get top card
-		this.topCard = this.cards[this.cards.length-1]        // top card element
+		this.topCard = this.cards[this.cards.length - 1]        // top card element
 
 		// get next card
-		this.nextCard = this.cards[this.cards.length-2]
+		this.nextCard = this.cards[this.cards.length -
+			2]
 
 		// if at least one card is present
 		if (this.cards.length > 0) {
@@ -35,16 +127,20 @@ class Carousel {
 			// destroy previous Hammer instance, if present
 			if (this.hammer) this.hammer.destroy()
 
-			// listen for tap and pan gestures on top card
-			this.hammer = new Hammer(this.topCard)           // Hammer constructor
-			this.hammer.add(new Hammer.Tap())
-			this.hammer.add(new Hammer.Pan({
-				position: Hammer.position_ALL, threshold: 0
-			}))
+			//Don't do anything if its the last card
+			if (this.reachedLastCard == false) {
+				// listen for tap and pan gestures on top card
+				this.hammer = new Hammer(this.topCard)           // Hammer constructor
+				this.hammer.add(new Hammer.Tap())
+				this.hammer.add(new Hammer.Pan({
+					position: Hammer.position_ALL, threshold: 0
+				}))
 
-			// pass events data to custom callbacks
-			this.hammer.on('tap', (e) => { this.onTap(e) })
-			this.hammer.on('pan', (e) => { this.onPan(e) })
+				// pass events data to custom callbacks
+				this.hammer.on('tap', (e) => { this.onTap(e) })
+				this.hammer.on('pan', (e) => { this.onPan(e) })
+			};
+
 
 		}
 
@@ -52,14 +148,71 @@ class Carousel {
 
 	checkDirection(posX) {
 
-    	var socket = io();
+		// -> Event: 'swipe_details'
+		// Sample Data: {'sessionID': 123456,
+		// 			'swipeIndex': 5,
+		// 			'userIdentifier':'abc123',
+		// 			'selection':'true'/'false'}
+		// Use case: Emitted by user whenever swiping
 
-    	if (posX > 0) {
-        	socket.emit('my event', {data: 'RIGHT'});
-    	}
-    	else if (posX < 0) {
-           	socket.emit('my event', {data: 'LEFT'});
-       	}
+		var socket = io();
+
+		var data = {
+			'sessionID': this.session_id,
+			'swipeIndex': this.curIndex,
+			'userIdentifier': this.uuid
+		}
+		console.log(data)
+		if (posX > 0) {
+			data['selection'] = true
+		}
+		else if (posX < 0) {
+			data['selection'] = false
+		}
+
+		socket.emit('swipe_details', data);
+
+		//Update the other details depending on the index
+		this._update_other_details(this.curIndex);
+
+	}
+
+	_update_other_details(indexToDisplay) {
+		var location_name = this.result_details['possible_locations'][indexToDisplay]
+		var location_details = this.result_details[location_name]
+		var img_urls = location_details['pictures'].slice(1,4)
+		var rating = location_details['rating']
+		rating = rating == 'nan' ? 3 : parseFloat(rating)
+		var price = location_details['price']
+		price = price == 'nan' ? 'Unknown' : price
+		var writeup = location_details['writeup']
+		$('#additional_images').empty();
+		//Update each of the images
+		img_urls.forEach((img_url) => {
+			$('#additional_images').append(`
+			<div class="row mb-2">
+				<img class="img-fluid"
+					src="${img_url}">
+			</div>
+			`)
+		})
+		//Update the location name
+		$('#location_name').text(location_name)
+		//Update the number of stars
+		const starTotal = 5;
+		const starPercentage = (rating / starTotal) * 100;
+		const starPercentageRounded = `${(Math.round(starPercentage / 10) * 10)}%`;
+		document.querySelector(`.stars-inner`).style.width = starPercentageRounded;
+		//Update the price
+		$('#price_div').text(price)
+		//Update the writeup
+		$('#writeup_div').text(writeup)
+		// console.log(indexToDisplay)
+		// console.log(location_name)
+		// console.log(img_urls)
+		// console.log(rating)
+		// console.log(price)
+		// console.log(writeup)
 	}
 
 	onTap(e) {
@@ -129,7 +282,7 @@ class Carousel {
 		let scale = (95 + (5 * Math.abs(propX))) / 100
 
 		// move top card
-    	this.topCard.style.transform =
+		this.topCard.style.transform =
 			'translateX(' + posX + 'px) translateY(' + posY + 'px) rotate(' + deg + 'deg) rotateY(0deg) scale(1)'
 
 		// scale next card
@@ -200,12 +353,28 @@ class Carousel {
 
 	push() {
 
+
 		let card = document.createElement('div')
 
-    	card.classList.add('card')
+		card.classList.add('swipeCard')
 
-		card.style.backgroundImage =
-			"url('https://picsum.photos/320/320/?random=" + Math.round(Math.random()*1000000) + "')"
+		var url;
+		var location_name;
+		var first_pic_url;
+		//Determine the picture to use
+		if (this.curIndex == -1) {
+			url = '/static/swipeLeftRight.png'
+		} else if (this.curIndex >= this.result_details['possible_locations'].length) {
+			//TODO fix dont have result details yet bug
+			this.reachedLastCard = true;
+			url = '/static/pleaseWait.png'
+		} else {
+			location_name = this.result_details['possible_locations'][this.curIndex]
+			url = this.result_details[location_name]['pictures'][0]
+
+		}
+
+		card.style.backgroundImage = `url('${url}')`;
 
 		if (this.board.firstChild) {
 			this.board.insertBefore(card, this.board.firstChild)
@@ -213,7 +382,11 @@ class Carousel {
 			this.board.append(card)
 		}
 
+		this.curIndex++;
+
 	}
+
+
 
 }
 
