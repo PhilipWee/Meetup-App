@@ -82,7 +82,7 @@ function submitButton() {
             contentType:'application/json',
             success: function (response_data) {
                 console.log("Everything looks good!")
-                window.location.href='/' //form submission
+                //window.location.href='/' //form submission
             },
             error: function(response_data) {
               console.log(response_data['responseText']);

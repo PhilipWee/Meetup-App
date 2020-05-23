@@ -36,7 +36,12 @@ if (not len(firebase_admin._apps)):
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+<<<<<<< HEAD
+    # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+=======
     cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+>>>>>>> 3fbf0cb73acfcf3006014efe81fef2c76d792b06
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -378,11 +383,11 @@ def edit_session_details():
     if result != "":
         return result, status.HTTP_400_BAD_REQUEST
     if content['action'] == 'remove_user':
-        
+
         edit_user_details(content,content['session_id'],remove=True)
-        
+
         print('user [ ' + content['uuid'] + " ] removed from session [ " + content['session_id'] + " ]")
-        
+
         return jsonify({'info': 'user successfully removed',
                         'uuid': content['uuid'],
                         'session_id': content['session_id']})
@@ -499,7 +504,7 @@ def on_swipe_details(data):
 
     doc_ref.update({'swipe_details':swipe_details})
 
-    
+
 
 def check_calculate_done(session_id):
     try:
@@ -555,9 +560,9 @@ def edit_user_details(details,session_id,remove=False):
                     break
         else:
             doc_dict['info']['users'].append(details)
-        
+
         doc_ref.set(doc_dict)
-        
+
         if len(doc_dict['info']['users']) == 0:
             doc_ref.delete()
 
@@ -612,7 +617,7 @@ def get_doc_ref_for_id(session_id):
 def update_userdata_sessionid(details,session_id,remove=False):
     #Update userData sessionId
     data = db.collection(u'userData').document(details['uuid']).get().to_dict()
-    
+
     if remove:
         if data is None:
             print("Unable to remove sessionid from userdata, is user in session?")
@@ -620,15 +625,15 @@ def update_userdata_sessionid(details,session_id,remove=False):
         else:
             data['sessionId'].remove(session_id)
     else:
-        
-    
+
+
         if data is None:
             data = {}
         if 'sessionId' in data:
             data['sessionId'].append(session_id)
         else:
             data["sessionId"] = [session_id]
-    
+
     db.collection(u'userData').document(details['uuid']).set(data)
 
 def send_bug_report(content):
