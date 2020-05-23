@@ -772,5 +772,8 @@ long double precision,
 operating_hours TEXT,
 pictures_url TEXT[],
 cost_per_pax TEXT,
-rating FLOAT
+rating FLOAT,
+max_price FLOAT,
+min_price FLOAT,
+food_place_link TEXT
 );

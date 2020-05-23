@@ -154,7 +154,7 @@ def calculate(sess_id,info):
             #Get the osm_id closest to the user's location
 
             if results_df is None:
-                sql_string = "SELECT *,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean\
+                sql_string = "SELECT *,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean_2\
                 ORDER BY distance"
     #           print(sql_string)
                 original_df = pd.read_sql(sql_string,data_conn)
@@ -165,7 +165,7 @@ def calculate(sess_id,info):
                 # print(original_df)
                 
             else:
-                sql_string = "SELECT id,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean\
+                sql_string = "SELECT id,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean_2\
                 ORDER BY distance"
                 table = pd.read_sql(sql_string,data_conn)
                 results_df = pd.concat([results_df,table]).groupby('id').sum().reset_index()
@@ -184,12 +184,18 @@ def calculate(sess_id,info):
         
         #Sort the values in order
         results_df = results_df.sort_values(by='distance')
+        
 
         
         max_price = max(price_array, default = 5)
         min_price = min(price_array, default = 0)
         min_rating = np.mean(quality_array)
         max_travel_time_diff = (6 - np.mean(speed_array)) * 5/60
+        
+        results_df = results_df[results_df['rating']>=min_rating]
+        # results_df = results_df[results_df['min_price']>=min_price*10]
+        results_df = results_df[results_df['min_price']<=max_price*10]
+        # return results_df
         
         # pprint.pprint(user_details)
         
@@ -306,11 +312,17 @@ def upload_calculated_route(sess_id,result):
 #         upload_calculated_route(sess_id,results)
     
 sio = socketio.Client()
-# sio.connect('http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000')
-sio.connect('http://127.0.0.1:5000')
+if len(sys.argv) >0:
+    print(sys.argv[1])
+    sio.connect(sys.argv[1])
+else:
+    sio.connect('http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000')
 
-# info = get_details_for_session_id('000000')
-# results = calculate('000000',info)
+
+
+info = get_details_for_session_id('000000')
+pprint.pprint(info)
+results = calculate('000000',info)
 # upload_calculated_route('000000',results)
 
 

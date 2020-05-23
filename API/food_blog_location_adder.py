@@ -18,11 +18,13 @@ import uuid
 import datetime
 import firebase_admin
 import requests
+import sys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 from selenium.webdriver.common import keys
+from webdriver_manager.chrome import ChromeDriverManager
 from firebase_admin import credentials
 from firebase_admin import firestore
 from onemapsg import OneMapClient
@@ -32,6 +34,7 @@ import pprint
 
 #--------------------------------------SETTINGS--------------------------------------
 NUMBER_OF_RESULTS = 20
+DEBUG_MODE = True
 #--------------------------------------SETTINGS--------------------------------------
 
 #--------------------------------------CONNECT TO FIREBASE-------------------------------
@@ -48,6 +51,12 @@ else:
 print('Connected!')
 #--------------------------------------CONNECT TO FIREBASE-------------------------------
 
+def quit_if_debug():
+    if DEBUG_MODE == True:
+        sys.exit()
+    else:
+        pass
+
 #--------------------------------------CONNECT TO DATABASE-------------------------------
 # Set up a connection to the postgres server.
 
@@ -57,18 +66,20 @@ try:
     +" password="+ creds.PGPASSWORD
     data_conn=psycopg2.connect(conn_string)
     print("Connected!")
-    crsr = conn.cursor()
+    crsr = data_conn.cursor()
 except:
     raise Exception("Unable to connect to the food blog data database, check postgres is running and IP address is correct")
 try:
     db_string = creds.PGUSER+"://"+creds.PGUSER+":"+creds.PGPASSWORD+"@"+creds.PGHOST+":5432/data"
     data_engine = create_engine(db_string)
+except:
+    pass
 #--------------------------------------CONNECT TO DATABASE-------------------------------
     
 #Get the one map api
 Client = OneMapClient(creds.ONEMAPEMAIL,creds.ONEMAPPASSWORD)
 
-def add_food_place(name,writeup,postal_code,address,operating_hours,pictures_url_arr,cost_per_pax,rating):
+def add_food_place(name,writeup,postal_code,address,operating_hours,pictures_url_arr,cost_per_pax,rating,food_place_link):
     data_conn.rollback()
     if cost_per_pax is not None:  
         cost_per_pax = str(cost_per_pax)
@@ -79,8 +90,8 @@ def add_food_place(name,writeup,postal_code,address,operating_hours,pictures_url
     lat = loc_details['results'][0]['LATITUDE']
     pictures_url_str = '{' + ','.join(pictures_url_arr) + '}'
     crsr = data_conn.cursor()
-    crsr.execute("INSERT INTO food_blog_places (name,writeup,postal_code,lat,long,address,operating_hours,pictures_url,cost_per_pax,rating) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);",
-                 (name,writeup,postal_code,lat,long,address,operating_hours,pictures_url_str,cost_per_pax,rating))
+    crsr.execute("INSERT INTO food_blog_places (name,writeup,postal_code,lat,long,address,operating_hours,pictures_url,cost_per_pax,rating,food_place_link) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s);",
+                 (name,writeup,postal_code,lat,long,address,operating_hours,pictures_url_str,cost_per_pax,rating,food_place_link))
     data_conn.commit()
 
 # add_food_place('THE FOOD PEEPS',
@@ -115,9 +126,16 @@ def add_food_place(name,writeup,postal_code,address,operating_hours,pictures_url
 #                ,4)
     
 #Scraping code for sethlui.com
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(ChromeDriverManager().install())
 driver.get("https://sethlui.com/singapore/food/")
 assert "SETHLUI" in driver.title
+#If the annoying popup comes click on it
+popups_close = WebDriverWait(driver,10).until(
+            EC.presence_of_all_elements_located((By.XPATH,"//a[@class='spu-close spu-close-popup spu-close-top_right']")))
+if len(popups_close) > 0:
+    for popup_close in popups_close:
+        popup_close.click()
+#End annoying popup
 filter_buttons = driver.find_elements_by_class_name('filter-option')
 filter_buttons[2].click()
 cafe_button = driver.find_element_by_id('cafes')
@@ -147,7 +165,7 @@ while True:
 
 cafe_links = list(dict.fromkeys(cafe_links))
 
-# cafe_link = "https://sethlui.com/plus-eight-two-cafe-korean-bingsu-singapore/"
+cafe_link = "https://sethlui.com/plus-eight-two-cafe-korean-bingsu-singapore/"
 
 def get_cafe_details_from_webpage(cafe_link):
     #Now that we have each page we need to get the data from each of them
@@ -189,7 +207,11 @@ def get_cafe_details_from_webpage(cafe_link):
             operating_hours = info_element.text.split('|')[2].strip()
         except:
             print('Unable to get address for ' + cafe_link + ' assuming its overseas and continuing')
+            quit_if_debug()
             return None
+    if operating_hours == "":
+        print('Operating hours are empty for ' + cafe_link)
+        quit_if_debug()
     img_elements = driver.find_elements_by_css_selector("img[class^='alignnone size-full']")
     if len(img_elements)==0:
         #Another image format
@@ -198,17 +220,32 @@ def get_cafe_details_from_webpage(cafe_link):
     try:
         cost_per_pax = re.split('Expected Damage:',write_up, flags = re.IGNORECASE)[1].strip()
     except:
-        cost_per_pax = None
-        print('Unable to get cost for ' + cafe_link)
+        
+        try: 
+            cost_per_pax = re.split('Prices:',write_up, flags = re.IGNORECASE)[1].strip()
+            
+        except:
+            try: 
+                cost_per_pax = re.split('Price:',write_up, flags = re.IGNORECASE)[1].strip()
+            except:
+                cost_per_pax = None
+                print('Unable to get cost for ' + cafe_link)
+                quit_if_debug()
+        
     try:
         rating_element = driver.find_element_by_css_selector("span[style^='font-size:11px; color:#888;font-weight:bold;']")
         rating = rating_element.text.split('/')[0]
     except:
         rating = None
         print('Unable to get rating for ' + cafe_link)
+        links_with_no_rating = ["https://sethlui.com/carmens-best-filipino-brand-singapore-2019/",
+                                "https://sethlui.com/creamery-boutique-ice-creams-mont-blanc-ice-cream-and-seasonal-favourite-lava-cookies-singapore-nov-2019/"]
+        if cafe_link not in links_with_no_rating:            
+            quit_if_debug()
     address = address.strip()
     postal_code = postal_code.strip()
-    return [name,write_up,postal_code,address,operating_hours,img_urls,cost_per_pax,rating]
+    food_place_link = cafe_link
+    return [name,write_up,postal_code,address,operating_hours,img_urls,cost_per_pax,rating,food_place_link]
 
 #Final execute loop
 for cur_iteration,cafe_link in enumerate(cafe_links):
@@ -219,6 +256,9 @@ for cur_iteration,cafe_link in enumerate(cafe_links):
         print('Adding food place to postgres for iteration ' + str(cur_iteration) + ' and webpage ' + cafe_link)
         # pprint.pprint(details)
         add_food_place(*details)
+
+
+cafe_links = cafe_links[2:]
 
 def correct_operating_hrs(op_hrs):
     contains_illegal_words = bool(re.search('Facebook|Website|Tel',op_hrs))
@@ -243,3 +283,26 @@ food_places_df = food_places_df[x]
 
 #Uplaod the cleaned results
 food_places_df.to_sql('food_blog_places_clean',data_engine)
+
+#Data cleaning part 2
+food_places_df = pd.read_sql('SELECT * FROM food_blog_places_clean',data_conn)
+
+def find_max_min_price(price_string):
+    if price_string and price_string.strip():
+        try:
+            all_floats = re.findall(r"[+]?\d*\.\d+|\d+", price_string)
+            all_floats = [float(x) for x in all_floats]
+            min_price = min(all_floats)
+            max_price = max(all_floats)
+            return min_price,max_price
+        except:
+            return None,None
+    else:
+        return None,None
+
+food_places_df['min_price'] = pd.Series(find_max_min_price(x)[0] for x in food_places_df['cost_per_pax'])
+food_places_df['max_price'] = pd.Series(find_max_min_price(x)[1] for x in food_places_df['cost_per_pax'])
+food_places_df.to_sql('food_blog_places_clean_2',data_engine)
+
+
+
