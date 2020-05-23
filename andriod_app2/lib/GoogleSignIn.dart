@@ -17,7 +17,31 @@ class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
+  @override
+  void initState(){
+    super.initState();
+    try{_auth.currentUser().then((user) => userExists(user));}
+    catch(error){print("there is some weird error");}
+  }
 
+  void userExists(user){
+    if(user==null) {
+      print("user doesn't exist");
+    }
+    else {
+      globals.uuid = user.uid;
+      globals.username = user.displayName;
+      globals.profileurl = user.photoUrl;
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return CheckNetworkPage();
+          },
+        ),
+      );
+    }
+  }
   Future<String> signInWithGoogle() async {
     final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
@@ -40,32 +64,6 @@ class _LoginPageState extends State<LoginPage> {
     globals.uuid = user.uid;
     globals.username = user.displayName;
     globals.profileurl = user.photoUrl;
-
-    try {
-      QuerySnapshot docs = await Firestore.instance.collection('userData').where('uid',isEqualTo: user.uid).getDocuments();
-      if (!docs.documents[0].exists){
-        Firestore.instance.collection('userData').document(user.uid).setData({
-          'activityType': 'activityType',
-          'lat': 0.0,
-          'long': 0.0,
-          'link': 'link',
-          'price': 0,
-          'quality': 'No Preference',
-          'sessionId': [],
-          'transportMode': 'Public Transit',
-          'userName': user.displayName,
-          'uid': user.uid
-        }).whenComplete(() =>
-            print("created userData for " + user.displayName));
-      }
-      else{
-        print("userData for ${user.displayName} already exists.");
-
-      }
-    }on PlatformException{
-      print("userData for ${user.displayName} already exists.");
-    }
-
 
     return 'signInWithGoogle succeeded: $user';
 
