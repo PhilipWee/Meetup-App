@@ -77,9 +77,9 @@ API important links explanation:
         "long":float,
         "transport_mode": lambda x: x in ["public","driving","walking"],
         "metrics":{
-            "speed":int,
-            "quality":int,
-            "price":int},
+            "speed":int,(From 1 to 5)
+            "quality":int, (From 1 to 5)
+            "price":int}, (From 1 to 5)
         "username":str,
         "uuid":str,
         "meeting_type" : lambda x: x in ["food","outing","meeting"]

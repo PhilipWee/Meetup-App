@@ -154,7 +154,7 @@ def calculate(sess_id,info):
             #Get the osm_id closest to the user's location
 
             if results_df is None:
-                sql_string = "SELECT *,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean\
+                sql_string = "SELECT *,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean_2\
                 ORDER BY distance"
     #           print(sql_string)
                 original_df = pd.read_sql(sql_string,data_conn)
@@ -165,7 +165,7 @@ def calculate(sess_id,info):
                 # print(original_df)
                 
             else:
-                sql_string = "SELECT id,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean\
+                sql_string = "SELECT id,sqrt((long- "+str(user['long'])+")^2 + (lat- "+str(user['lat'])+")^2) as distance FROM food_blog_places_clean_2\
                 ORDER BY distance"
                 table = pd.read_sql(sql_string,data_conn)
                 results_df = pd.concat([results_df,table]).groupby('id').sum().reset_index()
@@ -191,11 +191,10 @@ def calculate(sess_id,info):
         min_price = min(price_array, default = 0)
         min_rating = np.mean(quality_array)
         max_travel_time_diff = (6 - np.mean(speed_array)) * 5/60
-        print(max_price)
-        print(min_price)
-        print(min_rating)
         
         results_df = results_df[results_df['rating']>=min_rating]
+        # results_df = results_df[results_df['min_price']>=min_price*10]
+        results_df = results_df[results_df['min_price']<=max_price*10]
         # return results_df
         
         # pprint.pprint(user_details)
