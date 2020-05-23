@@ -114,7 +114,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         Scaffold.of(context).showSnackBar(
             SnackBar(
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
-              duration: Duration(seconds: 2),
+              duration: Duration(milliseconds: 800)
             ));
       }
       else{
@@ -228,7 +228,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     style: TextStyle(fontWeight: FontWeight.w400, fontFamily: "Quicksand",),
                                     textAlign: TextAlign.center,
                                   ),
-                                  duration: Duration(seconds: 1),
+                                  duration: Duration(milliseconds: 400),
                                 ));
                           }
                           else{

@@ -48,10 +48,11 @@ class MeetupPageState extends State<MeetupPageWidget> {
   }
 
   void getSessionResults (String inputSessID) async{
+//    await Future.delayed(Duration(milliseconds: 8000)); // remove when calculator is working
     String url = '${globals.serverAddress}/session/$inputSessID/results';
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
-    print(results);
+    print("POSSIBLE LOCATIONS: ${results["possible_locations"]}");
     Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),);
   }
 
@@ -75,8 +76,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
     globals.socketIO.subscribe("calculation_result", (data)=>{
       print("Calculation Done!"),
 //      setState((){}),
-//      getSessionResults(globals.sessionData["sessionid"]),
-      Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()))
+      getSessionResults(globals.sessionData["sessionid"]),
     });
   } //SOCKETS
 
@@ -181,7 +181,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       setState(() {globals.isCalculating = true;});
                       print("Calculating for session id: ${globals.sessionData["sessionid"]}");
                       calculateSession(globals.sessionData["sessionid"]);
-//                      Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),);
                     },
                   ),
                 ),
