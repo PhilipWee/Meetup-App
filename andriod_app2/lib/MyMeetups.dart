@@ -272,7 +272,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                               child: FlatButton(
                                 padding: EdgeInsets.all(0),
                                 onPressed: (){
-//                                  globals.isCalculating = false;
                                   globals.sessionData = allData[index];
                                   globals.sessionData["sessionid"] = sessionIDs[index];
                                   globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";

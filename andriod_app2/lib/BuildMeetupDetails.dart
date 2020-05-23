@@ -140,7 +140,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     //Function to generate the search button for host
     Widget _generateButton() {
-      if (globals.isCreator ==  true && globals.storyPoint == "isCalculating") {
+      if (globals.isCreator ==  true) {
         return SizedBox(
             width: 22,
             height: 22,
@@ -333,7 +333,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                     children: <Widget>[
                       Visibility(
                         visible:
-                        (globals.storyPoint == "")  ? true : false,
+                        (globals.sessionData["session_status"] == "pending_members") ? true : false,
                         child: Padding(
                           padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
                           child: Row(
@@ -363,7 +363,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),//share link
 
                       Visibility(
-                          visible: (globals.isCreator == true &&  globals.storyPoint == "") ? true : false,
+                          visible: (globals.isCreator == true && globals.sessionData["session_status"] == "pending_members") ? true : false,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Center(child: _generateButton(),),
@@ -371,21 +371,22 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),// generateButton
 
                       Visibility(
-                        visible: (globals.storyPoint == "isFound") ? true : false,
-                        child: _buildLocationDetails(locationDetails),
-                      ), //build confirmed location details
-
-                      Visibility(
-                          visible: (globals.storyPoint == "isWaiting") ? true : false,
+                          visible: (false) ? true : false, //TODO DOOBEEDOOBEDOOOO
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Center(child: Text("Waiting for the rest")),
                           )
                       ),// build Waiting text
+
+                      Visibility(
+                        visible: (globals.sessionData["session_status"] == "location_confirmed") ? true : false,
+                        child: _buildLocationDetails(locationDetails),
+                      ), //build confirmed location details
                     ],
                   ),
                 ])
               ),
+
               makeHeader("Mice Joining (${globals.sessionData["users"].length})"), //no. of members
 
               SliverToBoxAdapter(
