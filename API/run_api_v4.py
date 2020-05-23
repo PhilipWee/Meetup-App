@@ -248,7 +248,7 @@ def get_details(session_id):
 @app.route('/loginPage')
 def login():
     if request.method == "GET":
-        return render_template('loginPage.html' , session_id = session_id)
+        return render_template('loginPage.html')
 
 @app.route('/pendingUsers')
 def pendingUsers():
