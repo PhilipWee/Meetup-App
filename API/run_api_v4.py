@@ -104,13 +104,15 @@ API important links explanation:
 
 /session/<session_id> (GET)
 -> Get all session details
+-> confirmed_place_index is also provided here
 -> PLEASE USE THE SOCKET CONNECTION INSTEAD UNLESS FIRST PULL OF DATA
 -> Sample Data:
     { "session_status": "pending_members",
       "meeting_type": "food",
       "meetup_name": "hi",
       "time_created": "2020-05-13 12:46:57.370295",
-      "host_uuid": "8319hfbicyvsug21obhvyduiew"
+      "host_uuid": "8319hfbicyvsug21obhvyduiew",
+      "confirmed_place_index": 2
       "users": [
         {
           "lat": 103.3,
