@@ -21,10 +21,6 @@ String userLocationName = "defaultLocation";
 String storyPoint = "";
 
 bool isCreator = false;
-//bool isCalculating = false
-//bool isWaiting = false;
-//bool isFound = false;
-
 
 Map<String, dynamic> tempMeetingDetails = {"meetup_name": "meetup_name", "meeting_type":"meeting_type"};
 
@@ -56,31 +52,6 @@ Map sessionData = {};
 //  ]
 //  sessionid : 12345678
 //}
-
-
-List fakelistofmembers = [
-  {
-    "username" : "identifier",
-    "lat" : 0,
-    "long" : 0,
-    "transport_mode" : "driving",
-    "metrics" : {"speed":0, "quality":0, "price":0}
-  },
-  {
-    "username" : "Julia Chua",
-    "lat" : 1.332319,
-    "long" : 103.672113,
-    "transport_mode" : "Driving",
-    "metrics" : {"speed":0, "quality":0, "price":0}
-  },
-  {
-    "username" : "David Fan",
-    "lat" : 1.332319,
-    "long" : 103.672113,
-    "transport_mode" : "Driving",
-    "metrics" : {"speed":0, "quality":0, "price":0}
-  },
-];
 
 Map<String,dynamic> tempData = {
 
@@ -205,4 +176,28 @@ class FakeData {
 //      images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
 //        "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
 //        "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]),
+//];
+
+//List fakelistofmembers = [
+//  {
+//    "username" : "identifier",
+//    "lat" : 0,
+//    "long" : 0,
+//    "transport_mode" : "driving",
+//    "metrics" : {"speed":0, "quality":0, "price":0}
+//  },
+//  {
+//    "username" : "Julia Chua",
+//    "lat" : 1.332319,
+//    "long" : 103.672113,
+//    "transport_mode" : "Driving",
+//    "metrics" : {"speed":0, "quality":0, "price":0}
+//  },
+//  {
+//    "username" : "David Fan",
+//    "lat" : 1.332319,
+//    "long" : 103.672113,
+//    "transport_mode" : "Driving",
+//    "metrics" : {"speed":0, "quality":0, "price":0}
+//  },
 //];

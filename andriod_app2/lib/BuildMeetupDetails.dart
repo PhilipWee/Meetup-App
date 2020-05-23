@@ -52,10 +52,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
   initState(){
     super.initState();
 
-//    globals.isCalculating = false;
-//    globals.isWaiting = false;
-//    globals.isFound = false;
-
     if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
     else{globals.isCreator = false;}
 
@@ -71,8 +67,12 @@ class MeetupPageState extends State<MeetupPageWidget> {
       print("Calculation Done!"),
       Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)
     });
-  } //SOCKETS
 
+    globals.socketIO.subscribe("location_found", (data)=>{
+      print("Location Found!")
+
+    });
+  } //SOCKETS
 
   // TODO: Get details of final location found from database
   globals.FakeData locationDetails = globals.FakeData(name: "Fisherman's Wharf",
@@ -363,19 +363,19 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),//share link
 
                       Visibility(
-                          visible: (globals.isCreator == true && globals.sessionData["session_status"] == "pending_members") ? true : false,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Center(child: _generateButton(),),
-                          )
+                        visible: (globals.isCreator == true && globals.sessionData["session_status"] == "pending_members") ? true : false,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(child: _generateButton(),),
+                        )
                       ),// generateButton
 
                       Visibility(
-                          visible: (false) ? true : false, //TODO DOOBEEDOOBEDOOOO
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Center(child: Text("Waiting for the rest")),
-                          )
+                        visible: (false) ? true : false, //TODO DOOBEEDOOBEDOOOO
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(child: Text("Waiting for the rest")),
+                        )
                       ),// build Waiting text
 
                       Visibility(
