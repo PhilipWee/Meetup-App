@@ -101,13 +101,15 @@ API important links explanation:
 
 /session/<session_id> (GET)
 -> Get all session details
+-> confirmed_place_index is also provided here
 -> PLEASE USE THE SOCKET CONNECTION INSTEAD UNLESS FIRST PULL OF DATA
 -> Sample Data:
     { "session_status": "pending_members",
       "meeting_type": "food",
       "meetup_name": "hi",
       "time_created": "2020-05-13 12:46:57.370295",
-      "host_uuid": "8319hfbicyvsug21obhvyduiew"
+      "host_uuid": "8319hfbicyvsug21obhvyduiew",
+      "confirmed_place_index": 2
       "users": [
         {
           "lat": 103.3,
@@ -492,7 +494,7 @@ def on_swipe_details(data):
                 break
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
-                update_session_status(sessionID,'location_confirmed')
+                update_session_status(sessionID,'location_confirmed',index=swipe_detail_index)
                 socketio.emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
 
     except KeyError:
@@ -567,10 +569,12 @@ def edit_user_details(details,session_id,remove=False):
         print(e)
         return "Error"
 
-def update_session_status(session_id,status):
+def update_session_status(session_id,status,index=None):
     doc_ref = get_doc_ref_for_id(session_id)
     data = doc_ref.get().get('info')
     data['session_status'] = status
+    if index is not None:
+        data['confirmed_place_index'] = index
     doc_ref.update({'info':data})
 
 
