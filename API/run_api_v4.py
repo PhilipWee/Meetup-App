@@ -33,15 +33,12 @@ if (not len(firebase_admin._apps)):
 
     # Use the application default credentials
     # Use a service account
-    # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-<<<<<<< HEAD
     # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
-=======
-    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
->>>>>>> 3fbf0cb73acfcf3006014efe81fef2c76d792b06
+   # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+   # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -251,7 +248,13 @@ def get_details(session_id):
 @app.route('/loginPage')
 def login():
     if request.method == "GET":
-        return render_template('loginPage.html')
+        return render_template('loginPage.html' , session_id = session_id)
+
+@app.route('/pendingUsers')
+def pendingUsers():
+    if request.method == "GET":
+        return render_template('pendingUsers.html')
+
 
 @app.route('/session/<session_id>/swipe')
 def swipe(session_id):
