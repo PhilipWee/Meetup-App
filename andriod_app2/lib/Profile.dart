@@ -13,6 +13,37 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  bool _edit = false;
+  String name = globals.username;
+  String bio = "Add your bio";
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _bioController = TextEditingController();
+
+  void _changed(bool editing, String button) {
+    setState(() {
+    if (button == "edit") {
+      _edit = editing;
+    }
+    if (button == "done"){
+      if(_nameController.text.isNotEmpty) {
+        name = _nameController.text;
+        globals.username = name;
+      }
+      if (_bioController.text.isNotEmpty){
+        bio = _bioController.text;
+      } else if (_bioController.text.isEmpty) {
+        bio = "Add your bio";
+      }
+      _edit = editing;
+    }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = name;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,95 +61,156 @@ class _ProfilePageState extends State<ProfilePage> {
           alignment: Alignment.topCenter,
           child: new CustomScrollView(
             slivers: <Widget>[
-              SliverAppBar(
-                actions: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.edit, color: Colors.white,),
-                    onPressed: (){ },
-                    iconSize: 25,
-                  )
-                ],
-                backgroundColor: Colors.deepOrange,
-                automaticallyImplyLeading: false,
-                floating: true,
-                expandedHeight: _height*0.5,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Stack(
+              SliverToBoxAdapter(
+                child: Container(
+                  width: _width,
+                  height: 385,
+                  child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
                       Positioned.fill(
-                        child: new Image.network(imgUrl, scale: 2, fit: BoxFit.cover, width: _width,)),
-                      Positioned.fill(
+                          child: new Image.network(imgUrl, scale: 2, fit: BoxFit.cover, width: _width,)),
+
+                      ClipRect(
                         child: new BackdropFilter(
                             filter: new ui.ImageFilter.blur(
                               sigmaX: 5.0,
                               sigmaY: 5.0,
                             ),
                             child: new Container(
+                              width: _width,
+                              height: 385,
                               color: Colors.deepOrange.withOpacity(0.7),
                             )
                         ),
                       ),
-                      Positioned.fill(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Padding(padding: const EdgeInsets.symmetric(vertical: 5.0)),
-                            Align(
-                              alignment: Alignment.center,
-                              child: CircleAvatar(
-                                radius:_width/4.5,
-                                backgroundImage: NetworkImage(imgUrl),),
-                            ),
-                            Padding(padding: const EdgeInsets.symmetric(vertical:5.0)),
-                            Text(globals.username,
+
+                      _edit == false ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(padding: const EdgeInsets.symmetric(vertical: 25)),
+                          Align(
+                            alignment: Alignment.center,
+                            child: CircleAvatar(
+                              radius:_width/4.5,
+                              backgroundImage: NetworkImage(imgUrl),),
+                          ),
+
+                          Padding(padding: const EdgeInsets.symmetric(vertical:5.0)),
+                          Text(name,
+                            style: new TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25,
+                              color: Colors.white,
+                              fontFamily: "Quicksand",
+                            ),),
+
+                          Padding(
+                            padding: const EdgeInsets.only(top:10.0, left: 15.0, right: 15.0),
+                            child: new Text(bio,
+                              maxLines: 2,
                               style: new TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                                color: Colors.white,
-                                fontFamily: "Quicksand",
-                              ),),
-                            Padding(
-                              padding: const EdgeInsets.only(top:10.0, left: 10.0, right: 10.0),
-                              child: new Text('Prime Minister of Canada. "Come Home" to Canada, the Maple Leaf Country <3',
-                                maxLines: 2,
-                                style: new TextStyle(
-                                    fontFamily: "Quicksand",
-                                    fontSize: 14,
-                                    color: Colors.white),
-                                textAlign: TextAlign.center,),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0, bottom: 0.0),
-                              child: new Row(
-                                children: <Widget>[
-                                  rowCell(343, 'Meetups'),
-                                  rowCell(67, 'Followers'),
-                                  rowCell(275, 'Following'),
-                                ],),
-                            ),
-                          ],
-                        ),
+                                  fontFamily: "Quicksand",
+                                  fontSize: 14,
+                                  color: Colors.white),
+                              textAlign: TextAlign.center,),
+                          ),
+
+                          Padding(
+                            padding: const EdgeInsets.only(top:25.0, bottom: 15),
+                            child: new Row(
+                              children: <Widget>[
+                                rowCell(0, 'Meetups'),
+                                rowCell(0, 'Followers'),
+                                rowCell(0, 'Following'),
+                              ],),
+                          ),
+                        ],
                       )
+                      : Column(
+                        children: <Widget>[
+                          Padding(padding: const EdgeInsets.symmetric(vertical: 25)),
+                          Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                              children: <Widget>[
+                                CircleAvatar(
+                                  radius:_width/6,
+                                  backgroundImage: NetworkImage(imgUrl),
+                                ),
+
+                                FlatButton(
+                                    onPressed: () {},
+                                    child: Text("Edit",
+                                      style: TextStyle(
+                                        color: Colors.white
+                                      ),
+                                    ),
+                                )
+                              ],
+                            ),
+                          ),
+//                          Padding(padding: const EdgeInsets.symmetric(vertical:3.0)),
+
+                          Padding(
+                            padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                            child: TextField(
+                              controller: _nameController,
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                labelText: "Name",
+                                labelStyle: TextStyle(color: Colors.white, fontSize: 14.0),
+                                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                              ),
+                            ),
+                          ),
+
+                          Padding(
+                            padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                            child: TextField(
+                              controller: _bioController,
+                              style: TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                labelText: "Bio",
+                                labelStyle: TextStyle(color: Colors.white, fontSize: 14.0),
+                                enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                                focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      ),
+
+                      Positioned(
+                        top: 25,
+                        right: 10,
+                        child: _edit == false
+                            ? IconButton(
+                                icon: Icon(Icons.edit, color: Colors.white,),
+                                onPressed: (){
+                                  _changed(true, "edit");
+                                },
+                                iconSize: 25,
+                              )
+                            : IconButton(
+                                icon: Icon(Icons.done, color: Colors.white,),
+                                onPressed: () {
+                                  _changed(false, "done");
+                                },
+                                iconSize: 25,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
 
+
+
               SliverList(
                 delegate: SliverChildListDelegate([
-//                    Container(
-//                      color: Colors.white,
-//                      child: Padding(
-//                        padding: const EdgeInsets.only(top:8.0, bottom: 8.0),
-//                        child: new Row(
-//                          children: <Widget>[
-//                            rowCell(343, 'Meetups'),
-//                            rowCell(67, 'Followers'),
-//                            rowCell(275, 'Following'),
-//                          ],),
-//                      ),
-//                    ),
 
                     ListTileTheme(
                       iconColor: Colors.white,
@@ -172,6 +264,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
+
+              SliverToBoxAdapter(
+                child: Container(height: 300,),
+              ),
             ],
           ),
         )
