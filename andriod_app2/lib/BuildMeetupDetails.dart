@@ -47,26 +47,20 @@ class MeetupPageState extends State<MeetupPageWidget> {
     Map calculate = jsonDecode(response.body);
   }
 
-  void getSessionResults (String inputSessID) async{
-//    await Future.delayed(Duration(milliseconds: 8000)); // remove when calculator is working
-    String url = '${globals.serverAddress}/session/$inputSessID/results';
-    http.Response response = await http.get(url);
-    Map results = jsonDecode(response.body);
-    print("POSSIBLE LOCATIONS: ${results["possible_locations"]}");
-    Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),);
-  }
 
-  ///SOCKETS
   @override
   initState(){
     super.initState();
 
-    // ignore: unnecessary_statements
+//    globals.isCalculating = false;
+//    globals.isWaiting = false;
+//    globals.isFound = false;
+
     if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
     else{globals.isCreator = false;}
 
+    ///SOCKETS
     globals.socketIO.joinSession(globals.sessionData["sessionid"]);
-
     globals.socketIO.subscribe("user_joined_room", (data)=>{
       print("INCOMING SOCKETS DATA: $data"),
       globals.sessionData["users"].add(data),
@@ -75,14 +69,12 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     globals.socketIO.subscribe("calculation_result", (data)=>{
       print("Calculation Done!"),
-//      setState((){}),
-      getSessionResults(globals.sessionData["sessionid"]),
+      Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)
     });
   } //SOCKETS
 
 
   // TODO: Get details of final location found from database
-
   globals.FakeData locationDetails = globals.FakeData(name: "Fisherman's Wharf",
       address: "39 San Francisco Bay Area",
       details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
@@ -148,7 +140,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     //Function to generate the search button for host
     Widget _generateButton() {
-      if (globals.isCalculating ==  true) {
+      if (globals.isCreator ==  true && globals.storyPoint == "isCalculating") {
         return SizedBox(
             width: 22,
             height: 22,
@@ -178,7 +170,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
                     color: Colors.deepOrange,
                     textColor: Colors.white,
                     onPressed: () {
-                      setState(() {globals.isCalculating = true;});
                       print("Calculating for session id: ${globals.sessionData["sessionid"]}");
                       calculateSession(globals.sessionData["sessionid"]);
                     },
@@ -341,7 +332,8 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   Column(
                     children: <Widget>[
                       Visibility(
-                        visible: globals.locationFound == false ? true : false,
+                        visible:
+                        (globals.storyPoint == "")  ? true : false,
                         child: Padding(
                           padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
                           child: Row(
@@ -368,10 +360,10 @@ class MeetupPageState extends State<MeetupPageWidget> {
                             ],
                           ),
                         ),
-                      ),//copy or share link
+                      ),//share link
 
                       Visibility(
-                          visible: (globals.isCreator == true && globals.locationFound == false) ? true : false,
+                          visible: (globals.isCreator == true &&  globals.storyPoint == "") ? true : false,
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Center(child: _generateButton(),),
@@ -379,10 +371,17 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),// generateButton
 
                       Visibility(
-                        visible: globals.locationFound,
+                        visible: (globals.storyPoint == "isFound") ? true : false,
                         child: _buildLocationDetails(locationDetails),
                       ), //build confirmed location details
 
+                      Visibility(
+                          visible: (globals.storyPoint == "isWaiting") ? true : false,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(child: Text("Waiting for the rest")),
+                          )
+                      ),// build Waiting text
                     ],
                   ),
                 ])

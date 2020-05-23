@@ -23,7 +23,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   String value7 = "Outing";
   String value2 = "Public Transit";
   String value4 = "No Preference";
-  double value5 = 0;
+  double value5 = 1;
 
   String labels() {
     switch (value5.floor()) {
@@ -414,8 +414,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value4 = newValue;
-                          if (value4=="Best"){globals.tempData["quality"]=3;}
-                          else if (value4=="Regular"){globals.tempData["quality"]=2;}
+                          if (value4=="Best"){globals.tempData["quality"]=5;}
+                          else if (value4=="Regular"){globals.tempData["quality"]=3;}
                           else if (value4=="No Preference"){globals.tempData["quality"]=1;}
                         });
                       },
@@ -463,11 +463,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       value: value5,
                       onChanged: (newValue) => setState(() {
                         value5 = newValue;
-                        if (value5==1){globals.tempData["price"]=1;}
-                        else if (value5==2){globals.tempData["price"]=2;}
-                        else if (value5==3){globals.tempData["price"]=3;}
-                        else if (value5==4){globals.tempData["price"]=4;}
-                        else{globals.tempData["price"]=0;}
+                        if (value5==1){globals.tempData["price"]=2;}
+                        else if (value5==2){globals.tempData["price"]=3;}
+                        else if (value5==3){globals.tempData["price"]=4;}
+                        else if (value5==4){globals.tempData["price"]=5;}
+                        else{globals.tempData["price"]=1;}
                       }),
                       max: 4,
                       min: 0,

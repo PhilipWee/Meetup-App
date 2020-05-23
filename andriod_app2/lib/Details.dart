@@ -2,18 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:getflutter/getflutter.dart';
+import 'package:flutter/services.dart';
 
-class DetailsPage extends StatelessWidget {
-  final dynamic item;
-  DetailsPage({this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Details(item: item,),
-    );
-  }
-}
 
 class Details extends StatefulWidget {
   final dynamic item;
@@ -26,6 +16,7 @@ class Details extends StatefulWidget {
 class DetailsState extends State<Details> {
   dynamic item;
   DetailsState({this.item});
+
 
   //Function to build the carousel for images
   Widget _buildImgCarousel(List images, double height) {

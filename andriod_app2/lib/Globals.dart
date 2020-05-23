@@ -17,9 +17,14 @@ String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icon
 
 String userLocationName = "defaultLocation";
 
+
+String storyPoint = "";
+
 bool isCreator = false;
-bool locationFound = false;
-bool isCalculating = false;
+//bool isCalculating = false
+//bool isWaiting = false;
+//bool isFound = false;
+
 
 Map<String, dynamic> tempMeetingDetails = {"meetup_name": "meetup_name", "meeting_type":"meeting_type"};
 
@@ -151,6 +156,7 @@ Future<String> getplacefromlatlong(double givenlat, double givenlong) async{
   print("Member Location $memberLocationName." );
   return memberLocationName;
 }
+
 
 class FakeData {
   String name;

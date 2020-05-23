@@ -1,6 +1,7 @@
 import 'dart:convert';
 //import 'dart:html';
 import 'dart:math';
+import 'package:andriod_app2/BuildMeetupDetails.dart';
 import 'Details.dart';
 import 'color_loader.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,13 +12,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'Globals.dart' as globals;
-
+import 'PopUp.dart';
+import 'package:flutter/services.dart';
+import 'BuildMeetupDetails.dart';
 
 //Fake data to generate cards
 // TODO: Get actual images and info of the results from database
-
-//User's selected places
-List selectedCards = [];
 
 List<globals.FakeData> swipeData = [];
 
@@ -68,6 +68,7 @@ class ResultSwipePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.deepOrange,
         title: Text("Choose a Place!"),
       ),
@@ -88,16 +89,14 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     String url = '${globals.serverAddress}/session/$inputSessID/results';
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
-//    print(results);
     List possibleLocations = results["possible_locations"];
 
     for( var i=0 ; i<possibleLocations.length ; i++ ){
 
       Map oneLocation = results[possibleLocations[i]];
 
-//      print("");
-      print(possibleLocations);
-//      print(possibleLocations[i]);
+//      print(possibleLocations);
+      print(possibleLocations[i]);
 //      print(oneLocation);
 //      print(oneLocation["address"]);
 //      print(oneLocation["writeup"]);
@@ -126,19 +125,27 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   ];
 
   _addCard(dynamic item) {
+    Map<String, dynamic> data = {
+      'sessionID': globals.tempData["sessionid"],
+      'swipeIndex': swipeData.indexOf(item),
+      'userIdentifier':globals.uuid,
+      'selection':true
+    };
+    globals.socketIO.sendMessage("swipe_details", data);
 
-//    setState(() {
-      // TODO: Communicate to backend it's a YES
-      swipeData.remove(item);
-      selectedCards.add(item);
-//    });
+//    swipeData.remove(item);
   }
 
   _dismissCard(dynamic item) {
-    // TODO: Communicate to backend it's a NO
-//    setState(() {
-      swipeData.remove(item);
-//    });
+    Map<String, dynamic> data = {
+      'sessionID': globals.tempData["sessionid"],
+      'swipeIndex': swipeData.indexOf(item),
+      'userIdentifier':globals.uuid,
+      'selection':false
+    };
+    globals.socketIO.sendMessage("swipe_details", data);
+
+//    swipeData.remove(item);
   }
 
   @override
@@ -149,127 +156,145 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       body: FutureBuilder(
         future: getSessionResults(globals.sessionData["sessionid"]),
         builder: (BuildContext context, AsyncSnapshot snapshot){
-        if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.connectionState == ConnectionState.done && swipeData.length != 0) {
               return Container(
-                child: swipeData.length == 0
-                    ? Container(
-                        width: screen.width,
-                        height: screen.height,
-                        alignment: Alignment.center,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            ColorLoader(
-                                colors: colorsForLoad,
-                                duration: Duration(milliseconds: 1200)),
-                            Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 15, bottom: 10),
-                                child: Text("Waiting for results")),
-                          ],
-                        ),
-                      )
-                    : Stack(
-                        alignment: AlignmentDirectional.center,
-                        children: swipeData.map((item) {
-                          return Dismissible(
-                            key: UniqueKey(),
-                            crossAxisEndOffset: -0.25,
-                            onDismissed: (DismissDirection direction) {
-                              if (direction == DismissDirection.endToStart) {
-                                _dismissCard(item);
-                              } else {
-                                _addCard(item);
-                              }
-                            },
-                            child: Container(
-                              color: Colors.white,
+                child: Stack(
+                  alignment: AlignmentDirectional.center,
+                  children: swipeData.map((item) {
+                    return Dismissible(
+                      key: UniqueKey(),
+                      crossAxisEndOffset: -0.25,
+                      onDismissed: (DismissDirection direction) {
+                        if (swipeData.indexOf(item) == swipeData.indexOf(swipeData.first)){
+                          globals.storyPoint = "isWaiting";
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                        }
+                        else if (direction == DismissDirection.endToStart) {
+                          _dismissCard(item);
+                        } else {
+                          _addCard(item);
+                        }
+                      },
+                      child: Container(
+                        color: Colors.white,
 //                      elevation: 0.5,
 //                      shape: RoundedRectangleBorder(
 //                          borderRadius: BorderRadius.all(Radius.circular(0))
 //                      ),
-                              child: Container(
-                                child: Column(
+                        child: Container(
+                          child: Column(
+                            children: <Widget>[
+                              Expanded(
+                                flex: 12,
+                                child: Hero(
+                                    tag: UniqueKey(),
+                                    child: GestureDetector(
+                                      child: Container(
+                                        child: Image.network(
+                                          item.images[0],
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        showPopup(context, _popupBody(item));
+                                      },
+                                    )),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Row(
                                   children: <Widget>[
                                     Expanded(
-                                      flex: 12,
-                                      child: Hero(
-                                          tag: item.name,
-                                          child: GestureDetector(
-                                            child: Container(
-                                              child: Image.network(
-                                                item.images[0],
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          DetailsPage(
-                                                            item: item,
-                                                          )));
-                                            },
+                                      flex: 6,
+                                      child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 10.0,
+                                              top: 20.0,
+                                              bottom: 15,
+                                              right: 20.0),
+                                          child: _Description(
+                                            name: item.name,
+                                            address: item.address,
                                           )),
                                     ),
-                                    Expanded(
-                                      flex: 2,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Expanded(
-                                            flex: 6,
-                                            child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10.0,
-                                                    top: 20.0,
-                                                    bottom: 15,
-                                                    right: 20.0),
-                                                child: _Description(
-                                                  name: item.name,
-                                                  address: item.address,
-                                                )),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 8.0),
-                                            child: Text(
-                                              item.rating.toString(),
-                                              style: TextStyle(fontSize: 15.0),
-                                            ),
-                                          ),
-                                          Expanded(
-                                              flex: 2,
-                                              child: Container(
-                                                padding: const EdgeInsets.only(
-                                                    right: 10.0),
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: RatingBarIndicator(
-                                                  rating: item.rating,
-                                                  itemBuilder:
-                                                      (context, index) => Icon(
-                                                    Icons.star,
-                                                    color: Colors.black,
-                                                  ),
-                                                  itemCount: 5,
-                                                  itemSize: 15,
-                                                ),
-                                              ))
-                                        ],
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          right: 8.0),
+                                      child: Text(
+                                        item.rating.toString(),
+                                        style: TextStyle(fontSize: 15.0),
                                       ),
-                                    )
+                                    ),
+                                    Expanded(
+                                        flex: 2,
+                                        child: Container(
+                                          padding: const EdgeInsets.only(
+                                              right: 10.0),
+                                          alignment:
+                                          Alignment.centerRight,
+                                          child: RatingBarIndicator(
+                                            rating: item.rating,
+                                            itemBuilder:
+                                                (context, index) => Icon(
+                                              Icons.star,
+                                              color: Colors.black,
+                                            ),
+                                            itemCount: 5,
+                                            itemSize: 15,
+                                          ),
+                                        ))
                                   ],
                                 ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
+                    );
+                  }).toList(),
+                ),
               );
             }
+        else if (snapshot.connectionState == ConnectionState.done && swipeData.length == 0){
+          return Center(child: Text("No Results Found", style: TextStyle(fontFamily: "Quicksand"),));
+        }
         else{return Center(child: CircularProgressIndicator());}
           }),
     );
   }
+
+  showPopup(BuildContext context, Widget widget, {BuildContext popupContext}) {
+    Navigator.push(
+      context,
+      PopupLayout(
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        child: PopupContent(
+          content: Scaffold(
+              resizeToAvoidBottomPadding: false,
+              body: widget,
+              backgroundColor: Colors.white
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _popupBody(globals.FakeData item) {
+
+    Widget linkSection = Container(
+//        height: 100,
+        child: Padding(
+            padding: const EdgeInsets.all(0),
+            child: Details(item: item,)
+        )
+    );
+
+    return Container(child: linkSection);
+  }
+
+
 }
+

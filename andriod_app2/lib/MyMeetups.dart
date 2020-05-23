@@ -236,8 +236,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                               sessionEnter(_joinController.text);
                               await Future.delayed(Duration(milliseconds:2000)); //TODO TIME.SLEEP FOR JOINING SESSION
                               _joinController.clear();
-                              Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),
-                              );
+                              Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
                             }
                           },
                         iconSize: 25,
@@ -273,7 +272,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                               child: FlatButton(
                                 padding: EdgeInsets.all(0),
                                 onPressed: (){
-                                  globals.isCalculating = false;
+//                                  globals.isCalculating = false;
                                   globals.sessionData = allData[index];
                                   globals.sessionData["sessionid"] = sessionIDs[index];
                                   globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
@@ -308,7 +307,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                   child: FlatButton(
                                     padding: EdgeInsets.all(0),
                                     onPressed: (){
-                                      globals.isCalculating = false;
+                                      globals.storyPoint = "";
                                       globals.sessionData = allData[index];
                                       globals.sessionData["sessionid"] = sessionIDs[index];
                                       globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
