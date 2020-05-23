@@ -141,12 +141,12 @@
             <div id='loginStatusButton' class='col-2' style='margin-top:2%;margin-left:0%'></div>
 
           </div>
-          
+
 
           <div class='row pl-2' style="background-color:white;">
             <h2 >Allow meetup mouse to access your location and squeak away!</h2>
           </div>
-       
+
 
     <div class='row justify-content-center'>
       <div class='col-1'></div>
@@ -169,36 +169,36 @@
                 <input type="text" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="inputReport" placeholder="What bugs did you meet?" >
                 <button style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="enterBugReport" onclick='submitBugReport()'>Submit</button>
               </div>
-             
+
             </div>
-            
-            
+
+
             <div class='col-2'></div>
           </div>
             <!--  -->
             <hr  class="new5">
             <div class='row' style="justify-content: center;">
               <div class='col col-2'></div>
-              
+
               <div class='col'>
                 <div class='row'>
                 <p style='font-family: Patrick Hand SC;font-size: 3vw; margin-left:1.5%;'> My Meetups</p>
               </div>
-            
-          </div>    
-            
-             
+
+          </div>
+
+
                 <script>
                   firebase.auth().onAuthStateChanged(function(user) {
                     if (user) {
                       var isAnonymous = user.isAnonymous;
                       var uid = user.uid;
-                      //console.log(uid);
+                      console.log(uid);
                       var db = firebase.firestore();
                       var username = user.displayName;
                       console.log(username);
 
-                      docUserData = db.collection("userData").doc(username);
+                      docUserData = db.collection("userData").doc(uid);
 
                       docUserData.get().then(function(doc) {
                         if (doc.exists) {   // if User ID exists in the firebase
@@ -218,17 +218,19 @@
                               sessionData = result;
 
                               meetupName = sessionData['meetup_name'];
+                              meetupHost = sessionData['host_uuid'];
                               console.log(sessionData);
+                              console.log(meetupHost);
                               let sessionStatus = sessionData['session_status'];
                               console.log(meetupName);
 
                               div = document.createElement("div");
-                              
+
                               btn = document.createElement("BUTTON");
                               btn.class = "block";
                               div.className= 'col col-2';
                               div.style='margin-left: 2.5%; margin-bottom: 15%;'
-                              
+
                               btn.innerHTML = meetupName;
                               btn.id = sessionsList[i];
 
@@ -236,7 +238,13 @@
                                 if (sessionStatus == "pending_swipes") {
                                   window.location.href = "/session/" + sessionsList[i] + "/swipe";
                                 } else if (sessionStatus == "pending_members") {
-                                  console.log("Pending members!");
+                                    // Check if user is host
+                                    if (uid == meetupHost) {
+                                      window.location.href = "/session/" + sessionsList[i] + "/results_display?ifHost=True";
+                                    } else {
+                                      window.location.href = '/session/' + sessionsList[i] + "/results_display?ifHost=False";
+                                    }
+
                                 } else if (sessionStatus == "location_confirmed") {
                                   console.log("Location confirmed!");
                                 }
@@ -244,15 +252,15 @@
                               })
 
                               btn.style = 'font-family: Patrick Hand SC; font-size: 2vw;text-align: center;justify-items: center; width:100%; height:300%;'
-                              
+
                               div.appendChild(btn);
                               document.getElementById('allSessionsDiv').appendChild(div);
-                              
+
 
                             }).catch(function (error){
                               console.log('Unable to get results, Error: ' + error)
                             })
-                            
+
                           })(i);
                         } else {
                           console.log("No such document!");
@@ -272,15 +280,15 @@
                   });
                 </script>
 
-               
-            
+
+
           </div>
 
-   
-          <div class='row' style='margin-left:14%;' id="allSessionsDiv"></div>
- 
 
-     
+          <div class='row' style='margin-left:14%;' id="allSessionsDiv"></div>
+
+
+
   </body>
 
   <script src="{{url_for('static', filename='js/mainpage.js')}}"></script>
