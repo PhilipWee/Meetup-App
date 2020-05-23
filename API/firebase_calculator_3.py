@@ -312,8 +312,13 @@ def upload_calculated_route(sess_id,result):
 #         upload_calculated_route(sess_id,results)
     
 sio = socketio.Client()
-sio.connect('http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000')
-# sio.connect('http://127.0.0.1:5000')
+if len(sys.argv) >0:
+    print(sys.argv[1])
+    sio.connect(sys.argv[1])
+else:
+    sio.connect('http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000')
+
+
 
 info = get_details_for_session_id('000000')
 pprint.pprint(info)
