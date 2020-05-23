@@ -33,12 +33,21 @@ if (not len(firebase_admin._apps)):
 
     # Use the application default credentials
     # Use a service account
-    # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+<<<<<<< HEAD
     cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
 
+=======
+   # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+   # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+=======
+    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+>>>>>>> 6f0d994ecaf4fd051ca19e397d7a7a1108eee385
+>>>>>>> master
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -74,9 +83,9 @@ API important links explanation:
         "long":float,
         "transport_mode": lambda x: x in ["public","driving","walking"],
         "metrics":{
-            "speed":int,
-            "quality":int,
-            "price":int},
+            "speed":int,(From 1 to 5)
+            "quality":int, (From 1 to 5)
+            "price":int}, (From 1 to 5)
         "username":str,
         "uuid":str,
         "meeting_type" : lambda x: x in ["food","outing","meeting"]
@@ -251,6 +260,12 @@ def get_details(session_id):
 def login():
     if request.method == "GET":
         return render_template('loginPage.html')
+
+@app.route('/pendingUsers')
+def pendingUsers():
+    if request.method == "GET":
+        return render_template('pendingUsers.html')
+
 
 @app.route('/session/<session_id>/swipe')
 def swipe(session_id):
@@ -494,6 +509,7 @@ def on_swipe_details(data):
                 break
             if False not in swipe_detail.values():
                 #We have found a place everyone agreed on!
+                print('Session [ ' + str(sessionID) + " ] location confirmed, index " + str(swipe_detail_index))
                 update_session_status(sessionID,'location_confirmed',index=swipe_detail_index)
                 socketio.emit('location_found',{'swipeIndex':swipe_detail_index},room=sessionID)
 

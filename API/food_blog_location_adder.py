@@ -226,7 +226,7 @@ def get_cafe_details_from_webpage(cafe_link):
             
         except:
             try: 
-            cost_per_pax = re.split('Price:',write_up, flags = re.IGNORECASE)[1].strip()
+                cost_per_pax = re.split('Price:',write_up, flags = re.IGNORECASE)[1].strip()
             except:
                 cost_per_pax = None
                 print('Unable to get cost for ' + cafe_link)
@@ -238,7 +238,10 @@ def get_cafe_details_from_webpage(cafe_link):
     except:
         rating = None
         print('Unable to get rating for ' + cafe_link)
-        quit_if_debug()
+        links_with_no_rating = ["https://sethlui.com/carmens-best-filipino-brand-singapore-2019/",
+                                "https://sethlui.com/creamery-boutique-ice-creams-mont-blanc-ice-cream-and-seasonal-favourite-lava-cookies-singapore-nov-2019/"]
+        if cafe_link not in links_with_no_rating:            
+            quit_if_debug()
     address = address.strip()
     postal_code = postal_code.strip()
     food_place_link = cafe_link
@@ -255,7 +258,7 @@ for cur_iteration,cafe_link in enumerate(cafe_links):
         add_food_place(*details)
 
 
-cafe_links = cafe_links[6:]
+cafe_links = cafe_links[2:]
 
 def correct_operating_hrs(op_hrs):
     contains_illegal_words = bool(re.search('Facebook|Website|Tel',op_hrs))
@@ -280,3 +283,26 @@ food_places_df = food_places_df[x]
 
 #Uplaod the cleaned results
 food_places_df.to_sql('food_blog_places_clean',data_engine)
+
+#Data cleaning part 2
+food_places_df = pd.read_sql('SELECT * FROM food_blog_places_clean',data_conn)
+
+def find_max_min_price(price_string):
+    if price_string and price_string.strip():
+        try:
+            all_floats = re.findall(r"[+]?\d*\.\d+|\d+", price_string)
+            all_floats = [float(x) for x in all_floats]
+            min_price = min(all_floats)
+            max_price = max(all_floats)
+            return min_price,max_price
+        except:
+            return None,None
+    else:
+        return None,None
+
+food_places_df['min_price'] = pd.Series(find_max_min_price(x)[0] for x in food_places_df['cost_per_pax'])
+food_places_df['max_price'] = pd.Series(find_max_min_price(x)[1] for x in food_places_df['cost_per_pax'])
+food_places_df.to_sql('food_blog_places_clean_2',data_engine)
+
+
+
