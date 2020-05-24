@@ -40,6 +40,10 @@ function objectifyForm(formArray) {//serialize data function
   return returnArray;
 }
 
+function homeButton() {
+  location.replace("http://localhost:5000");
+}
+
 function submitbutton() {
   meetupForm = $('#createMeetup')
   //console.log(meetupForm);
@@ -115,9 +119,5 @@ function submitbutton() {
     }
   }
 
-function myFunction() {
-  console.log('hello world')
-  location.replace("https://www.w3schools.com")
-}
-
 document.getElementById ("submitbutton").addEventListener ("click", submitbutton);
+document.getElementById ("homeButton").addEventListener ("click", homeButton);

@@ -235,18 +235,16 @@
                               btn.id = sessionsList[i];
 
                               btn.addEventListener('click', function(e) {
-                                if (sessionStatus == "pending_swipes") {
+                                if (sessionStatus == "pending_members") {
+                                  // Check if user is host
+                                  if (uid == meetupHost) {
+                                    window.location.href = "/session/" + sessionsList[i] + "/results_display?isHost=true";
+                                  } else {
+                                    window.location.href = '/session/' + sessionsList[i] + "/results_display?isHost=false";
+                                  }
+                                }
+                                else {
                                   window.location.href = "/session/" + sessionsList[i] + "/swipe";
-                                } else if (sessionStatus == "pending_members") {
-                                    // Check if user is host
-                                    if (uid == meetupHost) {
-                                      window.location.href = "/session/" + sessionsList[i] + "/results_display?ifHost=True";
-                                    } else {
-                                      window.location.href = '/session/' + sessionsList[i] + "/results_display?ifHost=False";
-                                    }
-
-                                } else if (sessionStatus == "location_confirmed") {
-                                  console.log("Location confirmed!");
                                 }
                                 //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
                               })
