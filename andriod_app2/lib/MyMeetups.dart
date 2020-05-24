@@ -332,13 +332,13 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                         itemCount: custLabels.length,
                         itemBuilder: (context, index) {
                           final item = custLabels[index];
-                          return Dismissible(
-                            dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 5.0),
+                            child: Dismissible(
+                              dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
 //                            direction: DismissDirection.endToStart,
-                            background: slideRightBackground(),
-                            secondaryBackground: slideLeftBackground(),
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom:5.0),
+                              background: slideRightBackground(),
+                              secondaryBackground: slideLeftBackground(),
                               child: Container(
                                 child: FlatButton(
                                   padding: EdgeInsets.all(0),
@@ -353,19 +353,19 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                   child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                                 ),
                               ),
-                            ),
-                            key: Key(item),
-                            onDismissed: (direction){
-                              if (direction == DismissDirection.endToStart) {
-                                sessionRemove(sessionIDs[index]);
-                                custLabels.removeAt(index);
+                              key: Key(item),
+                              onDismissed: (direction){
+                                if (direction == DismissDirection.endToStart) {
+                                  sessionRemove(sessionIDs[index]);
+                                  custLabels.removeAt(index);
 //                              setState(() {custLabels.removeAt(index);});
-                                Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted $item", textAlign: TextAlign.center,),));
-                              } else {
-                                Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
-                              }
+                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted $item", textAlign: TextAlign.center,),));
+                                } else {
+                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
+                                }
 
-                            }
+                              }
+                            ),
                           );
                         },
                       ),
