@@ -33,17 +33,12 @@ if (not len(firebase_admin._apps)):
 
     # Use the application default credentials
     # Use a service account
-    cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-<<<<<<< HEAD
+    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
    # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-=======
-    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
->>>>>>> 6f0d994ecaf4fd051ca19e397d7a7a1108eee385
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -108,39 +103,61 @@ API important links explanation:
 -> confirmed_place_index is also provided here
 -> PLEASE USE THE SOCKET CONNECTION INSTEAD UNLESS FIRST PULL OF DATA
 -> Sample Data:
-    { "session_status": "pending_members",
-      "meeting_type": "food",
-      "meetup_name": "hi",
-      "time_created": "2020-05-13 12:46:57.370295",
-      "host_uuid": "8319hfbicyvsug21obhvyduiew",
-      "confirmed_place_index": 2
-      "users": [
-        {
-          "lat": 103.3,
-          "long": 1.2,
-          "metrics": {
-            "price": 4,
-            "quality": 3,
-            "speed": 2
-          },
-          "transport_mode": "public",
-          "username": "Philip",
-          "uuid": "8319hfbicyvsug21obhvyduiew"
-        },
-        {
-          "lat": 103.3,
-          "long": 1.2,
-          "metrics": {
-            "price": 4,
-            "quality": 3,
-            "speed": 2
-          },
-          "transport_mode": "public",
-          "username": "Philip",
-          "uuid": "8319hfbicyvsug21obhvyduiew"
-        }
-      ]
+    {
+  "host_uuid": "TESTINGUUID", 
+  "meeting_type": "food", 
+  "meetup_name": "testing", 
+  "session_status": "location_confirmed", 
+  "swipe_details": {
+    "8319hfbicyvsug21obhvyduiew": [], 
+    "TESTINGUUID": [
+      false, 
+      false, 
+      false, 
+      false, 
+      false, 
+      false, 
+      false, 
+      false, 
+      true, 
+      true, 
+      true, 
+      false, 
+      true, 
+      false, 
+      true
+    ]
+  }, 
+  "time_created": "2020-05-24 02:55:15.861895", 
+  "users": [
+    {
+      "lat": 103.3, 
+      "long": 1.2, 
+      "metrics": {
+        "price": 5, 
+        "quality": 1, 
+        "speed": 2
+      }, 
+      "transport_mode": "public", 
+      "user_place": "kensington Park", 
+      "username": "Philip", 
+      "uuid": "TESTINGUUID"
+    }, 
+    {
+      "lat": 103.3, 
+      "long": 1.2, 
+      "metrics": {
+        "price": 4, 
+        "quality": 3, 
+        "speed": 2
+      }, 
+      "transport_mode": "public", 
+      "user_place": "Kensington Park Drive", 
+      "username": "Philip", 
+      "uuid": "8319hfbicyvsug21obhvyduiew"
     }
+  ]
+}
 -> Requires OAuth
 
 /session/<session_id>/calculate (GET)
@@ -343,6 +360,7 @@ def manage_details(session_id):
         info = get_details_for_session_id(session_id)
         #Get the swiping details and append it to the info dict
         try:
+            doc_ref = get_doc_ref_for_id(session_id)
             #Update the session with the new details
             swipe_details_list = doc_ref.get().get('swipe_details')
             #Convert from list of dics to dic of lists
@@ -351,8 +369,10 @@ def manage_details(session_id):
             for swipe_detail in swipe_details_list:
                 for uuid in uuid_list:
                     if uuid in swipe_detail.keys():
-                        swipe_details_dict['uuid'].append(swipe_detail['uuid']) 
-    
+                        swipe_details_dict[uuid].append(swipe_detail[uuid])
+            swipe_details_dict = {'swipe_details':swipe_details_dict}
+        
+
         except KeyError:
             #There are no swipe details just don't do anything
             swipe_details_dict = {}
