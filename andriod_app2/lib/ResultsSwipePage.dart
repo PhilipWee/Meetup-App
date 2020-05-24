@@ -70,7 +70,7 @@ class ResultSwipePage extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.deepOrange,
-        title: Text("Choose a Place!"),
+        title: Text("Choose a Place!", style: TextStyle(fontFamily: "QuickSand"),textAlign: TextAlign.center,),
       ),
       body: ResultSwipeWidget(),
     );
@@ -157,6 +157,9 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
         future: getSessionResults(globals.sessionData["sessionid"]),
         builder: (BuildContext context, AsyncSnapshot snapshot){
         if (snapshot.connectionState == ConnectionState.done && swipeData.length != 0) {
+
+
+
               return Container(
                 child: Stack(
                   alignment: AlignmentDirectional.center,
@@ -166,8 +169,8 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                       crossAxisEndOffset: -0.25,
                       onDismissed: (DismissDirection direction) {
                         if (swipeData.indexOf(item) == swipeData.indexOf(swipeData.last)){
-                          globals.storyPoint = "isWaiting";
-                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                          globals.sessionData["session_status"] = "pending_swipes";
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MeetupPage()),);
                         }
                         else if (direction == DismissDirection.endToStart) {
                           _dismissCard(item);
@@ -256,9 +259,11 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
               );
             }
         else if (snapshot.connectionState == ConnectionState.done && swipeData.length == 0){
+
           return Center(child: Text("No Results Found", style: TextStyle(fontFamily: "Quicksand"),));
         }
-        else{return Center(child: CircularProgressIndicator());}
+        else if (snapshot.connectionState == ConnectionState.waiting){return Center(child: CircularProgressIndicator());}
+        else{return Center(child: Text("ERROR: ${snapshot.error}"));}
           }),
     );
   }

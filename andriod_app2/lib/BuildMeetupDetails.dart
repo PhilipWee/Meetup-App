@@ -21,7 +21,7 @@ class MeetupPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        title: Text(globals.sessionData["meetup_name"]),
+        title: Text("${globals.sessionData["meetup_name"]}"),
         backgroundColor: Colors.deepOrange,
       ),
       body: MeetupPageWidget(),
@@ -66,7 +66,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     globals.socketIO.subscribe("calculation_result", (data)=>{
       print("Calculation Done!"),
-      Navigator.push(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)
     });
 
     globals.socketIO.subscribe("location_found", (data)=>{
@@ -99,6 +99,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       setState((){});
       return await Future.delayed(Duration(milliseconds: 1000));
     }
+
     Future<void> _shareText() async {
       try {
         Share.text('Link', globals.sessionData["url"], 'text/plain'); //TODO
@@ -142,55 +143,44 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
+    // Function to show waiting
+    Widget _waitingText() {
+      return Padding(
+        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
+        child: Center(child: Text("Waiting for the rest ...")),
+      );
+    }
+
     //Function to generate the search button for host
     Widget _generateButton() {
-      bool _pressed = false;
-
-      if (_pressed) {
-        return SizedBox(
-            width: 22,
-            height: 22,
-            child: Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.deepOrange,
-                  strokeWidth: 3,
-                )
-            )
-        );
-      }
-      else {
-        return Container(
-          height: 50.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
-                  child: ButtonTheme(
-                    minWidth: 150,
-                    height: 50,
-                    child: FlatButton(
-                      child: Center(child: Text("Search Places", style: TextStyle(fontFamily: "Quicksand"))),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
-                      color: Colors.deepOrange,
-                      textColor: Colors.white,
-                      onPressed: () {
-                        setState(() {
-                          _pressed = true;
-                        });
-                        print("Calculating for session id: ${globals.sessionData["sessionid"]}");
-                        calculateSession(globals.sessionData["sessionid"]);
-                      },
-                    ),
+      return Container(
+        height: 50.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
+                child: ButtonTheme(
+                  minWidth: 150,
+                  height: 50,
+                  child: FlatButton(
+                    child: Center(child: Text("Search Places", style: TextStyle(fontFamily: "Quicksand"))),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+                    color: Colors.deepOrange,
+                    textColor: Colors.white,
+                    onPressed: () {
+                      setState(() {globals.sessionData["session_status"] = "is_calculating";});
+                      print("Calculating for session id: ${globals.sessionData["sessionid"]}");
+                      calculateSession(globals.sessionData["sessionid"]);
+                    },
                   ),
                 ),
-              )
-            ],
-          ),
-        );
-      }
-
+              ),
+            )
+          ],
+        ),
+      );
     }
 
     //Function to build details of tabulated final location
@@ -341,8 +331,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   Column(
                     children: <Widget>[
                       Visibility(
-                        visible:
-                        (globals.sessionData["session_status"] == "pending_members") ? true : false,
+                        visible:(globals.sessionData["session_status"] == "pending_members" && globals.sessionData["session_status"] != "is_calculating") ? true : false,
                         child: Padding(
                           padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
                           child: Row(
@@ -372,7 +361,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),//share link
 
                       Visibility(
-                        visible: (globals.isCreator == true && globals.sessionData["session_status"] == "pending_members") ? true : false,
+                        visible: (globals.sessionData["session_status"] == "pending_members"  && globals.isCreator == true) ? true : false,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Center(child: _generateButton(),),
@@ -380,10 +369,18 @@ class MeetupPageState extends State<MeetupPageWidget> {
                       ),// generateButton
 
                       Visibility(
-                        visible: (false) ? true : false, //TODO DOOBEEDOOBEDOOOO
+                          visible: (globals.sessionData["session_status"] == "is_calculating") ? true : false,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15),
+                            child: Center(child: CircularProgressIndicator()),
+                          )
+                      ),// build Calculating text
+
+                      Visibility(
+                        visible: (globals.sessionData["session_status"] == "pending_swipes") ? true : false,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Center(child: Text("Waiting for the rest")),
+                          child: Center(child: _waitingText()),
                         )
                       ),// build Waiting text
 
@@ -396,14 +393,14 @@ class MeetupPageState extends State<MeetupPageWidget> {
                 ])
               ),
 
-              makeHeader("Mice Joining (${globals.sessionData["users"].length})"), //no. of members
+              makeHeader("Mice Joining (${globals.sessionData["users"].length}) => ${globals.sessionData["session_status"]}"), //no. of members
 
               SliverToBoxAdapter(
                 child: Center(child: Padding(
                   padding: const EdgeInsets.all(2),
                   child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
                 )),
-              ),
+              ), //scroll to refresh
 
               SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -412,7 +409,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                     },
                   childCount: globals.sessionData["users"].length,
               ),
-            ),
+            ),// membersList
 
             ]
           ),

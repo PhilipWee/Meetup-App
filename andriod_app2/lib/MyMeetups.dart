@@ -15,19 +15,24 @@ class HomeUsernameWidget extends StatefulWidget {
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
 
+  Future _future;
 
   bool invalidLink = false;
 
   final _joinController = TextEditingController(text: "");
 
+  List allData = [];
+
   List<String> custLabels = [];
   List<String> custImgs = [];
   List<String> custStates = [];
   List<String> sessionIDs = [];
-  List allData = [];
+
+
 
   @override
   initState(){
+    _future = getAllUserSessionsData(globals.uuid);
     super.initState();
   }
 
@@ -39,29 +44,31 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
     print("Current Session Details ===> ${globals.tempMeetingDetails}");
-    } //session details saved in global.tempMeetingDetals
+    } //session details saved in global.tempMeetingDetails
 
   Future getAllUserSessionsData(String inputUserId) async{
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
     Map tempMap = jsonDecode(response.body);
+    print("HEREE");
+    print(tempMap);
     tempMap.forEach((k, v) => sessionIDs.add(k));
     print("sessiondIDs length: ${sessionIDs.length}");
 
-//    if (sessionIDs.length == 0 || sessionIDs.isEmpty) {return 0;}
-//    else {
       for( var i=0 ; i<sessionIDs.length ; i++ ){
+        print("");
         print("Session ID: ${sessionIDs[i]}");
+
         String url = '${globals.serverAddress}/session/${sessionIDs[i]}';
         http.Response response = await http.get(url);
         Map map = jsonDecode(response.body);
+
         allData.add(map);
+
         if (allData[0] == "error"){
           print(allData);
-//          return null;
         }
-        else{
-          print(""); //for println spacing
+        else{ //for println spacing
           print("Time Created: ${map["time_created"]}"); //TODO BUILD LIST IN ORDER OF TIME
 
           //LABELS
@@ -82,8 +89,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           print(""); //for println spacing
         }
       }
-//      return 1;
-//    }
   } // list of all sessionIds saved in
 
   Future<Null> _refresh() async {
@@ -181,11 +186,11 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   //Creates a list view with buildCustomButtons inside
   Widget build(BuildContext context) {
 
-    custLabels = [];
-    custImgs = [];
-    custStates = [];
-    sessionIDs = [];
-    allData = [];
+//    custLabels = [];
+//    custImgs = [];
+//    custStates = [];
+//    sessionIDs = [];
+//    allData = [];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -248,16 +253,18 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               )
             ],
           ),//join text controller
+
           Container(
             child: Padding(
               padding: const EdgeInsets.all(1),
               child: Center(child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w200),)),
             ),
-          ),
+          ),//scroll to refresh
+
           Container(
             child: Expanded(
               child: FutureBuilder(
-                future: getAllUserSessionsData(globals.uuid),
+                future: _future,
                 builder: (BuildContext context, AsyncSnapshot snapshot){
                     if (snapshot.connectionState ==  ConnectionState.done){
                     return RefreshIndicator(
@@ -272,6 +279,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                               child: FlatButton(
                                 padding: EdgeInsets.all(0),
                                 onPressed: (){
+                                  globals.sessionData = {}; //clear sessionData
                                   globals.sessionData = allData[index];
                                   globals.sessionData["sessionid"] = sessionIDs[index];
                                   globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
@@ -294,42 +302,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                     );
                   }
                     else if(snapshot.connectionState == ConnectionState.waiting){
-                      return RefreshIndicator(
-                        onRefresh: _refresh,
-                        child: ListView.builder(
-                          padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
-                          itemCount: custLabels.length,
-                          itemBuilder: (context, index) {
-                            final item = custLabels[index];
-                            return Dismissible(
-                                child: Card(
-                                  child: FlatButton(
-                                    padding: EdgeInsets.all(0),
-                                    onPressed: (){
-                                      globals.storyPoint = "";
-                                      globals.sessionData = allData[index];
-                                      globals.sessionData["sessionid"] = sessionIDs[index];
-                                      globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
-                                      print("Current Session Data ===> ${globals.sessionData}");
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
-                                    },
-                                    child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
-                                  ),
-                                ),
-                                key: Key(item),
-                                onDismissed: (direction){
-                                  sessionRemove(sessionIDs[index]);
-                                  setState(() {custLabels.removeAt(index);});
-                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted $item", textAlign: TextAlign.center,),));
-                                }
-                            );
-                          },
-                        ),
-                      );
+                      return Center(child: CircularProgressIndicator());
                   }
-                    else {
-                      return Center(child: Text("SNAPSHOT ERROR: ${snapshot.error}"),);
-                    }
+                    else {return Center(child: Text("SNAPSHOT ERROR: ${snapshot.error}"),);}
 //                    else {return Center(
 //                        child: CircularProgressIndicator()
 //                    );}

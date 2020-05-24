@@ -17,8 +17,6 @@ String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icon
 
 String userLocationName = "defaultLocation";
 
-String storyPoint = "";
-
 bool isCreator = false;
 
 Map<String, dynamic> tempMeetingDetails = {"meetup_name": "meetup_name", "meeting_type":"meeting_type"};
