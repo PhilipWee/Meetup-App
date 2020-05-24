@@ -58,7 +58,6 @@ socketio = SocketIO(app)
 #         eventlet.sleep(5)
 
 # eventlet.spawn(listen)
-
 #The secret key is necessary for session to work
 app.secret_key = 'super dsagbrjuyki64y5tg4fd key'
 

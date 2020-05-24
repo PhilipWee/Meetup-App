@@ -259,8 +259,8 @@ def calculate(sess_id,info):
                 results_dict[location]['operating_hours'] = str(results_df[results_df['name']==location]['operating_hours'].values[0])
                 pictures_unparsed = results_df[results_df['name']==location]['pictures_url'].values[0]
                 
-                results_dict[location]['pictures'] = pictures_unparsed[1:-1].split(',')
-                print(results_dict[location]['pictures'])
+                results_dict[location]['pictures'] = pictures_unparsed[1:-1].split(',')[:3]
+                # print(results_dict[location]['pictures'])
                 results_dict[location]['writeup'] = str(results_df[results_df['name']==location]['writeup'].values[0])
                 
                 #Make a dictionary for each use
@@ -312,7 +312,7 @@ def upload_calculated_route(sess_id,result):
 #         upload_calculated_route(sess_id,results)
     
 sio = socketio.Client()
-if len(sys.argv) >0:
+if len(sys.argv) >1:
     print(sys.argv[1])
     sio.connect(sys.argv[1])
 else:
