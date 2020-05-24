@@ -126,7 +126,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   _addCard(dynamic item) {
     Map<String, dynamic> data = {
-      'sessionID': globals.tempData["sessionid"],
+      'sessionID': globals.sessionData["sessionid"],
       'swipeIndex': swipeData.indexOf(item),
       'userIdentifier':globals.uuid,
       'selection':true
@@ -137,7 +137,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   _dismissCard(dynamic item) {
     Map<String, dynamic> data = {
-      'sessionID': globals.tempData["sessionid"],
+      'sessionID': globals.sessionData["sessionid"],
       'swipeIndex': swipeData.indexOf(item),
       'userIdentifier':globals.uuid,
       'selection':false
