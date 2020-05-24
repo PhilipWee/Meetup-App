@@ -89,11 +89,13 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     globals.socketIO.subscribe("location_found", (data)=>{
       print("Location Found!"),
-      print(data)
+      print(data), //{'swipeIndex' : 12}
+      globals.sessionData["confirmed_index"] = data["swipeIndex"],
+      globals.sessionData["session_status"] = "location_found"
     });
 
     globals.socketIO.subscribe("Error", (data)=>{
-      print("ERROR FOUND!"),
+      print("SOCKET ERROR FOUND!"),
       print(data)
     });
 
