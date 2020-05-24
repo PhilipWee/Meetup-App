@@ -74,6 +74,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     });
 
+    //TODO: SOCKET CODE FOR LEAVING THE PAGE
 //    globals.socketIO.sendMessage('leave', {'room':{globals.sessionData["sessionid"]}});
 
   } //SOCKETS
@@ -133,7 +134,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
-    //Function to generate the search button for the host
+    //Function to show calculating
     Widget _calculatingText() {
       return Padding(
         padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
@@ -143,7 +144,9 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     //Function to generate the search button for host
     Widget _generateButton() {
-      if (globals.isCreator ==  true) {
+      bool _pressed = false;
+
+      if (_pressed) {
         return SizedBox(
             width: 22,
             height: 22,
@@ -157,32 +160,35 @@ class MeetupPageState extends State<MeetupPageWidget> {
       }
       else {
         return Container(
-        height: 50.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
-                child: ButtonTheme(
-                  minWidth: 150,
-                  height: 50,
-                  child: FlatButton(
-                    child: Center(child: Text("Search Places", style: TextStyle(fontFamily: "Quicksand"))),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
-                    color: Colors.deepOrange,
-                    textColor: Colors.white,
-                    onPressed: () {
-                      print("Calculating for session id: ${globals.sessionData["sessionid"]}");
-                      calculateSession(globals.sessionData["sessionid"]);
-                    },
+          height: 50.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
+                  child: ButtonTheme(
+                    minWidth: 150,
+                    height: 50,
+                    child: FlatButton(
+                      child: Center(child: Text("Search Places", style: TextStyle(fontFamily: "Quicksand"))),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+                      color: Colors.deepOrange,
+                      textColor: Colors.white,
+                      onPressed: () {
+                        setState(() {
+                          _pressed = true;
+                        });
+                        print("Calculating for session id: ${globals.sessionData["sessionid"]}");
+                        calculateSession(globals.sessionData["sessionid"]);
+                      },
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
-        ) ,
-      );
+              )
+            ],
+          ),
+        );
       }
 
     }

@@ -160,12 +160,12 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
               return Container(
                 child: Stack(
                   alignment: AlignmentDirectional.center,
-                  children: swipeData.map((item) {
+                  children: swipeData.reversed.toList().map((item) {
                     return Dismissible(
                       key: UniqueKey(),
                       crossAxisEndOffset: -0.25,
                       onDismissed: (DismissDirection direction) {
-                        if (swipeData.indexOf(item) == swipeData.indexOf(swipeData.first)){
+                        if (swipeData.indexOf(item) == swipeData.indexOf(swipeData.last)){
                           globals.storyPoint = "isWaiting";
                           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
                         }
