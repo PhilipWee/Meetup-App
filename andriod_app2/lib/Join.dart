@@ -140,7 +140,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                     padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
-                    child: Text(globals.tempMeetingDetails["meetup_name"],
+                    child: Text("${globals.tempMeetingDetails["meetup_name"]}",
                       style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
                   )
               )
@@ -154,7 +154,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                       padding:const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 8),
-                      child: Text(mtype,
+                      child: Text("$mtype",
                         style: TextStyle(fontFamily: "QuickSand", fontSize: 15, fontWeight: FontWeight.bold),)
                   )
               )
