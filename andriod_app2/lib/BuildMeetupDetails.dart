@@ -70,6 +70,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
   initState(){
     super.initState();
 
+
     if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
     else{globals.isCreator = false;}
 
@@ -87,20 +88,21 @@ class MeetupPageState extends State<MeetupPageWidget> {
       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)
     });
 
-    globals.socketIO.subscribe("location_found", (data)=>{
-      print("Location Found!"),
-      print(data), //{'swipeIndex' : 12}
-      globals.sessionData["confirmed_index"] = data["swipeIndex"],
-      globals.sessionData["session_status"] = "location_found"
-    });
+//    globals.socketIO.subscribe("location_found", (data)=>{
+//      print("Location Found!"),
+//      print(data), //{'swipeIndex' : 12}
+//      globals.sessionData["confirmed_index"] = data["swipeIndex"],
+//      print(globals.sessionData),
+//      globals.sessionData["session_status"] = "location_confirmed",
+//    });
 
     globals.socketIO.subscribe("Error", (data)=>{
       print("SOCKET ERROR FOUND!"),
       print(data)
+
     });
 
-    //TODO: SOCKET CODE FOR LEAVING THE PAGE
-//    globals.socketIO.sendMessage('leave', {'room':{globals.sessionData["sessionid"]}});
+//    setState(() {});
 
   } //SOCKETS
 

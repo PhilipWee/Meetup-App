@@ -84,6 +84,25 @@ class ResultSwipeWidget extends StatefulWidget{
 
 class ResultSwipeState extends State<ResultSwipeWidget> {
 
+
+  @override
+  initState(){
+    super.initState();
+
+    ///SOCKETS
+    globals.socketIO.subscribe("location_found", (data)=>{
+      print("Location Found!"),
+      print(data), //{'swipeIndex' : 12}
+      globals.sessionData["confirmed_index"] = data["swipeIndex"],
+      print(globals.sessionData),
+      globals.sessionData["session_status"] = "location_confirmed",
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MeetupPage()),)
+    });
+
+    setState(() {});
+
+  } //SOCKETS
+
   Future getSessionResults (String inputSessID) async{
     swipeData = [];
     String url = '${globals.serverAddress}/session/$inputSessID/results';
@@ -164,10 +183,14 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                       key: UniqueKey(),
                       crossAxisEndOffset: -0.25,
                       onDismissed: (DismissDirection direction) {
+
                         if (swipeData.indexOf(item) == swipeData.indexOf(swipeData.last)){
                           globals.sessionData["session_status"] = "pending_swipes";
                           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MeetupPage()),);
                         }
+//                        else if (globals.sessionData["session_status"] == "location_found"){
+//                          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MeetupPage()),);
+//                        }
                         else if (direction == DismissDirection.endToStart) {
                           _dismissCard(item);
                         } else {
