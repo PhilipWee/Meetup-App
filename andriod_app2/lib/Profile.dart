@@ -1,6 +1,6 @@
 //import 'dart:html';
 import 'Globals.dart' as globals;
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 
@@ -37,6 +37,15 @@ class _ProfilePageState extends State<ProfilePage> {
       _edit = editing;
     }
     });
+  }
+
+  _launchURL() async {
+    const url = 'https://forms.gle/ua19qDgYCpuLWGJw9';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -221,7 +230,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.w400,
                                 fontFamily: "Quicksand")),
                         trailing: Icon(Icons.keyboard_arrow_right),
-                        onTap: () {},
+                        onTap: () {
+                          Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
+                        },
                       ),
                     ),
                     ListTileTheme(
@@ -233,7 +244,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.w400,
                                 fontFamily: "Quicksand")),
                         trailing: Icon(Icons.keyboard_arrow_right),
-                        onTap: () {},
+                        onTap: () {
+                          Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
+                        },
                       ),
                     ),
                     ListTileTheme(
@@ -245,7 +258,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.w400,
                                 fontFamily: "Quicksand")),
                         trailing: Icon(Icons.keyboard_arrow_right),
-                        onTap: () {},
+                        onTap: _launchURL,
                       ),
                     ),
                     ListTileTheme(
@@ -265,9 +278,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
 
 
-              SliverToBoxAdapter(
-                child: Container(height: 300,),
-              ),
             ],
           ),
         )

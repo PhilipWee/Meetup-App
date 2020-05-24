@@ -29,7 +29,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   clipboard_manager: ^0.0.4
   esys_flutter_share: ^1.0.2
-  url_launcher: ^5.1.2
+  url_launcher: ^5.4.10
   connectivity: ^0.4.4
   pull_to_refresh: ^1.5.7
   loading_indicator: ^1.0.0
