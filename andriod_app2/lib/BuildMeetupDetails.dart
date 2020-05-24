@@ -57,6 +57,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     ///SOCKETS
     globals.socketIO.joinSession(globals.sessionData["sessionid"]);
+
     globals.socketIO.subscribe("user_joined_room", (data)=>{
       print("INCOMING SOCKETS DATA: $data"),
       globals.sessionData["users"].add(data),
@@ -72,6 +73,9 @@ class MeetupPageState extends State<MeetupPageWidget> {
       print("Location Found!")
 
     });
+
+//    globals.socketIO.sendMessage('leave', {'room':{globals.sessionData["sessionid"]}});
+
   } //SOCKETS
 
   // TODO: Get details of final location found from database
@@ -94,7 +98,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
       setState((){});
       return await Future.delayed(Duration(milliseconds: 1000));
     }
-
     Future<void> _shareText() async {
       try {
         Share.text('Link', globals.sessionData["url"], 'text/plain'); //TODO

@@ -17,7 +17,6 @@ String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icon
 
 String userLocationName = "defaultLocation";
 
-
 String storyPoint = "";
 
 bool isCreator = false;
@@ -67,6 +66,7 @@ Map<String,dynamic> tempData = {
   "sessionid" : 01234567,
   "link" : "LinkNotUpdated",
   "joinlink": "",
+
 //  "speed" :0,
 }; ///////////////////////////////////////////////////////////////////////////////////////////////////////tempDATA
 
