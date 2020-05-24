@@ -16,15 +16,33 @@ import 'package:getflutter/getflutter.dart';
 
 
 class MeetupPage extends StatelessWidget {
+
+  Future<bool> _isBackPressed() async{
+    globals.socketIO.sendMessage('leave', {'room':"${globals.sessionData["sessionid"]}"});
+    print("Exited Session: ${globals.sessionData["sessionid"]}, sessionData reset.");
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        title: Text("${globals.sessionData["meetup_name"]}"),
-        backgroundColor: Colors.deepOrange,
+    return WillPopScope(
+      onWillPop: _isBackPressed,
+      child: Scaffold(
+        appBar: AppBar(
+        automaticallyImplyLeading: false,
+          title: Text("${globals.sessionData["meetup_name"]}"),
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () async {
+                globals.socketIO.sendMessage('leave', {'room':"${globals.sessionData["sessionid"]}"});
+                print("Exited Session: ${globals.sessionData["sessionid"]}, sessionData reset.");
+                Navigator.of(context).pop();
+              },
+          ),
+          backgroundColor: Colors.deepOrange,
+        ),
+        body: MeetupPageWidget(),
       ),
-      body: MeetupPageWidget(),
     );
   }
 }
@@ -87,6 +105,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
         "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
         "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]);
+
 
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
@@ -315,6 +334,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
         },
       );
     }
+
 
     /////////////////////////////////////////////////////////////////////// [SCAFFOLD]
 
