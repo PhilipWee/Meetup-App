@@ -115,4 +115,9 @@ function submitbutton() {
     }
   }
 
+function myFunction() {
+  console.log('hello world')
+  location.replace("https://www.w3schools.com")
+}
+
 document.getElementById ("submitbutton").addEventListener ("click", submitbutton);

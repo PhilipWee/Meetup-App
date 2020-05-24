@@ -121,22 +121,24 @@
     </style>
 </head>
 
-<body>
-    <div>
+<body style='z-index:0;'>
+    <div style='z-index:0;'>
 
-        <div style='position:absolute;' class='row '>
+        <div style='position:absolute;z-index:0;' class='row '>
           <div class='col col-8'>
 
           </div>
-          <div class='col col-2'>
+          <div class='col col-2' style='z-index:0;'>
             <img style="height:100%;width:200%;margin-right:0px;" src="/static/Mouse.png" alt="Mouse"
               width="500" height="500">
 
           </div>
         </div>
 
-        <div class='row pl-2' style='background-color:Tomato;height:100%;'>
-          <h1 style='font-family:Pacifico; color: white;margin-left: 20px;font-size: 5vw;'>MeetUp Mouse</h1>
+        <div class='row pl-2' style='background-color:Tomato;height:100%;z-index:0;'>
+          <h1 style='font-family:Pacifico; color: white;margin-left: 20px;font-size: 5vw;z-index:0;' href="http://www.xboxers.es">MeetUp Mouse</h1>
+          
+
         </div>
         <div class='row pl-2' style="background-color:White;">
           <h2 style='font-family:Patrick Hand SC;margin-left: 20px;margin-top:1mm;font-size: 3vw;'>Allow meetup mouse to access your location and squeak away!</h2>
@@ -172,7 +174,7 @@
                 var title = document.createElement("p");
                 var node = document.createTextNode("Enter your name");
                 title.appendChild(node);
-                title.style = 'margin-top:2%;font-size:2vw;margin-left:1%;';
+                title.style = 'margin-top:2%;font-size:2vw;';
                 document.getElementById('addName').appendChild(title);
 
                 var input = document.createElement("input");
@@ -198,7 +200,7 @@
           console.log('Finished running name script');
           </script>
 
-          <div id='addName'></div>
+          <div style='margin-left:1%;' id='addName'></div>
 
           <p style='margin-top:2%;font-size:2vw;margin-left:1%;'>Name of Meetup</p>
           <p style='font-size:1.5vw;margin-left:1%;'>
@@ -245,9 +247,9 @@
 
         <!-- Map for user info -->
         <div class="row" style='margin-right:25%;' >
-         <input id="pac-input" style="font-family: Patrick Hand SC;margin-top:2%;margin-left:22.5%;margin-right:-25%;" class="controls" type="text" placeholder="   Search Location">
+         <input id="pac-input" style="font-family: Patrick Hand SC;margin-top:2%;margin-left:4%;margin-right:-25%;" class="controls" type="text" placeholder="   Search Location">
 
-         <div class="round3" id='basicMap' style='margin-top:2%;margin-bottom:3%;margin-left:22.5%;margin-right:-25%;'></div>
+         <div class="round3" id='basicMap' style='margin-top:2%;margin-bottom:3%;margin-left:4%;margin-right:-25%;'></div>
 
 
       <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
@@ -267,9 +269,17 @@
       </div>
 
       </form>
+     
 
-      <script src="{{url_for('static', filename='js/createMeetup.js')}}"></script>
+      <script src="{{url_for('static', filename='js/createMeetup.js')}}">
+      
+  
+      </script>
+      <div>
+     
+       
 
+       
 
 </body>
 
