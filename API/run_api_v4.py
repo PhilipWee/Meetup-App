@@ -341,6 +341,24 @@ def manage_details(session_id):
 
         #Get all the meetup details and return it to the user
         info = get_details_for_session_id(session_id)
+        #Get the swiping details and append it to the info dict
+        try:
+            #Update the session with the new details
+            swipe_details_list = doc_ref.get().get('swipe_details')
+            #Convert from list of dics to dic of lists
+            swipe_details_dict = {user['uuid']:[] for user in info['users']}
+            uuid_list = [user['uuid'] for user in info['users']]
+            for swipe_detail in swipe_details_list:
+                for uuid in uuid_list:
+                    if uuid in swipe_detail.keys():
+                        swipe_details_dict['uuid'].append(swipe_detail['uuid']) 
+    
+        except KeyError:
+            #There are no swipe details just don't do anything
+            swipe_details_dict = {}
+            
+        info.update(swipe_details_dict)
+        
         if info != 'Error':
             return jsonify(info)
         else:
