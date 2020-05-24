@@ -1,6 +1,9 @@
 
 session_id = window.location.pathname.split('/')[2]
 base_url = window.location.origin;
+
+document.getElementById("homeButton").addEventListener("click", homeButton);
+
 //Get the current session details
 var details_url = base_url + '/session/' + session_id;
 var results_url = base_url + '/session/' + session_id + '/results';
@@ -101,13 +104,17 @@ function add_user_to_list(user) {
         <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>${user_place}</p>
         <p>${username}</p>
         </div>
-        <div class='col col-2'>
+        <!-- <div class='col col-2'>
         <button type='button' style='margin-top: 35%;'>
             Remove
         </button>
 
-        </div>
+        </div> -->
     `)
+}
+
+function homeButton() {
+  location.replace("http://localhost:5000");
 }
 
 //Set up the socketio for detecting additional members joining
@@ -136,7 +143,7 @@ socket.on('calculation_result', (data) => {
     if(data['info'] == 'done') {
         //Change to the card swipe page
         let url = base_url + '/session/' + session_id + '/swipe';
-        location.assign(url);
+        console.log("Replacing URL.")
+        location.replace(url);
     }
 })
-
