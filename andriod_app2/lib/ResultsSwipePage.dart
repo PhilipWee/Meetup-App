@@ -133,7 +133,6 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     };
     globals.socketIO.sendMessage("swipe_details", data);
 
-//    swipeData.remove(item);
   }
 
   _dismissCard(dynamic item) {
@@ -145,7 +144,6 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     };
     globals.socketIO.sendMessage("swipe_details", data);
 
-//    swipeData.remove(item);
   }
 
   @override
@@ -157,8 +155,6 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
         future: getSessionResults(globals.sessionData["sessionid"]),
         builder: (BuildContext context, AsyncSnapshot snapshot){
         if (snapshot.connectionState == ConnectionState.done && swipeData.length != 0) {
-
-
 
               return Container(
                 child: Stack(

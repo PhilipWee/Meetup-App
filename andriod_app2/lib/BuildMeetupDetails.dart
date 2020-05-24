@@ -88,8 +88,13 @@ class MeetupPageState extends State<MeetupPageWidget> {
     });
 
     globals.socketIO.subscribe("location_found", (data)=>{
-      print("Location Found!")
+      print("Location Found!"),
+      print(data)
+    });
 
+    globals.socketIO.subscribe("Error", (data)=>{
+      print("ERROR FOUND!"),
+      print(data)
     });
 
     //TODO: SOCKET CODE FOR LEAVING THE PAGE
