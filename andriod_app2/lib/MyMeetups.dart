@@ -182,6 +182,64 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     );
   }
 
+  Widget slideRightBackground() {
+    return Container(
+      color: Colors.grey,
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              width: 20,
+            ),
+            Icon(
+              Icons.archive,
+              color: Colors.white,
+            ),
+//            Text(
+//              " Edit",
+//              style: TextStyle(
+//                color: Colors.white,
+//                fontWeight: FontWeight.w700,
+//              ),
+//              textAlign: TextAlign.left,
+//            ),
+          ],
+        ),
+        alignment: Alignment.centerLeft,
+      ),
+    );
+  }
+
+  Widget slideLeftBackground() {
+    return Container(
+      color: Colors.redAccent,
+      child: Align(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+//            Text(
+//              " Delete",
+//              style: TextStyle(
+//                color: Colors.white,
+//                fontWeight: FontWeight.w700,
+//              ),
+//              textAlign: TextAlign.right,
+//            ),
+            SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
+        alignment: Alignment.centerRight,
+      ),
+    );
+  }
+
   @override
   //Creates a list view with buildCustomButtons inside
   Widget build(BuildContext context) {
@@ -270,31 +328,43 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                     return RefreshIndicator(
                       onRefresh: _refresh,
                       child: ListView.builder(
-                        padding: EdgeInsets.only(top: 0, bottom: 0, left:4, right:4),
+                        padding: EdgeInsets.only(top: 0, bottom: 0, left:5, right:5),
                         itemCount: custLabels.length,
                         itemBuilder: (context, index) {
                           final item = custLabels[index];
                           return Dismissible(
-                            child: Card(
-                              child: FlatButton(
-                                padding: EdgeInsets.all(0),
-                                onPressed: (){
-                                  globals.sessionData = {}; //clear sessionData
-                                  globals.sessionData = allData[index];
-                                  globals.sessionData["sessionid"] = sessionIDs[index];
-                                  globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
-                                  print("Current Session Data ===> ${globals.sessionData}");
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
-                                },
-                                child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+                            dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
+//                            direction: DismissDirection.endToStart,
+                            background: slideRightBackground(),
+                            secondaryBackground: slideLeftBackground(),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom:5.0),
+                              child: Container(
+                                child: FlatButton(
+                                  padding: EdgeInsets.all(0),
+                                  onPressed: (){
+                                    globals.sessionData = {}; //clear sessionData
+                                    globals.sessionData = allData[index];
+                                    globals.sessionData["sessionid"] = sessionIDs[index];
+                                    globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+                                    print("Current Session Data ===> ${globals.sessionData}");
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                  },
+                                  child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+                                ),
                               ),
                             ),
                             key: Key(item),
                             onDismissed: (direction){
-                              sessionRemove(sessionIDs[index]);
-                              custLabels.removeAt(index);
+                              if (direction == DismissDirection.endToStart) {
+                                sessionRemove(sessionIDs[index]);
+                                custLabels.removeAt(index);
 //                              setState(() {custLabels.removeAt(index);});
-                              Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted $item", textAlign: TextAlign.center,),));
+                                Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted $item", textAlign: TextAlign.center,),));
+                              } else {
+                                Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
+                              }
+
                             }
                           );
                         },
