@@ -96,6 +96,8 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       globals.sessionData["confirmed_index"] = data["swipeIndex"],
       print(globals.sessionData),
       globals.sessionData["session_status"] = "location_confirmed",
+      globals.confirmedDetails = swipeData[globals.sessionData["confirmed_index"]],
+      globals.locationDetails = globals.confirmedDetails,
       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MeetupPage()),)
     });
 
@@ -130,6 +132,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
         rating: double.parse(oneLocation["rating"]), //integer
         images: oneLocation["pictures"], //list
       );
+
       swipeData.add(placeInfo);
     } //for loop ends here!
   }

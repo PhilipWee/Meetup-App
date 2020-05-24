@@ -106,14 +106,14 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   } //SOCKETS
 
-  // TODO: Get details of final location found from database
-  globals.FakeData locationDetails = globals.FakeData(name: "Fisherman's Wharf",
-      address: "39 San Francisco Bay Area",
-      details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
-      rating: 4.6,
-      images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
-        "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
-        "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]);
+//  globals.FakeData locationDetails = globals.FakeData(
+//      name: "Fisherman's Wharf",
+//      address: "39 San Francisco Bay Area",
+//      details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
+//      rating: 4.6,
+//      images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
+//        "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
+//        "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]);
 
 
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
@@ -415,7 +415,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
                       Visibility(
                         visible: (globals.sessionData["session_status"] == "location_confirmed") ? true : false,
-                        child: _buildLocationDetails(locationDetails),
+                        child: _buildLocationDetails(globals.locationDetails),
                       ), //build confirmed location details
                     ],
                   ),
