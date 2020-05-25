@@ -44,7 +44,7 @@ else:
     db = firestore.client()
 print('Connected!')
 #--------------------------------------CONNECT TO FIREBASE-------------------------------
-# eventlet.monkey_patch()
+# eventlet.monk ey_patch()
 app = Flask(__name__)
 # socketio = SocketIO(app,logger=True,engineio_logger=True)
 socketio = SocketIO(app)
@@ -189,7 +189,7 @@ Use case: Will be emitted when all there is an error with the socket information
 
 
 Client Emitted Events:
-    
+
 -> Event: 'leave'
 Sample Data: {'room' : <session_id> }
 Use case: Will be triggered when the leave room function is called
@@ -438,7 +438,7 @@ def get_user_sessions():
 #Room joining function
 @socketio.on('join')
 def on_join(data):
-    
+
 
     #Verify the data is in the correct format
     schema_str = """
@@ -455,10 +455,10 @@ def on_join(data):
     join_room(room)
     emit('join_ack',{'message':'Someone has joined the room',
                      'room':room},room=room)
-    
+
 @socketio.on('leave')
 def on_leave(data):
-    
+
 
     #Verify the data is in the correct format
     schema_str = """
@@ -475,7 +475,7 @@ def on_leave(data):
     leave_room(room)
     emit('join_ack',{'message':'Someone has left the room',
                      'room':room},room=room)
-    
+
 @socketio.on('calculation_done')
 def test(data):
     print("Session ID [ " + data['session_id'] + " ] has been calculated")
@@ -529,7 +529,6 @@ def on_swipe_details(data):
         swipe_details = [{userIdentifier:selection}]
 
     doc_ref.update({'swipe_details':swipe_details})
-
 
 
 def check_calculate_done(session_id):
@@ -604,7 +603,7 @@ def update_session_status(session_id,status,index=None):
     if index is not None:
         data['confirmed_place_index'] = index
     doc_ref.update({'info':data})
-    
+
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')
