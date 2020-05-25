@@ -1,19 +1,12 @@
 import 'dart:convert';
-//import 'dart:html';
-import 'dart:math';
 import 'package:andriod_app2/BuildMeetupDetails.dart';
 import 'Details.dart';
-import 'color_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'Globals.dart' as globals;
 import 'PopUp.dart';
-import 'package:flutter/services.dart';
 import 'BuildMeetupDetails.dart';
 
 //Fake data to generate cards

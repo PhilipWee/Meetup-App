@@ -2,10 +2,8 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
-import 'PopUp.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:geolocator/geolocator.dart';
 
 class CustomizationPage2Widget extends StatefulWidget {
@@ -61,7 +59,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
     try{
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
       int statusCode = response.statusCode;
-      String message = response.body;
 
       if (statusCode != 200){
         print(response.body);

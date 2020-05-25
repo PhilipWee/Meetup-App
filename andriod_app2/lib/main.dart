@@ -1,19 +1,7 @@
-import 'dart:convert';
-import 'package:andriod_app2/ResultsSwipePage.dart';
 import 'GoogleSignIn.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:connectivity/connectivity.dart';
-import 'package:http/http.dart' as http;
-import 'MyMeetups.dart';
-import 'Create.dart';
-import 'Profile.dart';
-import 'PopUp.dart';
-import 'BuildMeetupDetails.dart';
-import 'Globals.dart' as globals;
-import 'Join.dart';
 import 'BottomTab.dart';
 
 void main() => runApp(MyApp());
@@ -60,7 +48,7 @@ class CheckNetworkPage extends StatelessWidget {
               var result = snapShot.data;
               switch (result) {
                 case ConnectivityResult.none:
-                  print("Internet servie unavailable");
+                  print("Internet service unavailable");
                   return Center(child: Text("No Internet Connection!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:

@@ -54,9 +54,13 @@ class MeetupPageWidget extends StatefulWidget {
 
 class MeetupPageState extends State<MeetupPageWidget> {
 
-  /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
+  Future _future;
 
-  Future<List<dynamic>> getMembers() async{}
+  Future getMembers() async{
+    http.Response response = await http.get('${globals.serverAddress}/session/${globals.sessionIdCarrier}');
+    globals.sessionData = jsonDecode(response.body);
+    print("Getting Members ${globals.sessionData}");
+  }
 
   void calculateSession (String inputSessID) async{
     String url = '${globals.serverAddress}/session/$inputSessID/calculate';
@@ -65,11 +69,14 @@ class MeetupPageState extends State<MeetupPageWidget> {
     Map calculate = jsonDecode(response.body);
   }
 
-
   @override
   initState(){
+
+    _future = getMembers();
+
     super.initState();
 
+    setState((){_future = getMembers();});
 
     if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
     else{globals.isCreator = false;}
@@ -81,6 +88,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       print("INCOMING SOCKETS DATA: $data"),
       globals.sessionData["users"].add(data),
       print("UPDATED SESSION'S USER DATA: ${globals.sessionData["users"]}"),
+      setState((){})
     });
 
     globals.socketIO.subscribe("calculation_result", (data)=>{
@@ -124,13 +132,13 @@ class MeetupPageState extends State<MeetupPageWidget> {
   /////////////////////////////////////////////////////////////////////// [BUILDERS]
 
     Future<Null> _refresh() async {
-      setState((){});
+      setState((){_future = getMembers();});
       return await Future.delayed(Duration(milliseconds: 1000));
     }
 
     Future<void> _shareText() async {
       try {
-        Share.text('Link', globals.sessionData["url"], 'text/plain'); //TODO
+        Share.text('Link', globals.sessionUrlCarrier, 'text/plain'); //TODO
       } catch (e) {
         print('error: $e');
       }
@@ -162,7 +170,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
         ),
       );
     }
-
     //Function to show calculating
     Widget _calculatingText() {
       return Padding(
@@ -200,7 +207,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                     onPressed: () {
                       setState(() {globals.sessionData["session_status"] = "is_calculating";});
                       print("Calculating for session id: ${globals.sessionData["sessionid"]}");
-                      calculateSession(globals.sessionData["sessionid"]);
+                      calculateSession(globals.sessionIdCarrier);
                     },
                   ),
                 ),
@@ -303,47 +310,36 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
-    //Function to build the list of members in current session
+    ///Function to build the list of members in current session
     FutureBuilder membersList(BuildContext context, int index) {
+
       return FutureBuilder(
-        future: getMembers(),
+        future: _future,
         builder: (BuildContext context, AsyncSnapshot snapshot){
-          if(globals.sessionData["users"].isEmpty){
-            return
-              Container(
-                  child: Center(
-                      child: Text("Loading...")
-                  )
-              );
-          }
-          else {
-            List<Widget> members = [];
-            members.add(
-                ListTile(
-                  leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                  title: Text(
-                    globals.sessionData["users"][index]["username"].toString(),
+          List<Widget> members = [];
+          members.add(ListTile(
+                leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
+                title: Text(
+                  globals.sessionData["users"][index]["username"].toString(),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
+                trailing: Container(
+                  width: MediaQuery.of(context).size.width*0.4,
+                  child: Text(
+                    globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), ''),
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    maxLines: 2,
                   ),
-                  subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
-                  trailing: Container(
-                    width: MediaQuery.of(context).size.width*0.4,
-                    child: Text(
-                      globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), ''),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                    ),
-                  ),
-            ));
-            return Column(
-              children: members,
-            );
-          }
+                ),
+              ));
+          return Column(
+            children: members,
+          );
         },
       );
     }
-
 
     /////////////////////////////////////////////////////////////////////// [SCAFFOLD]
 
@@ -368,14 +364,14 @@ class MeetupPageState extends State<MeetupPageWidget> {
                               Expanded(
                                 flex: 2,
                                 child: TextField(
-                                    controller: TextEditingController(text:globals.sessionData["url"]),
+                                    controller: TextEditingController(text:globals.sessionUrlCarrier),
                                     decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
                                 ),
                               ),
                               IconButton(
                                 icon: Icon(Icons.content_copy),
                                 onPressed: () {
-                                  Clipboard.setData(ClipboardData(text: globals.sessionData["url"]));
+                                  Clipboard.setData(ClipboardData(text: globals.sessionUrlCarrier));
                                 },
                               ),
                               IconButton(
@@ -439,7 +435,6 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   childCount: globals.sessionData["users"].length,
               ),
             ),// membersList
-
             ]
           ),
         ),

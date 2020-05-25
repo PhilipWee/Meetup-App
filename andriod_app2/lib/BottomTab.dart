@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'MyMeetups.dart';
 import 'Create.dart';
 import 'Profile.dart';
-import 'PopUp.dart';
-import 'BuildMeetupDetails.dart';
 import 'Globals.dart' as globals;
-import 'Join.dart';
 
 
 class MyHomePage extends StatefulWidget {
@@ -26,10 +23,11 @@ class _MyHomePageState extends State<MyHomePage> {
     ProfilePage()
   ];
 
-//  @override
-//  void initState() {
-//    super.initState();
-//  }
+  @override
+  void initState() {
+    super.initState();
+    globals.saveMyLocationName();
+  }
 
   @override
   Widget build(BuildContext context) {

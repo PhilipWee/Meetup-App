@@ -4,7 +4,6 @@ import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'Globals.dart' as globals;
 import 'Join.dart';
 
 
@@ -22,13 +21,10 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   final _joinController = TextEditingController(text: "");
 
   List allData = [];
-
   List<String> custLabels = [];
   List<String> custImgs = [];
   List<String> custStates = [];
   List<String> sessionIDs = [];
-
-
 
   @override
   initState(){
@@ -38,7 +34,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  void sessionEnter(String inputLink) async{
+  void sessionJoin(String inputLink) async{
     globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
@@ -50,15 +46,13 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
     Map tempMap = jsonDecode(response.body);
-    print("HEREE");
-    print(tempMap);
+    print("Server Response: $tempMap");
     tempMap.forEach((k, v) => sessionIDs.add(k));
-    print("sessiondIDs length: ${sessionIDs.length}");
+//    print("No. of Sessions: ${sessionIDs.length}");
 
       for( var i=0 ; i<sessionIDs.length ; i++ ){
         print("");
         print("Session ID: ${sessionIDs[i]}");
-
         String url = '${globals.serverAddress}/session/${sessionIDs[i]}';
         http.Response response = await http.get(url);
         Map map = jsonDecode(response.body);
@@ -91,8 +85,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       }
   } // list of all sessionIds saved in
 
-  Future<Null> _refresh() async {
-    setState((){});
+  Future<Null> _refresh() async{
+//    setState((){});
+    setState((){_future = getAllUserSessionsData(globals.uuid);});
     return await Future.delayed(Duration(milliseconds: 1000));
   }
 
@@ -244,11 +239,12 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   //Creates a list view with buildCustomButtons inside
   Widget build(BuildContext context) {
 
-//    custLabels = [];
-//    custImgs = [];
-//    custStates = [];
-//    sessionIDs = [];
-//    allData = [];
+    //this code resets the below and prevents from returning cloned cards
+    custLabels = [];
+    custImgs = [];
+    custStates = [];
+    sessionIDs = [];
+    allData = [];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -296,7 +292,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           }
                           else{
                               globals.saveMyLocationName();
-                              sessionEnter(_joinController.text);
+                              sessionJoin(_joinController.text);
                               await Future.delayed(Duration(milliseconds:2000)); //TODO TIME.SLEEP FOR JOINING SESSION
                               _joinController.clear();
                               Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
@@ -310,6 +306,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                 ),
               )
             ],
+
           ),//join text controller
 
           Container(
@@ -343,12 +340,21 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                 child: FlatButton(
                                   padding: EdgeInsets.all(0),
                                   onPressed: (){
-                                    globals.sessionData = {}; //clear sessionData
+
+                                    globals.sessionData = {};
+                                    globals.sessionUrlCarrier = "";
+                                    globals.sessionIdCarrier = "";
+
                                     globals.sessionData = allData[index];
-                                    globals.sessionData["sessionid"] = sessionIDs[index];
-                                    globals.sessionData["url"] = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+                                    globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
+                                    globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+
+                                    print("Current SessionID===>${globals.sessionIdCarrier}");
+                                    print("Current Session URL===>${globals.sessionUrlCarrier}");
                                     print("Current Session Data ===> ${globals.sessionData}");
+
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+
                                   },
                                   child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                                 ),

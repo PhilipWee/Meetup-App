@@ -2,14 +2,11 @@ library meetupmouse.globals;
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'socketiohelper.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
-String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
+//String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
+String serverAddress = "http://3.23.239.59:5000";
 
 String uuid = "defaultUser";
 String username = "defaultName";
@@ -28,6 +25,8 @@ List<String> sessionIDs = [];
 List allData = [];
 
 Map sessionData = {};
+String sessionIdCarrier = "";
+String sessionUrlCarrier = "";
 
 ///SESSION DATA SAMPLE
 //{
@@ -112,8 +111,8 @@ void saveMyLocationName() async{
 }
 
 Future<String> getplacefromlatlong(double givenlat, double givenlong) async{
-  var location = Location();
-  LocationData currentLocation = await location.getLocation();
+//  var location = Location();
+//  LocationData currentLocation = await location.getLocation();
   double lat = givenlat;
   double long = givenlong;
   print("Member Coordinates: $lat,$long");

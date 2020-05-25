@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'main.dart';
 import 'Globals.dart' as globals;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -99,7 +97,6 @@ class _LoginPageState extends State<LoginPage> {
     return FlatButton(
       color: Colors.white,
       onPressed: () async {
-        globals.saveMyLocationName();
         signInWithGoogle().whenComplete(() {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
