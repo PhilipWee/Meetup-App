@@ -33,17 +33,11 @@ if (not len(firebase_admin._apps)):
 
     # Use the application default credentials
     # Use a service account
-    cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-<<<<<<< HEAD
-    # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-   # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
-   # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-=======
     cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
->>>>>>> 6f0d994ecaf4fd051ca19e397d7a7a1108eee385
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -188,6 +182,10 @@ Use case: Will be emitted when the calculation is completed
 -> Event: 'location_found'
 Sample Data: {'swipeIndex' : 12}
 Use case: Will be emitted when all there is a matching location
+
+-> Event: 'Error'
+Sample Data: Just the normal error stuff
+Use case: Will be emitted when all there is an error with the socket information
 
 
 Client Emitted Events:

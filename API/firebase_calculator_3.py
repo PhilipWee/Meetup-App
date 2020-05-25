@@ -316,7 +316,7 @@ if len(sys.argv) >1:
     print(sys.argv[1])
     sio.connect(sys.argv[1])
 else:
-    sio.connect('http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000')
+    sio.connect('3.23.239.59:5000')
 
 
 
