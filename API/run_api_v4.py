@@ -36,8 +36,8 @@ if (not len(firebase_admin._apps)):
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+    #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -342,6 +342,7 @@ def manage_details(session_id):
         #Get the swiping details and append it to the info dict
         try:
             #Update the session with the new details
+            doc_ref = get_doc_ref_for_id(session_id)
             swipe_details_list = doc_ref.get().get('swipe_details')
             #Convert from list of dics to dic of lists
             swipe_details_dict = {user['uuid']:[] for user in info['users']}
@@ -349,14 +350,14 @@ def manage_details(session_id):
             for swipe_detail in swipe_details_list:
                 for uuid in uuid_list:
                     if uuid in swipe_detail.keys():
-                        swipe_details_dict['uuid'].append(swipe_detail['uuid']) 
-    
+                        swipe_details_dict['uuid'].append(swipe_detail['uuid'])
+
         except KeyError:
             #There are no swipe details just don't do anything
             swipe_details_dict = {}
-            
+
         info.update(swipe_details_dict)
-        
+
         if info != 'Error':
             return jsonify(info)
         else:

@@ -193,7 +193,7 @@
                     if (user) {
                       var isAnonymous = user.isAnonymous;
                       var uid = user.uid;
-                      console.log(uid);
+                      //console.log(uid);
                       var db = firebase.firestore();
                       var username = user.displayName;
                       console.log(username);
@@ -206,6 +206,7 @@
                           // Check for user's meetings. If no meeting, returns empty array.
                           // IMPORTANT: If new user and no sessionId is created, returns Undefined
                           sessionsList = savedData['sessionId'];
+                          console.log("All Sessions.")
                           console.log(sessionsList);
 
                           for (i in sessionsList) (function(i) {
@@ -220,7 +221,6 @@
                               meetupName = sessionData['meetup_name'];
                               meetupHost = sessionData['host_uuid'];
                               console.log(sessionData);
-                              console.log(meetupHost);
                               let sessionStatus = sessionData['session_status'];
                               console.log(meetupName);
 
@@ -236,14 +236,12 @@
 
                               btn.addEventListener('click', function(e) {
                                 if (sessionStatus == "pending_members") {
-                                  // Check if user is host
                                   if (uid == meetupHost) {
                                     window.location.href = "/session/" + sessionsList[i] + "/results_display?isHost=true";
                                   } else {
                                     window.location.href = '/session/' + sessionsList[i] + "/results_display?isHost=false";
                                   }
-                                }
-                                else {
+                                } else {
                                   window.location.href = "/session/" + sessionsList[i] + "/swipe";
                                 }
                                 //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
