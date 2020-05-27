@@ -1,5 +1,5 @@
 //=================================== CAROUSEL =================================
-var user_uid;
+var user_uid, confirmed_place_index;
 
 class Carousel {
 
@@ -64,6 +64,11 @@ class Carousel {
 
 	display_meetup_details(result) {
 		var host_uuid = result['host_uuid'];
+		//confirmed_place_index = result['confirmed_place_index'];
+
+		var meetup_title = document.getElementById("meetup_title");
+		meetup_title.innerHTML = result['meetup_name'];
+
 		var that = this;
 		result['users'].forEach(member_details => {
 			let list_element = that.create_member_list_element(member_details, host_uuid)
