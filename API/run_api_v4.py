@@ -342,21 +342,21 @@ def manage_details(session_id):
         info = get_details_for_session_id(session_id)
         pprint.pprint(info);
         #Get the swiping details and append it to the info dict
-#        try:
+        try:
             #Update the session with the new details
-        doc_ref = get_doc_ref_for_id(session_id)
-        swipe_details_list = doc_ref.get().get('swipe_details')
-        #Convert from list of dics to dic of lists
-        swipe_details_dict = {user['uuid']:[] for user in info['users']}
-        uuid_list = [user['uuid'] for user in info['users']]
-        for swipe_detail in swipe_details_list:
-            for uuid in uuid_list:
-                if uuid in swipe_detail.keys():
-                    swipe_details_dict[uuid].append(swipe_detail[uuid])
+            doc_ref = get_doc_ref_for_id(session_id)
+            swipe_details_list = doc_ref.get().get('swipe_details')
+            #Convert from list of dics to dic of lists
+            swipe_details_dict = {user['uuid']:[] for user in info['users']}
+            uuid_list = [user['uuid'] for user in info['users']]
+            for swipe_detail in swipe_details_list:
+                for uuid in uuid_list:
+                    if uuid in swipe_detail.keys():
+                        swipe_details_dict[uuid].append(swipe_detail[uuid])
 
-#        except KeyError:
+        except KeyError:
 #            #There are no swipe details just don't do anything
-#            swipe_details_dict = {}
+            swipe_details_dict = {}
 #            print("well well, i done fk-ed up.")
 
         info.update(swipe_details_dict)

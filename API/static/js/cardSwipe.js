@@ -1,5 +1,5 @@
 //=================================== CAROUSEL =================================
-var user_uid, confirmed_place_index;
+var user_uid, confirmed_place_index, user_display_name;
 
 class Carousel {
 
@@ -9,7 +9,8 @@ class Carousel {
 
 		//TODO: Get the user uuid
 		this.uuid = user_uid;
-		console.log("HELLO! " + this.uuid);
+		this.username = user_display_name;
+		console.log("HELLO " + this.username + "! What you doing looking at the console >,<");
 
 		this.curIndex = -1;
 		//Get the url depending on where the server is hosted
@@ -39,35 +40,71 @@ class Carousel {
 
 		var that = this;
 		// Get the location data for the particular session id
+
 		$.getJSON(results_url, function (result) {
 			that.display_location_details(result);
 		}).catch(function (error) {
 			console.log('Unable to get results, Error: ' + error)
 		})
 
-		// Get the user data for the particular session id
-		$.getJSON(details_url, function (result) {
-			that.display_meetup_details(result);
-		}).catch(function (error) {
-			console.log('Unable to get meetup details, Error: ' + error)
+		function get_confirmed_index(callback) {
+			// Get the user data for the particular session id
+			$.getJSON(details_url, function (result) {
+				that.display_meetup_details(result);
+				callback(result);
+
+			}).catch(function (error) {
+				console.log('Unable to get meetup details, Error: ' + error)
+			})
+		}
+
+		get_confirmed_index(function (data) {
+
+			console.log("MEETUP DETAILS BELOW");
+			console.log(data);
+//			var last_swiped_position = data[user_uid];
+//			console.log(last_swiped_position);
+
+			if ("confirmed_place_index" in data) {
+				confirmed_place_index = data["confirmed_place_index"];
+				console.log("CONFIRMED PLACE");
+				console.log(confirmed_place_index);
+
+				that.push_confirmed();
+				that._update_other_details(confirmed_place_index);
+
+			} else {
+				var continue_swipe_index = data[user_uid].length;
+				console.log(continue_swipe_index);
+				that.curIndex = continue_swipe_index;
+				console.log(that.curIndex);
+
+				confirmed_place_index = "notConfirmed";
+				console.log(confirmed_place_index);
+
+				that.push();
+				that._update_other_details(that.curIndex);
+
+				that.handle();
+			}
 		})
 
 		this.board = element
 
-		// add first card programmatically
-		this.push()
-
-		// handle gestures
-		this.handle()
-
 	}
+
 
 	display_meetup_details(result) {
 		var host_uuid = result['host_uuid'];
-		//confirmed_place_index = result['confirmed_place_index'];
 
+		var session_status = result['session_status'];
 		var meetup_title = document.getElementById("meetup_title");
-		meetup_title.innerHTML = result['meetup_name'];
+		if (session_status == "location_confirmed") {
+			meetup_title.innerHTML = result['meetup_name'] + " (Confirmed!)";
+		} else {
+			meetup_title.innerHTML = result['meetup_name'] + " (Please swipe :D)";
+		}
+
 
 		var that = this;
 		result['users'].forEach(member_details => {
@@ -359,8 +396,30 @@ class Carousel {
 
 	}
 
-	push() {
+	push_confirmed() {
+		//console.log("WELL WELL");
+		//console.log(confirmed_place_index);
 
+		let card = document.createElement('div')
+
+		card.classList.add('swipeCard')		// idk what is this just copied it in
+
+		var url;
+		var location_name;
+
+		location_name = this.result_details['possible_locations'][confirmed_place_index];
+		url = this.result_details[location_name]['pictures'][0];
+
+		card.style.backgroundImage = `url('${url}')`;
+
+		if (this.board.firstChild) {
+			this.board.insertBefore(card, this.board.firstChild)
+		} else {
+			this.board.append(card)
+		}
+	}
+
+	push() {
 
 		let card = document.createElement('div')
 
@@ -422,6 +481,7 @@ class Auth {
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
 							user_uid = user.uid;
+							user_display_name = user.displayName;
 
 							let board = document.querySelector('#board')
 
