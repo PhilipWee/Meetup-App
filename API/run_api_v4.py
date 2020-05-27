@@ -36,16 +36,15 @@ if (not len(firebase_admin._apps)):
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-   # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
-   # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    #cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
     db = firestore.client()
 print('Connected!')
 #--------------------------------------CONNECT TO FIREBASE-------------------------------
-# eventlet.monkey_patch()
+# eventlet.monk ey_patch()
 app = Flask(__name__)
 # socketio = SocketIO(app,logger=True,engineio_logger=True)
 socketio = SocketIO(app)
@@ -206,9 +205,13 @@ Use case: Will be emitted when the calculation is completed
 Sample Data: {'swipeIndex' : 12}
 Use case: Will be emitted when all there is a matching location
 
+-> Event: 'Error'
+Sample Data: Just the normal error stuff
+Use case: Will be emitted when all there is an error with the socket information
+
 
 Client Emitted Events:
-    
+
 -> Event: 'leave'
 Sample Data: {'room' : <session_id> }
 Use case: Will be triggered when the leave room function is called
@@ -362,6 +365,7 @@ def manage_details(session_id):
         try:
             doc_ref = get_doc_ref_for_id(session_id)
             #Update the session with the new details
+            doc_ref = get_doc_ref_for_id(session_id)
             swipe_details_list = doc_ref.get().get('swipe_details')
             #Convert from list of dics to dic of lists
             swipe_details_dict = {user['uuid']:[] for user in info['users']}
@@ -376,9 +380,9 @@ def manage_details(session_id):
         except KeyError:
             #There are no swipe details just don't do anything
             swipe_details_dict = {}
-            
+
         info.update(swipe_details_dict)
-        
+
         if info != 'Error':
             return jsonify(info)
         else:
@@ -460,7 +464,7 @@ def get_user_sessions():
 #Room joining function
 @socketio.on('join')
 def on_join(data):
-    
+
 
     #Verify the data is in the correct format
     schema_str = """
@@ -477,10 +481,10 @@ def on_join(data):
     join_room(room)
     emit('join_ack',{'message':'Someone has joined the room',
                      'room':room},room=room)
-    
+
 @socketio.on('leave')
 def on_leave(data):
-    
+
 
     #Verify the data is in the correct format
     schema_str = """
@@ -497,7 +501,7 @@ def on_leave(data):
     leave_room(room)
     emit('join_ack',{'message':'Someone has left the room',
                      'room':room},room=room)
-    
+
 @socketio.on('calculation_done')
 def test(data):
     print("Session ID [ " + data['session_id'] + " ] has been calculated")
@@ -551,7 +555,6 @@ def on_swipe_details(data):
         swipe_details = [{userIdentifier:selection}]
 
     doc_ref.update({'swipe_details':swipe_details})
-
 
 
 def check_calculate_done(session_id):
@@ -626,7 +629,7 @@ def update_session_status(session_id,status,index=None):
     if index is not None:
         data['confirmed_place_index'] = index
     doc_ref.update({'info':data})
-    
+
 
 def create_firebase_session(content):
     meetup_name = content.pop('meetup_name')
