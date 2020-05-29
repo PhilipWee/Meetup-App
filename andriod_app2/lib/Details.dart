@@ -3,18 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:getflutter/getflutter.dart';
 
-class DetailsPage extends StatelessWidget {
-  final dynamic item;
-  DetailsPage({this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Details(item: item,),
-    );
-  }
-
-}
 
 class Details extends StatefulWidget {
   final dynamic item;
@@ -28,13 +16,14 @@ class DetailsState extends State<Details> {
   dynamic item;
   DetailsState({this.item});
 
+
   //Function to build the carousel for images
   Widget _buildImgCarousel(List images, double height) {
     return Container(
       child: GFCarousel(
         items: images.map((img) {
           return Container(
-            child: Image.asset(img, fit: BoxFit.cover,),
+            child: Image.network(img, fit: BoxFit.cover,),
           );
         }).toList(),
         height: height,
@@ -86,14 +75,14 @@ class DetailsState extends State<Details> {
                       Hero(
                         tag: item.name,
                         child: Container(
-                          child: Image.asset(item.images[0], fit: BoxFit.cover,),
+                          child: Image.network(item.images[0], fit: BoxFit.cover,),
                         ),
                       ),
                       Container(
                         child: GFCarousel(
                           items: images.map((img) {
                             return Container(
-                              child: Image.asset(img, fit: BoxFit.cover,),
+                              child: Image.network(img, fit: BoxFit.cover,),
                             );
                           }).toList(),
                           height: imgHeight,
