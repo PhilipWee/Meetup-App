@@ -86,9 +86,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   } // list of all sessionIds saved in
 
   Future<Null> _refresh() async{
-//    setState((){});
-    setState((){_future = getAllUserSessionsData(globals.uuid);});
-    return await Future.delayed(Duration(milliseconds: 1000));
+    _future = getAllUserSessionsData(globals.uuid);
+    setState((){});
   }
 
   sessionRemove(String inputSessionID) async {

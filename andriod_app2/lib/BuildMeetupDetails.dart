@@ -72,11 +72,11 @@ class MeetupPageState extends State<MeetupPageWidget> {
   @override
   initState(){
 
-    _future = getMembers();
-
     super.initState();
 
-    setState((){_future = getMembers();});
+    _future = getMembers();
+
+    setState((){});
 
     if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
     else{globals.isCreator = false;}
@@ -132,7 +132,8 @@ class MeetupPageState extends State<MeetupPageWidget> {
   /////////////////////////////////////////////////////////////////////// [BUILDERS]
 
     Future<Null> _refresh() async {
-      setState((){_future = getMembers();});
+      _future = getMembers();
+      setState((){});
       return await Future.delayed(Duration(milliseconds: 1000));
     }
 
