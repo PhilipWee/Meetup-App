@@ -40,9 +40,9 @@ if (not len(firebase_admin._apps)):
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    #cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -384,13 +384,13 @@ def manage_details(session_id):
         return jsonify({'updated_info_for_session_id':session_id})
 
     elif request.method == 'GET':
-
+        
         #Get all the meetup details and return it to the user
         info = get_details_for_session_id(session_id)
-        pprint.pprint(info);
+        
+        # pprint.pprint(info);
         #Get the swiping details and append it to the info dict
         try:
-            doc_ref = get_doc_ref_for_id(session_id)
             #Update the session with the new details
             doc_ref = get_doc_ref_for_id(session_id)
             swipe_details_list = doc_ref.get().get('swipe_details')
@@ -408,6 +408,7 @@ def manage_details(session_id):
 #            print("well well, i done fk-ed up.")
 
         info.update(swipe_details_dict)
+        
 
         if info != 'Error':
             return jsonify(info)
@@ -609,7 +610,7 @@ def set_calculate_flag(session_id):
 def get_details_for_session_id(session_id):
     try:
         doc_ref = get_doc_ref_for_id(session_id)
-        return doc_ref.get().to_dict()['info']
+        return doc_ref.get().get('info').to_dict()
     except:
         return 'Error'
 
@@ -727,7 +728,8 @@ def insert_user_details(details,session_id):
 def get_details_for_session_id(session_id):
     try:
         doc_ref = get_doc_ref_for_id(session_id)
-        return doc_ref.get().to_dict()['info']
+        result = doc_ref.get().get('info')
+        return result
     except:
         print('Error getting user details, does session id exist?')
         return 'Error'

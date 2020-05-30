@@ -100,6 +100,7 @@
             <div class = 'col-10'><h1 >MeetUp Mouse</h1></div>
             <script>
               firebase.auth().onAuthStateChanged(function(user) {
+                document.getElementById('loginStatusButton').innerHTML='';
                 if (user) {
                   var isAnonymous = user.isAnonymous;
                   if (isAnonymous) {
