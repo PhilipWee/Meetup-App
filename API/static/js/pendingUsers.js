@@ -98,7 +98,7 @@ function add_user_to_list(user) {
         style='font-family: Patrick Hand SC; margin-top:1%;margin-left:2%;margin-right:2%;background-color: #FFFBF5;border-radius: 15px;'>
 
         <div class='col col-2'>
-        <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/Avatar.png" alt="Avatar">
+        <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/avatar.png" alt="Avatar">
         </div>
         <div class='col' style='justify-content:left;align-items:left;' align=left>
         <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>${user_place}</p>
