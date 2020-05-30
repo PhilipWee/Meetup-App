@@ -40,6 +40,7 @@ dependencies:
   firebase_core: 0.4.4+3
   getflutter: ^1.0.11
   flutter_rating_bar: ^3.0.1+1
+  flutter_phoenix: ^0.1.0
 
 dev_dependencies:
   flutter_launcher_icons: "^0.7.3"
@@ -67,6 +68,7 @@ flutter:
     - images/host-purple.png
     - images/member.png
     - images/member-yellow.png
+
 
   fonts:
     - family: Pacifico

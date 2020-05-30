@@ -2,12 +2,15 @@ library meetupmouse.globals;
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'socketiohelper.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+final GoogleSignIn googleSignIn = GoogleSignIn();
 
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
 //String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
 //String serverAddress = "http://3.23.239.59:5000";
-String serverAddress = "http://meetup-mouse.com:5000/";
+String serverAddress = "http://meetup-mouse.com:5000";
 
 String uuid = "defaultUser";
 String username = "defaultName";

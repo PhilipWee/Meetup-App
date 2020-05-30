@@ -12,7 +12,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+//  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
   @override
@@ -40,8 +40,9 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+
   Future<String> signInWithGoogle() async {
-    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount googleSignInAccount = await globals.googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
     await googleSignInAccount.authentication;
 
@@ -66,10 +67,11 @@ class _LoginPageState extends State<LoginPage> {
     return 'signInWithGoogle succeeded: $user';
 
   }
-  void signOutGoogle() async{
-    await googleSignIn.signOut();
-    print("User Sign Out");
-  }
+
+//  void signOutGoogle() async{
+//    await globals.googleSignIn.signOut();
+//    print("User Sign Out");
+//  }
 
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
 

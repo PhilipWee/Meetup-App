@@ -349,10 +349,10 @@ class MeetupPageState extends State<MeetupPageWidget> {
         builder: (BuildContext context, AsyncSnapshot snapshot){
           List<Widget> members = [];
           if (globals.sessionData["users"][index]["uuid"] == globals.sessionData["host_uuid"] ){
-            members.add(_memberTile(index, Image.asset("images/host.png")));
+            members.add(_memberTile(index, Image.asset("images/host-purple.png")));
           }
           else {
-            members.add(_memberTile(index, Image.asset("images/member.png")));
+            members.add(_memberTile(index, Image.asset("images/member-yellow.png")));
           }
           return Column(
             children: members,
