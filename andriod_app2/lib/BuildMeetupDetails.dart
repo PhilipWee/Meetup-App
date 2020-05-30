@@ -313,6 +313,34 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
+    Widget _memberTile(int index, Widget imageAsset ){
+      return ListTile(
+        leading: SizedBox(
+          width: 40,
+          height: 40,
+          child: imageAsset,
+        ),
+        title: Text(
+          globals.sessionData["users"][index]["username"].toString(),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+        subtitle: Text(globals.sessionData["users"][index]
+        ["transport_mode"]
+            .toString()),
+        trailing: Container(
+          width: MediaQuery.of(context).size.width * 0.4,
+          child: Text(
+            globals.sessionData["users"][index]["user_place"]
+                .toString()
+                .replaceAll(new RegExp(r', Singapore'), ''),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
+        ),
+      );
+    }
+
     ///Function to build the list of members in current session
     FutureBuilder membersList(BuildContext context, int index) {
 
@@ -321,58 +349,10 @@ class MeetupPageState extends State<MeetupPageWidget> {
         builder: (BuildContext context, AsyncSnapshot snapshot){
           List<Widget> members = [];
           if (globals.sessionData["users"][index]["uuid"] == globals.sessionData["host_uuid"] ){
-            members.add(ListTile(
-              leading: SizedBox(
-                width: 40,
-                height: 40,
-                child: Image.asset("images/host.png"),
-              ),
-              title: Text(
-                globals.sessionData["users"][index]["username"].toString(),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              subtitle: Text(globals.sessionData["users"][index]
-              ["transport_mode"]
-                  .toString()),
-              trailing: Container(
-                width: MediaQuery.of(context).size.width * 0.4,
-                child: Text(
-                  globals.sessionData["users"][index]["user_place"]
-                      .toString()
-                      .replaceAll(new RegExp(r', Singapore'), ''),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-              ),
-            ));
+            members.add(_memberTile(index, Image.asset("images/host.png")));
           }
           else {
-            members.add(ListTile(
-              leading: SizedBox(
-                width: 40,
-                height: 40,
-                child: Image.asset("images/member.png"),
-              ),
-              title: Text(
-                globals.sessionData["users"][index]["username"].toString(),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              subtitle: Text(globals.sessionData["users"][index]
-                      ["transport_mode"]
-                  .toString()),
-              trailing: Container(
-                width: MediaQuery.of(context).size.width * 0.4,
-                child: Text(
-                  globals.sessionData["users"][index]["user_place"]
-                      .toString()
-                      .replaceAll(new RegExp(r', Singapore'), ''),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                ),
-              ),
-            ));
+            members.add(_memberTile(index, Image.asset("images/member.png")));
           }
           return Column(
             children: members,
