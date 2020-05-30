@@ -22,10 +22,9 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _bioController = TextEditingController();
 
   void signOutGoogle() async{
-//    await globals.googleSignIn.signOut();
+    await globals.googleSignIn.signOut();
     await globals.auth.signOut();
     print("User Sign Out");
-    await Future.delayed(Duration(milliseconds: 1000));
   }
 
   void _changed(bool editing, String button) {
@@ -281,6 +280,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         trailing: Icon(Icons.keyboard_arrow_right),
                         onTap: () async{
                           signOutGoogle();
+                          await Future.delayed(Duration(milliseconds: 2000));
                           Phoenix.rebirth(context);
                           },
                       ),

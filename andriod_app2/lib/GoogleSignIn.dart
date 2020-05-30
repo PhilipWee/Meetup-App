@@ -68,11 +68,6 @@ class _LoginPageState extends State<LoginPage> {
 
   }
 
-//  void signOutGoogle() async{
-//    await globals.googleSignIn.signOut();
-//    print("User Sign Out");
-//  }
-
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
   @override
