@@ -21,6 +21,7 @@ import credentials as creds
 import psycopg2
 import socketio as socketioclient
 import copy
+import pprint
 # import eventlet
 from distutils.util import strtobool
 from firebase_admin import credentials
@@ -39,9 +40,9 @@ if (not len(firebase_admin._apps)):
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    #cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    #cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -386,6 +387,7 @@ def manage_details(session_id):
 
         #Get all the meetup details and return it to the user
         info = get_details_for_session_id(session_id)
+        pprint.pprint(info);
         #Get the swiping details and append it to the info dict
         try:
             doc_ref = get_doc_ref_for_id(session_id)
@@ -403,8 +405,9 @@ def manage_details(session_id):
         
 
         except KeyError:
-            #There are no swipe details just don't do anything
+#            #There are no swipe details just don't do anything
             swipe_details_dict = {}
+#            print("well well, i done fk-ed up.")
 
         info.update(swipe_details_dict)
 
@@ -530,6 +533,8 @@ def on_leave(data):
 @socketio.on('calculation_done')
 def calculation_done(data):
     print("Session ID [ " + data['session_id'] + " ] has been calculated")
+    session_id = data['session_id']
+    update_session_status(session_id,'pending_swipes')
     socketio.emit('calculation_result',{"info":'done'},room=data['session_id'])
 
 @socketio.on('swipe_details')

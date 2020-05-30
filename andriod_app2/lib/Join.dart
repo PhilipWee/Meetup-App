@@ -2,11 +2,9 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
-import 'PopUp.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-
+import 'package:geolocator/geolocator.dart';
 
 class CustomizationPage2Widget extends StatefulWidget {
   @override
@@ -22,7 +20,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
   String value4 = "No Preference";
   double value5 = 0;
 
-  //Method for the labels on the slider
   String labels() {
     switch (value5.floor()) {
       case 0:
@@ -37,28 +34,59 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         return "\$\$\$\$";
     }
     return "";
+  } //Method for the labels on the slider
+
+  /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
+
+  sessionJoin() async {
+    //send json package to server as POST
+    Map<String, String> headers = {"Content-type": "application/json"};
+    String url = globals.tempData["joinlink"];
+    String jsonpackage = '{ '  //this package has no MeetupName and MeetupType
+        '"uuid":"${globals.uuid}", '
+        '"username":"${globals.username}", '
+        '"lat":${globals.tempData["lat"]}, '
+        '"long":${globals.tempData["long"]}, '
+        '"user_place":"${globals.tempData["userplace"]}", '
+        '"transport_mode":"${globals.tempData["transportmode"]}", '
+        '"metrics": {'
+        '"quality":${globals.tempData["quality"]}, '
+        '"price":${globals.tempData["price"]}, '
+        '"speed":0}'
+        '}';
+    print("Sending Jsonpackage To Server >>> $jsonpackage");
+    print("Using Link: $url");
+    try{
+      http.Response response = await http.post(url, headers:headers, body:jsonpackage);
+      int statusCode = response.statusCode;
+
+      if (statusCode != 200){
+        print(response.body);
+        Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Oops! Server Error. StatusCode:$statusCode"),
+              duration: Duration(seconds: 2),
+            ));
+      }
+      else{
+        String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+        print("PostData successfull with statuscode: $statusCode");
+        print("Get Session ID successfull with body : $body");
+      }
+    }
+    catch(e){print("Error caught at SessionCreate(): $e");}
   }
-//  void initState() {
-//    super.initState();
-//    _locationNameController.addListener(() {
-//      final text = _locationNameController.text.toLowerCase();
-//      _locationNameController.value = _locationNameController.value.copyWith(
-//        text: text,
-//        selection:
-//        TextSelection(baseOffset: text.length, extentOffset: text.length),
-//        composing: TextRange.empty,
-//      );
-//    });
-//  }
-//
-//  void dispose() {
-//    _locationNameController.dispose();
-//    super.dispose();
-//  }
+
+  /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
   @override
   Widget build(BuildContext context) {
 
+    String mtype = "";
+    if (globals.tempMeetingDetails["meeting_type"] == "food") {mtype = "Food";}
+    else if (globals.tempMeetingDetails["meeting_type"] == "outing") {mtype = "Outing";}
+    else if (globals.tempMeetingDetails["meeting_type"] == "meeting") {mtype = "Meeting";}
+    else {mtype = globals.tempMeetingDetails["meeting_type"];}
 
     Widget buttonSection = Container(
       height: 50.0,
@@ -72,15 +100,16 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                 minWidth: 150,
                 height: 50,
                 child: FlatButton(
+                  child: Text('Join Meetup', style: TextStyle(fontFamily: "Quicksand")),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
-                  onPressed: () {
-//                    showPopup(context, _popupBody(), 'F07 Class Outing');
+                  onPressed: () async{
                     globals.tempData["userplace"] = _locationNameController.text;
-//                    print(globals.tempData);
+                    print(globals.tempData);
+                    await sessionJoin();
+                    Navigator.pop(context);
                   },
-                  child: Text('Join Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
               ),
             ),
@@ -100,7 +129,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
       ),
       body: ListView(
         children: [
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
@@ -109,7 +137,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                     padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
-                    child: Text("F07 Class Outing",
+                    child: Text("${globals.tempMeetingDetails["meetup_name"]}",
                       style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
                   )
               )
@@ -123,7 +151,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   flex: 1,
                   child: Padding(
                       padding:const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 8),
-                      child: Text("Recreation",
+                      child: Text("$mtype",
                         style: TextStyle(fontFamily: "QuickSand", fontSize: 15, fontWeight: FontWeight.bold),)
                   )
               )
@@ -164,6 +192,12 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                       leading: Icon(Icons.search, color: Colors.black),
                       hint: "Enter Location",
                       mode: Mode.overlay,
+                      onSelected: (selected) async {
+                        List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
+                        await Future.delayed(Duration(milliseconds: 1000));
+                        globals.tempData["lat"] = placemark[0].position.latitude;
+                        globals.tempData["long"] = placemark[0].position.longitude;
+                      },
                     )
                 ),
               ),
@@ -200,10 +234,10 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value2 = newValue;
-                          if (value2=="Walk"){globals.tempData["transportMode"]="Walk";}
-                          else if (value2=="Driving"){globals.tempData["transportMode"]="Driving";}
-                          else if (value2=="Riding"){globals.tempData["transportMode"]="Riding";}
-                          else {globals.tempData["transportMode"]="Public Transit";}
+                          if (value2=="Walk"){globals.tempData["transportmode"]="walking";}
+                          else if (value2=="Driving"){globals.tempData["transportmode"]="driving";}
+                          else if (value2=="Riding"){globals.tempData["transportmode"]="riding";}
+                          else {globals.tempData["transportmode"]="public";}
                         });
                       },
                       items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
@@ -251,8 +285,8 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value4 = newValue;
-                          if (value4=="Best"){globals.tempData["quality"]=3;}
-                          else if (value4=="Regular"){globals.tempData["quality"]=2;}
+                          if (value4=="Best"){globals.tempData["quality"]=5;}
+                          else if (value4=="Regular"){globals.tempData["quality"]=3;}
                           else if (value4=="No Preference"){globals.tempData["quality"]=1;}
                         });
                       },
@@ -300,11 +334,11 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                       value: value5,
                       onChanged: (newValue) => setState(() {
                         value5 = newValue;
-                        if (value5==1){globals.tempData["price"]=1;}
-                        else if (value5==2){globals.tempData["price"]=2;}
-                        else if (value5==3){globals.tempData["price"]=3;}
-                        else if (value5==4){globals.tempData["price"]=4;}
-                        else{globals.tempData["price"]=0;}
+                        if (value5==1){globals.tempData["price"]=2;}
+                        else if (value5==2){globals.tempData["price"]=3;}
+                        else if (value5==3){globals.tempData["price"]=4;}
+                        else if (value5==4){globals.tempData["price"]=5;}
+                        else{globals.tempData["price"]=1;}
                       }),
                       max: 4,
                       min: 0,
@@ -328,36 +362,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
     } catch (e) {
       print('error: $e');
     }
-  }
-
-  showPopup(BuildContext context, Widget widget, String title, {BuildContext popupContext}) {
-    Navigator.push(
-      context,
-      PopupLayout(
-        top: 30,
-        left: 30,
-        right: 30,
-        bottom: 50,
-        child: PopupContent(
-          content: Scaffold(
-            appBar: AppBar(
-              backgroundColor: Colors.black,
-              title: Center(child:Text(title),),
-              brightness: Brightness.light,
-              automaticallyImplyLeading: false,
-            ),
-            resizeToAvoidBottomPadding: false,
-            body: widget,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _popupBody() {
-    return Container(
-      child: Text('This is a popup window'),
-    );
   }
 
 }
