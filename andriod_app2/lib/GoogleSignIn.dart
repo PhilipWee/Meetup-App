@@ -77,13 +77,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.deepOrange,
+        color: Color.fromRGBO(247, 147, 30, 1),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image(image: AssetImage("images/Mouse_copy.png"), height: 170),
+              Image(image: AssetImage("images/app_logo.png"), height: 350),
               SizedBox(height: 50),
               _signInButton(),
             ],
