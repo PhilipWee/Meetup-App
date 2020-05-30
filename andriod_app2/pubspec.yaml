@@ -63,6 +63,10 @@ flutter:
     - images/mouse_copy.png
     - images/mouseAvatar.jpg
     - images/food.jpg
+    - images/host.png
+    - images/host-purple.png
+    - images/member.png
+    - images/member-yellow.png
 
   fonts:
     - family: Pacifico

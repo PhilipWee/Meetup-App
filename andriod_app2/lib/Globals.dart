@@ -6,7 +6,8 @@ import 'socketiohelper.dart';
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
 //String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
-String serverAddress = "http://3.23.239.59:5000";
+//String serverAddress = "http://3.23.239.59:5000";
+String serverAddress = "http://meetup-mouse.com:5000/";
 
 String uuid = "defaultUser";
 String username = "defaultName";

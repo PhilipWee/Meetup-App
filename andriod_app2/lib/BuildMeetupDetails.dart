@@ -78,7 +78,9 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     setState((){});
 
-    if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
+    if (globals.sessionData["host_uuid"] == globals.uuid){
+      globals.isCreator = true;
+    }
     else{globals.isCreator = false;}
 
     ///SOCKETS
@@ -318,23 +320,60 @@ class MeetupPageState extends State<MeetupPageWidget> {
         future: _future,
         builder: (BuildContext context, AsyncSnapshot snapshot){
           List<Widget> members = [];
-          members.add(ListTile(
-                leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                title: Text(
-                  globals.sessionData["users"][index]["username"].toString(),
+          if (globals.sessionData["users"][index]["uuid"] == globals.sessionData["host_uuid"] ){
+            members.add(ListTile(
+              leading: SizedBox(
+                width: 40,
+                height: 40,
+                child: Image.asset("images/host.png"),
+              ),
+              title: Text(
+                globals.sessionData["users"][index]["username"].toString(),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              subtitle: Text(globals.sessionData["users"][index]
+              ["transport_mode"]
+                  .toString()),
+              trailing: Container(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: Text(
+                  globals.sessionData["users"][index]["user_place"]
+                      .toString()
+                      .replaceAll(new RegExp(r', Singapore'), ''),
                   overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+                  maxLines: 2,
                 ),
-                subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
-                trailing: Container(
-                  width: MediaQuery.of(context).size.width*0.4,
-                  child: Text(
-                    globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), ''),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
+              ),
+            ));
+          }
+          else {
+            members.add(ListTile(
+              leading: SizedBox(
+                width: 40,
+                height: 40,
+                child: Image.asset("images/member.png"),
+              ),
+              title: Text(
+                globals.sessionData["users"][index]["username"].toString(),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              subtitle: Text(globals.sessionData["users"][index]
+                      ["transport_mode"]
+                  .toString()),
+              trailing: Container(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: Text(
+                  globals.sessionData["users"][index]["user_place"]
+                      .toString()
+                      .replaceAll(new RegExp(r', Singapore'), ''),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                 ),
-              ));
+              ),
+            ));
+          }
           return Column(
             children: members,
           );
