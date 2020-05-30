@@ -7,8 +7,8 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Meetup Mouse"
-        android:icon="@mipmap/mouse_logo"
+        android:label="andriod_app2"
+        android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
