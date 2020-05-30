@@ -391,7 +391,6 @@ def manage_details(session_id):
         # pprint.pprint(info);
         #Get the swiping details and append it to the info dict
         try:
-            doc_ref = get_doc_ref_for_id(session_id)
             #Update the session with the new details
             doc_ref = get_doc_ref_for_id(session_id)
             swipe_details_list = doc_ref.get().get('swipe_details')
@@ -758,20 +757,6 @@ def check_requires_calculation():
             continue
     return ids_that_need_calc
 
-
-def check_calculate_done(session_id):
-    try:
-        doc_ref = get_doc_ref_for_id(session_id)
-        doc_dict = doc_ref.get().to_dict()
-        if doc_dict['calculate'] is not None:
-            if doc_dict['calculate'] == 'Done':
-                return True
-            else:
-                return False
-        else:
-            return 'not_started'
-    except:
-        return 'Error'
 
 #The info is a dictionary
 def calculate(sess_id,info):
