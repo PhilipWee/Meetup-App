@@ -34,7 +34,8 @@ if (not len(firebase_admin._apps)):
     # Use the application default credentials
     # Use a service account
     #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -81,7 +82,15 @@ try:
     print("Connected!")
     data_crsr = data_conn.cursor()
 except:
-    raise Exception("Unable to connect to the food blog data database, check postgres is running and IP address is correct")
+    try:
+        #We may be on the server, try connecting to that instead
+        conn_string = "host="+ creds.PGAWSHOST +" port="+ "5432" +" dbname="+ creds.PGDATADATABASE +" user=" + creds.PGUSER \
+        +" password="+ creds.PGPASSWORD
+        data_conn=psycopg2.connect(conn_string)
+        print("Connected!")
+        data_crsr = data_conn.cursor()
+    except:
+        raise Exception("Unable to connect to the food blog data database, check postgres is running and IP address is correct")
 #--------------------------------------CONNECT TO DATABASE-------------------------------
 
 def get_doc_ref_for_id(session_id):
