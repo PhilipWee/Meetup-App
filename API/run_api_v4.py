@@ -127,56 +127,56 @@ API important links explanation:
 -> PLEASE USE THE SOCKET CONNECTION INSTEAD UNLESS FIRST PULL OF DATA
 -> Sample Data:
     {
-  "host_uuid": "TESTINGUUID", 
-  "meeting_type": "food", 
-  "meetup_name": "testing", 
-  "session_status": "location_confirmed", 
+  "host_uuid": "TESTINGUUID",
+  "meeting_type": "food",
+  "meetup_name": "testing",
+  "session_status": "location_confirmed",
   "swipe_details": {
-    "8319hfbicyvsug21obhvyduiew": [], 
+    "8319hfbicyvsug21obhvyduiew": [],
     "TESTINGUUID": [
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      true, 
-      true, 
-      true, 
-      false, 
-      true, 
-      false, 
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
       true
     ]
-  }, 
-  "time_created": "2020-05-24 02:55:15.861895", 
+  },
+  "time_created": "2020-05-24 02:55:15.861895",
   "users": [
     {
-      "lat": 103.3, 
-      "long": 1.2, 
+      "lat": 103.3,
+      "long": 1.2,
       "metrics": {
-        "price": 5, 
-        "quality": 1, 
+        "price": 5,
+        "quality": 1,
         "speed": 2
-      }, 
-      "transport_mode": "public", 
-      "user_place": "kensington Park", 
-      "username": "Philip", 
+      },
+      "transport_mode": "public",
+      "user_place": "kensington Park",
+      "username": "Philip",
       "uuid": "TESTINGUUID"
-    }, 
+    },
     {
-      "lat": 103.3, 
-      "long": 1.2, 
+      "lat": 103.3,
+      "long": 1.2,
       "metrics": {
-        "price": 4, 
-        "quality": 3, 
+        "price": 4,
+        "quality": 3,
         "speed": 2
-      }, 
-      "transport_mode": "public", 
-      "user_place": "Kensington Park Drive", 
-      "username": "Philip", 
+      },
+      "transport_mode": "public",
+      "user_place": "Kensington Park Drive",
+      "username": "Philip",
       "uuid": "8319hfbicyvsug21obhvyduiew"
     }
   ]
@@ -584,21 +584,6 @@ def on_swipe_details(data):
 
     doc_ref.update({'swipe_details':swipe_details})
 
-
-def check_calculate_done(session_id):
-    try:
-        doc_ref = get_doc_ref_for_id(session_id)
-        doc_dict = doc_ref.get().to_dict()
-        if doc_dict['calculate'] is not None:
-            if doc_dict['calculate'] == 'done':
-                return True
-            else:
-                return False
-        else:
-            return 'not_started'
-    except:
-        return 'Error'
-
 def get_calculate_done_details(session_id):
     try:
         doc_ref = get_doc_ref_for_id(session_id)
@@ -763,7 +748,8 @@ def check_calculate_done(session_id):
         doc_ref = get_doc_ref_for_id(session_id)
         doc_dict = doc_ref.get().to_dict()
         if doc_dict['calculate'] is not None:
-            if doc_dict['calculate'] == 'Done':
+            print(doc_dict['calculate']);
+            if doc_dict['calculate'] == 'done':
                 return True
             else:
                 return False

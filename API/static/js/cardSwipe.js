@@ -74,23 +74,39 @@ class Carousel {
 				that._update_other_details(confirmed_place_index);
 
 			} else {
-				console.log(data[user_uid]);
-				if (continue_swipe_index) {
-					console.log(continue_swipe_index);
-				} else {
-					console.log("Starting from 0");
+				if (user_uid in data) { // If user has already swiped before
+					console.log("IT EXISTS.");
+
+					var continue_swipe_index = data[user_uid].length;
+
+//					if (continue_swipe_index) {
+//						console.log(continue_swipe_index);
+//					} else {
+//						console.log("Starting from 0");
+//					}
+
+					that.curIndex = continue_swipe_index;
+					console.log(that.curIndex);
+
+					confirmed_place_index = "notConfirmed";
+					console.log(confirmed_place_index);
+
+					that.push();
+					that._update_other_details(that.curIndex);
+
+					that.handle();
+
+				} else {								// If user has not swiped before
+					console.log("USER UID NON EXISTENT.");
+
+					that.push();
+
+					that.handle()
 				}
 
-				that.curIndex = continue_swipe_index;
-				console.log(that.curIndex);
+				//=========
 
-				confirmed_place_index = "notConfirmed";
-				console.log(confirmed_place_index);
-
-				that.push();
-				that._update_other_details(that.curIndex);
-
-				that.handle();
+				//========
 			}
 		})
 
