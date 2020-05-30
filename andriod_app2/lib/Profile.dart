@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class ProfilePage extends StatefulWidget {
@@ -21,7 +22,8 @@ class _ProfilePageState extends State<ProfilePage> {
   TextEditingController _bioController = TextEditingController();
 
   void signOutGoogle() async{
-    await globals.googleSignIn.signOut();
+//    await globals.googleSignIn.signOut();
+    await globals.auth.signOut();
     print("User Sign Out");
     await Future.delayed(Duration(milliseconds: 1000));
   }
@@ -277,7 +279,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.w400,
                                 fontFamily: "Quicksand")),
                         trailing: Icon(Icons.keyboard_arrow_right),
-                        onTap: () {
+                        onTap: () async{
                           signOutGoogle();
                           Phoenix.rebirth(context);
                           },

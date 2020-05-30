@@ -3,8 +3,10 @@ import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'socketiohelper.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
+final FirebaseAuth auth = FirebaseAuth.instance;
 
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 

@@ -11,14 +11,14 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+//  final FirebaseAuth _auth = FirebaseAuth.instance;
 //  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
   @override
   void initState(){
     super.initState();
-    try{_auth.currentUser().then((user) => userExists(user));}
+    try{globals.auth.currentUser().then((user) => userExists(user));}
     catch(error){print("there is some weird error");}
   }
 
@@ -51,12 +51,12 @@ class _LoginPageState extends State<LoginPage> {
       idToken: googleSignInAuthentication.idToken,
     );
 
-    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    final FirebaseUser user = (await globals.auth.signInWithCredential(credential)).user;
 
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 
-    final FirebaseUser currentUser = await _auth.currentUser();
+    final FirebaseUser currentUser = await globals.auth.currentUser();
     assert(user.uid == currentUser.uid);
     print("user " + user.uid + " is connected to firebase.");
 
