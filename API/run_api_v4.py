@@ -483,6 +483,8 @@ def on_leave(data):
 @socketio.on('calculation_done')
 def test(data):
     print("Session ID [ " + data['session_id'] + " ] has been calculated")
+    session_id = data['session_id']
+    update_session_status(session_id,'pending_swipes')
     socketio.emit('calculation_result',{"info":'done'},room=data['session_id'])
 
 @socketio.on('swipe_details')

@@ -74,8 +74,13 @@ class Carousel {
 				that._update_other_details(confirmed_place_index);
 
 			} else {
-				var continue_swipe_index = data[user_uid].length;
-				console.log(continue_swipe_index);
+				console.log(data[user_uid]);
+				if (continue_swipe_index) {
+					console.log(continue_swipe_index);
+				} else {
+					console.log("Starting from 0");
+				}
+
 				that.curIndex = continue_swipe_index;
 				console.log(that.curIndex);
 

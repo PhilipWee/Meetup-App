@@ -131,9 +131,7 @@ $('#calculation_button').on('click', () => {
     let url = base_url + '/session/' + session_id + '/calculate';
     $.get(url,function(data,status){
         console.log("Data: " + data + "\nStatus: " + status);
-        let url = base_url + '/session/' + session_id + '/swipe';
-        console.log("Replacing URL.")
-        location.replace(url);
+        
     })
 })
 
