@@ -32,6 +32,17 @@ class Carousel {
 			console.log(data)
 		})
 
+		//Listen for the location confirmed
+		this.socket.on("location_found", (data) => {
+			//Repeat the functions here
+			confirmed_place_index = data["confirmed_place_index"];
+			console.log("CONFIRMED PLACE");
+			console.log(confirmed_place_index);
+
+			that.push_confirmed();
+			that._update_other_details(confirmed_place_index);
+		})
+
 		//temp session_id for testing
 		this.session_id = window.location.pathname.split('/')[2]
 
@@ -236,7 +247,11 @@ class Carousel {
 			data['selection'] = false
 		}
 
-		socket.emit('swipe_details', data);
+		if (this.curIndex != -1) {
+			socket.emit('swipe_details', data);
+		}
+
+		this.curIndex++;
 
 		//Update the other details depending on the index
 		this._update_other_details(this.curIndex);
@@ -470,7 +485,7 @@ class Carousel {
 			this.board.append(card)
 		}
 
-		this.curIndex++;
+		
 
 	}
 }

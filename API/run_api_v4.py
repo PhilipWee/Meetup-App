@@ -22,7 +22,7 @@ import credentials as creds
 import psycopg2
 import socketio as socketioclient
 import copy
-# import eventlet
+import eventlet
 from distutils.util import strtobool
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -40,9 +40,9 @@ if (not len(firebase_admin._apps)):
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    #cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+    cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 else:
@@ -384,11 +384,10 @@ def manage_details(session_id):
         return jsonify({'updated_info_for_session_id':session_id})
 
     elif request.method == 'GET':
-        
+
         #Get all the meetup details and return it to the user
         info = get_details_for_session_id(session_id)
-        
-        # pprint.pprint(info);
+
         #Get the swiping details and append it to the info dict
         try:
             #Update the session with the new details
@@ -408,7 +407,7 @@ def manage_details(session_id):
 #            print("well well, i done fk-ed up.")
 
         info.update(swipe_details_dict)
-        
+
 
         if info != 'Error':
             return jsonify(info)
@@ -533,6 +532,7 @@ def on_leave(data):
 def calculation_done(data):
     print("Session ID [ " + data['session_id'] + " ] has been calculated")
     session_id = data['session_id']
+    print(data['session_id'])
     update_session_status(session_id,'pending_swipes')
     socketio.emit('calculation_result',{"info":'done'},room=data['session_id'])
 
@@ -545,6 +545,8 @@ def on_swipe_details(data):
     "userIdentifier": str,
     "selection":bool}
     """
+
+    pprint.pprint(data);
     result = check_dict_correct_format(data,schema_str)
     if result != "":
         emit("Error",result)
@@ -890,7 +892,7 @@ def calculate(sess_id,info):
                 results_dict[location]['operating_hours'] = str(results_df[results_df['name']==location]['operating_hours'].values[0])
                 pictures_unparsed = results_df[results_df['name']==location]['pictures_url'].values[0]
 
-                results_dict[location]['pictures'] = pictures_unparsed[1:-1].split(',')[:3]
+                results_dict[location]['pictures'] = pictures_unparsed[1:-1].split(',')[:4]
                 # print(results_dict[location]['pictures'])
                 results_dict[location]['writeup'] = str(results_df[results_df['name']==location]['writeup'].values[0])
 
