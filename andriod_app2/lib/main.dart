@@ -50,7 +50,7 @@ class CheckNetworkPage extends StatelessWidget {
               switch (result) {
                 case ConnectivityResult.none:
                   print("Internet service unavailable");
-                  return Center(child: Text("No Internet Connection!"));
+                  return Center(child: Text("Please connect to the Internet!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:
                   return MyHomePage();

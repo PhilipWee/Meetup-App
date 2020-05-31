@@ -8,9 +8,8 @@ import 'package:http/http.dart' as http;
 import 'Globals.dart' as globals;
 import 'PopUp.dart';
 import 'BuildMeetupDetails.dart';
+import 'color_loader.dart';
 
-//Fake data to generate cards
-// TODO: Get actual images and info of the results from database
 
 List<globals.FakeData> swipeData = [];
 
@@ -76,6 +75,14 @@ class ResultSwipeWidget extends StatefulWidget{
 }
 
 class ResultSwipeState extends State<ResultSwipeWidget> {
+
+  List<Color> colors = <Color>[
+    Colors.blue,
+    Colors.purple,
+    Colors.red,
+    Colors.green,
+    Colors.pink
+  ];
 
 
   @override
@@ -170,7 +177,6 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
         future: getSessionResults(globals.sessionData["sessionid"]),
         builder: (BuildContext context, AsyncSnapshot snapshot){
         if (snapshot.connectionState == ConnectionState.done && swipeData.length != 0) {
-
               return Container(
                 child: Stack(
                   alignment: AlignmentDirectional.center,
@@ -195,10 +201,6 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                       },
                       child: Container(
                         color: Colors.white,
-//                      elevation: 0.5,
-//                      shape: RoundedRectangleBorder(
-//                          borderRadius: BorderRadius.all(Radius.circular(0))
-//                      ),
                         child: Container(
                           child: Column(
                             children: <Widget>[
@@ -277,7 +279,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
           return Center(child: Text("No Results Found", style: TextStyle(fontFamily: "Quicksand"),));
         }
-        else if (snapshot.connectionState == ConnectionState.waiting){return Center(child: CircularProgressIndicator());}
+        else if (snapshot.connectionState == ConnectionState.waiting){return Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200)));}
         else{return Center(child: Text("ERROR: ${snapshot.error}"));}
           }),
     );

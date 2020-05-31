@@ -16,7 +16,7 @@ String serverAddress = "http://meetup-mouse.com:5000";
 
 String uuid = "defaultUser";
 String username = "defaultName";
-String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icons/png/19339625881548233621-512.png";
+String profileurl = "";
 
 String userLocationName = "defaultLocation";
 

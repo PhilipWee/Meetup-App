@@ -1,7 +1,6 @@
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
@@ -355,13 +354,4 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
       ),
     );
   }
-
-  Future<void> _shareText() async {
-    try {
-      Share.text('Link', "", 'text/plain');
-    } catch (e) {
-      print('error: $e');
-    }
-  }
-
 }

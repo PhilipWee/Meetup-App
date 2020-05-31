@@ -41,6 +41,7 @@ dependencies:
   getflutter: ^1.0.11
   flutter_rating_bar: ^3.0.1+1
   flutter_phoenix: ^0.1.0
+  shared_preferences: ^0.5.7+3
 
 dev_dependencies:
   flutter_launcher_icons: "^0.7.3"
@@ -57,17 +58,16 @@ flutter:
 
   assets:
     - images/app_logo.png
-    - images/food.jpg
     - images/google_logo.png
-    - images/meetingButton.jpg
-    - images/outing.jpg
-    - images/mouse_copy.png
-    - images/mouseAvatar.jpg
-    - images/food.jpg
+#    - images/mouse_copy.png
+#    - images/mouseAvatar.jpg
     - images/host.png
     - images/host-purple.png
     - images/member.png
     - images/member-yellow.png
+    - images/blue.png
+    - images/purple.png
+    - images/yellow.png
 
 
   fonts:
