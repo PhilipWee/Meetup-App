@@ -153,6 +153,8 @@ $('#calculation_button').on('click', () => {
     })
 })
 
+
+
 socket.on('calculation_result', (data) => {
     console.log(data)
 
@@ -163,6 +165,9 @@ socket.on('calculation_result', (data) => {
         //Change to the card swipe page
         let url = base_url + '/session/' + session_id + '/swipe';
         console.log("Replacing URL.")
-        location.replace(url);
+        location.href = url
+        
     }
 })
+
+// socket.emit('calculation_done', {'session_id':'23ac04ff-a31b-11ea-9cb9-0209d5bc9eb8'})
