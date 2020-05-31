@@ -170,7 +170,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Size screen = MediaQuery.of(context).size;
+//    Size screen = MediaQuery.of(context).size;
 
     return Scaffold(
       body: FutureBuilder(

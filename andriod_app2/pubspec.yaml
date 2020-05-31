@@ -42,6 +42,7 @@ dependencies:
   flutter_rating_bar: ^3.0.1+1
   flutter_phoenix: ^0.1.0
   shared_preferences: ^0.5.7+3
+  hive: ^1.4.1+1
 
 dev_dependencies:
   flutter_launcher_icons: "^0.7.3"
@@ -59,8 +60,6 @@ flutter:
   assets:
     - images/app_logo.png
     - images/google_logo.png
-#    - images/mouse_copy.png
-#    - images/mouseAvatar.jpg
     - images/host.png
     - images/host-purple.png
     - images/member.png

@@ -3,7 +3,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 class ProfilePage extends StatefulWidget {
@@ -60,8 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _nameController.text = name;
-
-
   }
 
   @override

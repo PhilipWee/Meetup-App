@@ -74,7 +74,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
     String url = '${globals.serverAddress}/session/$inputSessID/calculate';
     http.Response response = await http.get(url);
     print(response.body);
-    Map calculate = jsonDecode(response.body);
+//    Map calculate = jsonDecode(response.body);
   }
 
   @override
@@ -187,12 +187,12 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
     //Function to show calculating
-    Widget _calculatingText() {
-      return Padding(
-        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
-        child: Center(child: Text("Calculating")),
-      );
-    }
+//    Widget _calculatingText() {
+//      return Padding(
+//        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
+//        child: Center(child: Text("Calculating")),
+//      );
+//    }
 
     // Function to show waiting
     Widget _waitingText() {
@@ -318,6 +318,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   activeIndicator: Colors.white,
                   onPageChanged: (index) {
                     setState(() {
+                      // ignore: unnecessary_statements
                       index;
                     });
                   },

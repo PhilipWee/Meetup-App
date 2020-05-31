@@ -148,7 +148,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       child: Container( // yolo
         height:57,
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(139, 73, 161, 65),
+          color: Color.fromRGBO(139, 73, 161, 0.7),
         ),
         padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
@@ -182,7 +182,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       alignment: Alignment.bottomLeft,
       padding: const EdgeInsets.all(0.0),
     );}
-    if (imgName == "images/yellow.png"){return Container(
+    else if (imgName == "images/yellow.png"){return Container(
       height: 150.0,
       decoration: BoxDecoration(
           image: DecorationImage(
@@ -193,7 +193,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       child: Container( // yolo
         height:57,
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(247, 147, 30, 65),
+          color: Color.fromRGBO(247, 147, 30, 0.7),
         ),
         padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
@@ -227,7 +227,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       alignment: Alignment.bottomLeft,
       padding: const EdgeInsets.all(0.0),
     );}
-    if (imgName == "images/blue.png"){return Container(
+    else if (imgName == "images/blue.png"){return Container(
       height: 150.0,
       decoration: BoxDecoration(
           image: DecorationImage(
@@ -238,7 +238,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       child: Container( // yolo
         height:57,
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(19, 176, 190, 65),
+          color: Color.fromRGBO(19, 176, 190, 0.7),
         ),
         padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
@@ -272,6 +272,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       alignment: Alignment.bottomLeft,
       padding: const EdgeInsets.all(0.0),
     );}
+    else {return Center(child: Text("ListTile Error"),);}
   }
 
   Widget slideRightBackground() {
