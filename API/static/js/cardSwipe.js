@@ -4,6 +4,7 @@ var user_uid, confirmed_place_index, user_display_name;
 class Carousel {
 
 	constructor(element) {
+
 		this.reachedLastCard = false;
 		this.result_details;
 
@@ -35,12 +36,11 @@ class Carousel {
 		//Listen for the location confirmed
 		this.socket.on("location_found", (data) => {
 			//Repeat the functions here
-			confirmed_place_index = data["confirmed_place_index"];
-			console.log("CONFIRMED PLACE");
-			console.log(confirmed_place_index);
+			window.alert("Location Found!");
+			setTimeout(location.reload.bind(location), 2000);
 
-			that.push_confirmed();
-			that._update_other_details(confirmed_place_index);
+			//that.push_confirmed();
+			//that._update_other_details(confirmed_place_index);
 		})
 
 		//temp session_id for testing
@@ -485,7 +485,7 @@ class Carousel {
 			this.board.append(card)
 		}
 
-		
+
 
 	}
 }
@@ -561,5 +561,12 @@ class Auth {
           });
     }
 }
+
+function homeButton() {
+	var base_url = window.location.origin;
+	location.replace(base_url);
+}
+
+document.getElementById("homeButton").addEventListener("click", homeButton);
 
 let auth = new Auth()

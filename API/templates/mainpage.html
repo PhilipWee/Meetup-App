@@ -97,7 +97,9 @@
 
           </div>
           <div class='row pl-2' style='background-color:Tomato;height:100%;'>
-            <div class = 'col-10'><h1 >MeetUp Mouse</h1></div>
+            <div class = 'col-10'>
+              <h1 id="homeButton" style='font-family:Pacifico; color: white;margin-left: 20px;font-size: 5vw;z-index:0; cursor:pointer;'>MeetUp Mouse</h1>
+            </div>
             <script>
               firebase.auth().onAuthStateChanged(function(user) {
                 document.getElementById('loginStatusButton').innerHTML='';

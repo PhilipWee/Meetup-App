@@ -8,6 +8,8 @@ document.getElementById("homeButton").addEventListener("click", homeButton);
 var details_url = base_url + '/session/' + session_id;
 var results_url = base_url + '/session/' + session_id + '/results';
 
+document.getElementById('shareLink').value = details_url + '/get_details';
+
 var getParams = function (url) {
     var params = {};
     var parser = document.createElement('a');
@@ -114,7 +116,23 @@ function add_user_to_list(user) {
 }
 
 function homeButton() {
-  location.replace("http://localhost:5000");
+  var base_url = window.location.origin;
+  location.replace(base_url);
+}
+
+function copyLinkFunction() {
+  /* Get the text field */
+  var copyText = document.getElementById('shareLink');
+
+  /* Select the text field */
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+  /* Copy the text inside the field */
+  document.execCommand("copy");
+
+  /* Alert for the copied text */
+  alert("Text copied to clipboard");
 }
 
 //Set up the socketio for detecting additional members joining
@@ -131,7 +149,7 @@ $('#calculation_button').on('click', () => {
     let url = base_url + '/session/' + session_id + '/calculate';
     $.get(url,function(data,status){
         console.log("Data: " + data + "\nStatus: " + status);
-        
+
     })
 })
 

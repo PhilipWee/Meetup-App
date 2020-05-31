@@ -41,10 +41,11 @@ function objectifyForm(formArray) {//serialize data function
 }
 
 function homeButton() {
-  location.replace("http://localhost:5000");
+  var base_url = window.location.origin;
+  location.replace(base_url);
 }
 
-function submitbutton() {
+function createMeetupButton() {
   meetupForm = $('#createMeetup')
   //console.log(meetupForm);
   meetupData = objectifyForm(meetupForm.serializeArray());
@@ -81,7 +82,7 @@ function submitbutton() {
                   console.log("Everything looks good!")
                   response = response_data['session_id'];
                   window.session_id = response;
-                  document.getElementById('shareLink').value = host_address_port + '/session/' + response + '/get_details';
+                  window.location.href = window.session_id + '/results_display' + '?isHost=true';
                   //window.location.href='results_display' //form submission
               },
               error: function(response_data) {
@@ -94,30 +95,5 @@ function submitbutton() {
     }
 }
 
-
-  function copyLinkFunction() {
-    /* Get the text field */
-    var copyText = document.getElementById('shareLink');
-
-    /* Select the text field */
-    copyText.select();
-    copyText.setSelectionRange(0, 99999); /* For mobile devices */
-
-    /* Copy the text inside the field */
-    document.execCommand("copy");
-
-    /* Alert for the copied text */
-    alert("Text copied to clipboard");
-  }
-
-  function createMeetupButton() {
-    link = document.getElementById('shareLink').value;
-    if (link == "") {
-      alert("Click on submit to generate a shareable link first.");
-    } else {
-      window.location.href = window.session_id + '/results_display' + '?isHost=true';
-    }
-  }
-
-document.getElementById ("submitbutton").addEventListener ("click", submitbutton);
+document.getElementById ("createMeetupButton").addEventListener ("click", createMeetupButton);
 document.getElementById ("homeButton").addEventListener ("click", homeButton);
