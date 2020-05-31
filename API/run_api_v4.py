@@ -22,7 +22,7 @@ import credentials as creds
 import psycopg2
 import socketio as socketioclient
 import copy
-# import eventlet
+import eventlet
 from distutils.util import strtobool
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -127,56 +127,56 @@ API important links explanation:
 -> PLEASE USE THE SOCKET CONNECTION INSTEAD UNLESS FIRST PULL OF DATA
 -> Sample Data:
     {
-  "host_uuid": "TESTINGUUID", 
-  "meeting_type": "food", 
-  "meetup_name": "testing", 
-  "session_status": "location_confirmed", 
+  "host_uuid": "TESTINGUUID",
+  "meeting_type": "food",
+  "meetup_name": "testing",
+  "session_status": "location_confirmed",
   "swipe_details": {
-    "8319hfbicyvsug21obhvyduiew": [], 
+    "8319hfbicyvsug21obhvyduiew": [],
     "TESTINGUUID": [
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      false, 
-      true, 
-      true, 
-      true, 
-      false, 
-      true, 
-      false, 
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
       true
     ]
-  }, 
-  "time_created": "2020-05-24 02:55:15.861895", 
+  },
+  "time_created": "2020-05-24 02:55:15.861895",
   "users": [
     {
-      "lat": 103.3, 
-      "long": 1.2, 
+      "lat": 103.3,
+      "long": 1.2,
       "metrics": {
-        "price": 5, 
-        "quality": 1, 
+        "price": 5,
+        "quality": 1,
         "speed": 2
-      }, 
-      "transport_mode": "public", 
-      "user_place": "kensington Park", 
-      "username": "Philip", 
+      },
+      "transport_mode": "public",
+      "user_place": "kensington Park",
+      "username": "Philip",
       "uuid": "TESTINGUUID"
-    }, 
+    },
     {
-      "lat": 103.3, 
-      "long": 1.2, 
+      "lat": 103.3,
+      "long": 1.2,
       "metrics": {
-        "price": 4, 
-        "quality": 3, 
+        "price": 4,
+        "quality": 3,
         "speed": 2
-      }, 
-      "transport_mode": "public", 
-      "user_place": "Kensington Park Drive", 
-      "username": "Philip", 
+      },
+      "transport_mode": "public",
+      "user_place": "Kensington Park Drive",
+      "username": "Philip",
       "uuid": "8319hfbicyvsug21obhvyduiew"
     }
   ]
@@ -384,11 +384,10 @@ def manage_details(session_id):
         return jsonify({'updated_info_for_session_id':session_id})
 
     elif request.method == 'GET':
-        
+
         #Get all the meetup details and return it to the user
         info = get_details_for_session_id(session_id)
-        
-        # pprint.pprint(info);
+
         #Get the swiping details and append it to the info dict
         try:
             #Update the session with the new details
@@ -408,7 +407,7 @@ def manage_details(session_id):
 #            print("well well, i done fk-ed up.")
 
         info.update(swipe_details_dict)
-        
+
 
         if info != 'Error':
             return jsonify(info)
@@ -532,7 +531,10 @@ def on_leave(data):
 @socketio.on('calculation_done')
 def calculation_done(data):
     print("Session ID [ " + data['session_id'] + " ] has been calculated")
-    socketio.emit('calculation_result',{"info":'done'},room=data['session_id'])
+    session_id = data['session_id']
+    # print(data['session_id'])
+    update_session_status(session_id,'pending_swipes')
+    socketio.emit('calculation_result',{"info":'done'})
 
 @socketio.on('swipe_details')
 def on_swipe_details(data):
@@ -543,6 +545,8 @@ def on_swipe_details(data):
     "userIdentifier": str,
     "selection":bool}
     """
+
+    pprint.pprint(data);
     result = check_dict_correct_format(data,schema_str)
     if result != "":
         emit("Error",result)
@@ -582,21 +586,6 @@ def on_swipe_details(data):
         swipe_details = [{userIdentifier:selection}]
 
     doc_ref.update({'swipe_details':swipe_details})
-
-
-def check_calculate_done(session_id):
-    try:
-        doc_ref = get_doc_ref_for_id(session_id)
-        doc_dict = doc_ref.get().to_dict()
-        if doc_dict['calculate'] is not None:
-            if doc_dict['calculate'] == 'done':
-                return True
-            else:
-                return False
-        else:
-            return 'not_started'
-    except:
-        return 'Error'
 
 def get_calculate_done_details(session_id):
     try:
@@ -758,6 +747,21 @@ def check_requires_calculation():
     return ids_that_need_calc
 
 
+def check_calculate_done(session_id):
+    try:
+        doc_ref = get_doc_ref_for_id(session_id)
+        doc_dict = doc_ref.get().to_dict()
+        if doc_dict['calculate'] is not None:
+            print(doc_dict['calculate']);
+            if doc_dict['calculate'] == 'done':
+                return True
+            else:
+                return False
+        else:
+            return 'not_started'
+    except:
+        return 'Error'
+
 #The info is a dictionary
 def calculate(sess_id,info):
     print("Calculating for sess_id:",sess_id)
@@ -888,7 +892,7 @@ def calculate(sess_id,info):
                 results_dict[location]['operating_hours'] = str(results_df[results_df['name']==location]['operating_hours'].values[0])
                 pictures_unparsed = results_df[results_df['name']==location]['pictures_url'].values[0]
 
-                results_dict[location]['pictures'] = pictures_unparsed[1:-1].split(',')[:3]
+                results_dict[location]['pictures'] = pictures_unparsed[1:-1].split(',')[:4]
                 # print(results_dict[location]['pictures'])
                 results_dict[location]['writeup'] = str(results_df[results_df['name']==location]['writeup'].values[0])
 
@@ -953,25 +957,25 @@ def upload_calculated_route(sess_id,result):
 # pprint.pprint(info)
 # results = calculate('000000',info)
 # upload_calculated_route('000000',results)
-
+sio = socketioclient.Client()
 
 # Create a callback on_snapshot function to capture changes
 def on_snapshot(col_snapshot, changes, read_time):
     print(u'Callback received query snapshot.')
     for change in changes:
         if change.type.name == 'ADDED':
-            # sio = socketioclient.Client()
-            # sio.connect('127.0.0.1:5000')
+            sio.connect('http://127.0.0.1:5000')
             print(u'Requires calculation: {}'.format(change.document.id))
             sess_id = change.document.id
             info = get_details_for_session_id(sess_id)
             results = calculate(sess_id,info)
             upload_calculated_route(sess_id,results)
             #Send a message to the server saying that the calculation is done
-            # sio.emit('calculation_done',{'session_id':sess_id})
+            sio.emit('calculation_done',{'session_id':sess_id})
             # socketio.emit('calculation_done',content,room=session_id)
             data = {'session_id':sess_id}
-            calculation_done(data)
+            sio.disconnect()
+            # calculation_done(data)
         elif change.type.name == 'MODIFIED':
             print(u'Modification Made: {}'.format(change.document.id))
         elif change.type.name == 'REMOVED':
@@ -989,5 +993,5 @@ if __name__ == '__main__':
 
     # #--------------------------------------CONNECT TO DATABASE-------------------------------
     #Run the App
-    socketio.run(app,host='0.0.0.0', debug=True, use_reloader=False,port = 5000)
+    socketio.run(app,host='0.0.0.0', debug=False, use_reloader=False,port = 5000)
     # app.run(host='0.0.0.0', debug=True, use_reloader=False)

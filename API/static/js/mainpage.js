@@ -4,6 +4,11 @@ function createMeetup() {
   window.location.href = '/session/create';
 }
 
+function homeButton() {
+  var base_url = window.location.origin;
+  location.replace(base_url);
+}
+
 function joinMeetup() {
   document.getElementById("inputSessionId").style.display = "inline";
   document.getElementById("enterSessionId").style.display = "inline";
@@ -38,3 +43,5 @@ function submitBugReport() {
           }
   })
 }
+
+document.getElementById("homeButton").addEventListener("click", homeButton);

@@ -4,6 +4,7 @@ var user_uid, confirmed_place_index, user_display_name;
 class Carousel {
 
 	constructor(element) {
+
 		this.reachedLastCard = false;
 		this.result_details;
 
@@ -30,6 +31,16 @@ class Carousel {
 		//Connect the socket to listen for errors
 		this.socket.on("Error", (data) => {
 			console.log(data)
+		})
+
+		//Listen for the location confirmed
+		this.socket.on("location_found", (data) => {
+			//Repeat the functions here
+			window.alert("Location Found!");
+			setTimeout(location.reload.bind(location), 2000);
+
+			//that.push_confirmed();
+			//that._update_other_details(confirmed_place_index);
 		})
 
 		//temp session_id for testing
@@ -74,18 +85,39 @@ class Carousel {
 				that._update_other_details(confirmed_place_index);
 
 			} else {
-				var continue_swipe_index = data[user_uid].length;
-				console.log(continue_swipe_index);
-				that.curIndex = continue_swipe_index;
-				console.log(that.curIndex);
+				if (user_uid in data) { // If user has already swiped before
+					console.log("IT EXISTS.");
 
-				confirmed_place_index = "notConfirmed";
-				console.log(confirmed_place_index);
+					var continue_swipe_index = data[user_uid].length;
 
-				that.push();
-				that._update_other_details(that.curIndex);
+//					if (continue_swipe_index) {
+//						console.log(continue_swipe_index);
+//					} else {
+//						console.log("Starting from 0");
+//					}
 
-				that.handle();
+					that.curIndex = continue_swipe_index;
+					console.log(that.curIndex);
+
+					confirmed_place_index = "notConfirmed";
+					console.log(confirmed_place_index);
+
+					that.push();
+					that._update_other_details(that.curIndex);
+
+					that.handle();
+
+				} else {								// If user has not swiped before
+					console.log("USER UID NON EXISTENT.");
+
+					that.push();
+
+					that.handle()
+				}
+
+				//=========
+
+				//========
 			}
 		})
 
@@ -215,7 +247,11 @@ class Carousel {
 			data['selection'] = false
 		}
 
-		socket.emit('swipe_details', data);
+		if (this.curIndex != -1) {
+			socket.emit('swipe_details', data);
+		}
+
+		this.curIndex++;
 
 		//Update the other details depending on the index
 		this._update_other_details(this.curIndex);
@@ -449,7 +485,7 @@ class Carousel {
 			this.board.append(card)
 		}
 
-		this.curIndex++;
+
 
 	}
 }
@@ -525,5 +561,12 @@ class Auth {
           });
     }
 }
+
+function homeButton() {
+	var base_url = window.location.origin;
+	location.replace(base_url);
+}
+
+document.getElementById("homeButton").addEventListener("click", homeButton);
 
 let auth = new Auth()

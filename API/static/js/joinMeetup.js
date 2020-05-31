@@ -49,7 +49,8 @@ function objectifyForm(formArray) { //serialize data function
 }
 
 function homeButton() {
-  location.replace("http://localhost:5000");
+  var base_url = window.location.origin;
+  location.replace(base_url);
 }
 
 function submitButton() {
