@@ -1,4 +1,5 @@
 import 'package:andriod_app2/BuildMeetupDetails.dart';
+import 'package:andriod_app2/ResultsSwipePage.dart';
 import 'package:flutter/material.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
@@ -471,7 +472,24 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                       print("Current Session URL===>${globals.sessionUrlCarrier}");
                                       print("Current Session Data ===> ${globals.sessionData}");
 
-                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                      if (globals.sessionData["session_status"] != "pending_members" ||
+                                          globals.sessionData["session_status"] != "location_confirmed") {
+                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                      }
+
+                                      if (globals.sessionData["session_status"] == "pending_swipes") {
+
+                                        if (globals.sessionData["swipe_details"][globals.uuid] < 20){
+                                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
+                                        }
+                                        if (globals.sessionData["swipe_details"][globals.uuid] == 20){
+                                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                        }
+                                        else {Scaffold.of(context).showSnackBar(SnackBar(content: Text("pendingSwipes Error", textAlign: TextAlign.center,),));}
+                                      }
+
+                                      else {Scaffold.of(context).showSnackBar(SnackBar(content: Text("sessionStatus Error", textAlign: TextAlign.center,),));}
+
 
                                     },
                                     child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
@@ -480,7 +498,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                 onDismissed: (direction){
                                   if (direction == DismissDirection.endToStart) {
                                     sessionRemove(sessionIDs[index]);
-                                    custLabels.removeAt(index);
+                                    setState(() {custLabels.removeAt(index);});
                                     Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted ${custLabels[index]}", textAlign: TextAlign.center,),));
                                   }
                                   else {

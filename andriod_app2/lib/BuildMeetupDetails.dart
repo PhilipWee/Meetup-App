@@ -17,8 +17,8 @@ import 'color_loader.dart';
 class MeetupPage extends StatelessWidget {
 
   Future<bool> _isBackPressed() async{
-    globals.socketIO.sendMessage('leave', {'room':"${globals.sessionData["sessionid"]}"});
-    print("Exited Session: ${globals.sessionData["sessionid"]}, sessionData reset.");
+    globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
+    print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
     return true;
   }
 
@@ -33,8 +33,8 @@ class MeetupPage extends StatelessWidget {
           leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
-                globals.socketIO.sendMessage('leave', {'room':"${globals.sessionData["sessionid"]}"});
-                print("Exited Session: ${globals.sessionData["sessionid"]}, sessionData reset.");
+                globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
+                print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);
               },
           ),

@@ -108,8 +108,10 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   Future getSessionResults (String inputSessID) async{
     swipeData = [];
     String url = '${globals.serverAddress}/session/$inputSessID/results';
+    print("SENDING SWIPEDATA RESULT REQUEST FOR $inputSessID");
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
+//    print(results);
     List possibleLocations = results["possible_locations"];
 
     for( var i=0 ; i<possibleLocations.length ; i++ ){
@@ -148,7 +150,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   _addCard(dynamic item) {
     Map<String, dynamic> data = {
-      'sessionID': globals.sessionData["sessionid"],
+      'sessionID': globals.sessionIdCarrier,
       'swipeIndex': swipeData.indexOf(item),
       'userIdentifier':globals.uuid,
       'selection':true
@@ -159,7 +161,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   _dismissCard(dynamic item) {
     Map<String, dynamic> data = {
-      'sessionID': globals.sessionData["sessionid"],
+      'sessionID': globals.sessionIdCarrier,
       'swipeIndex': swipeData.indexOf(item),
       'userIdentifier':globals.uuid,
       'selection':false
@@ -174,7 +176,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
     return Scaffold(
       body: FutureBuilder(
-        future: getSessionResults(globals.sessionData["sessionid"]),
+        future: getSessionResults(globals.sessionIdCarrier),
         builder: (BuildContext context, AsyncSnapshot snapshot){
         if (snapshot.connectionState == ConnectionState.done && swipeData.length != 0) {
               return Container(
