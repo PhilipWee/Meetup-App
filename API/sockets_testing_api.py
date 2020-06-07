@@ -1,7 +1,7 @@
 #--------------------------------------REQUIREMENTS--------------------------------------
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_dance.contrib.github import make_github_blueprint, github
-from flask_cors import CORS
+# from flask_cors import CORS
 from flask_socketio import SocketIO
 from flask_socketio import emit, send
 from flask_socketio import join_room, leave_room
@@ -26,14 +26,14 @@ NUMBER_OF_RESULTS = 5
 #--------------------------------------SETTINGS------------------------------------------
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app,engineio_logger=True,cors_allowed_origins=["https://meetup-mouse.com"])
 
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
     #A placeholder to check if the website is working
     if request.method == 'GET':
-        return render_template('mainpage.html')
+        return render_template('socketio_test.html')
     
 
 @socketio.on('send_message')
@@ -55,7 +55,7 @@ def testing(data):
 #Testing function for joining a room based on sess id
 @socketio.on('join')
 def on_join(data):
-    print('Hello there')
+    print(111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111)
     room= data['room']
     join_room(room)
     emit('test',{'message':'Oi youre in the room'},room='1111')
@@ -69,7 +69,8 @@ if __name__ == '__main__':
         # Use the application default credentials
         # Use a service account
         # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
-        cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-934d0-firebase-adminsdk-txqu5-9b67a90c2c.json')
+        # cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-934d0-firebase-adminsdk-txqu5-9b67a90c2c.json')
+        cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
         firebase_admin.initialize_app(cred)
         db = firestore.client()
     else:
