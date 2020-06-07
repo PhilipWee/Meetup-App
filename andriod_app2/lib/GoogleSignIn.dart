@@ -11,14 +11,14 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+//  final FirebaseAuth _auth = FirebaseAuth.instance;
+//  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
   @override
   void initState(){
     super.initState();
-    try{_auth.currentUser().then((user) => userExists(user));}
+    try{globals.auth.currentUser().then((user) => userExists(user));}
     catch(error){print("there is some weird error");}
   }
 
@@ -40,8 +40,9 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+
   Future<String> signInWithGoogle() async {
-    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount googleSignInAccount = await globals.googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
     await googleSignInAccount.authentication;
 
@@ -50,12 +51,12 @@ class _LoginPageState extends State<LoginPage> {
       idToken: googleSignInAuthentication.idToken,
     );
 
-    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    final FirebaseUser user = (await globals.auth.signInWithCredential(credential)).user;
 
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 
-    final FirebaseUser currentUser = await _auth.currentUser();
+    final FirebaseUser currentUser = await globals.auth.currentUser();
     assert(user.uid == currentUser.uid);
     print("user " + user.uid + " is connected to firebase.");
 
@@ -66,10 +67,6 @@ class _LoginPageState extends State<LoginPage> {
     return 'signInWithGoogle succeeded: $user';
 
   }
-  void signOutGoogle() async{
-    await googleSignIn.signOut();
-    print("User Sign Out");
-  }
 
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
@@ -77,13 +74,13 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.deepOrange,
+        color: Color.fromRGBO(247, 147, 30, 1),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image(image: AssetImage("images/Mouse_copy.png"), height: 170),
+              Image(image: AssetImage("images/app_logo.png"), height: 350),
               SizedBox(height: 50),
               _signInButton(),
             ],

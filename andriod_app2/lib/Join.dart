@@ -1,10 +1,11 @@
+import 'package:andriod_app2/BottomTab.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'dart:convert';
 
 class CustomizationPage2Widget extends StatefulWidget {
   @override
@@ -80,6 +81,14 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
   @override
+  initState() {
+    super.initState();
+    setState(() {});
+
+  }
+
+
+  @override
   Widget build(BuildContext context) {
 
     String mtype = "";
@@ -108,7 +117,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                     globals.tempData["userplace"] = _locationNameController.text;
                     print(globals.tempData);
                     await sessionJoin();
-                    Navigator.pop(context);
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);
                   },
                 ),
               ),
@@ -126,6 +135,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         ),
         backgroundColor: Colors.deepOrange,
         automaticallyImplyLeading: true,
+
       ),
       body: ListView(
         children: [
@@ -136,9 +146,9 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
               Expanded(
                   flex: 1,
                   child: Padding(
-                    padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
-                    child: Text("${globals.tempMeetingDetails["meetup_name"]}",
-                      style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
+                      padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
+                      child: Text("${globals.tempMeetingDetails["meetup_name"]}",
+                        style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
                   )
               )
             ],
@@ -355,13 +365,4 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
       ),
     );
   }
-
-  Future<void> _shareText() async {
-    try {
-      Share.text('Link', "", 'text/plain');
-    } catch (e) {
-      print('error: $e');
-    }
-  }
-
 }

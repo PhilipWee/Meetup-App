@@ -1,10 +1,12 @@
 import 'package:andriod_app2/BuildMeetupDetails.dart';
+import 'package:andriod_app2/ResultsSwipePage.dart';
 import 'package:flutter/material.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'Join.dart';
+import 'color_loader.dart';
 
 
 class HomeUsernameWidget extends StatefulWidget {
@@ -13,6 +15,14 @@ class HomeUsernameWidget extends StatefulWidget {
 }
 
 class HomeUsernameState extends State<HomeUsernameWidget> {
+
+  List<Color> colorsForLoad = [
+    Colors.red,
+    Colors.green,
+    Colors.indigo,
+    Colors.pinkAccent,
+    Colors.blue
+  ];
 
   Future _future;
 
@@ -34,7 +44,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  void sessionJoin(String inputLink) async{
+  sessionEnter(String inputLink) async{
+    print("INPUTLINK $inputLink");
     globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
@@ -42,13 +53,13 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     print("Current Session Details ===> ${globals.tempMeetingDetails}");
     } //session details saved in global.tempMeetingDetails
 
+
   Future getAllUserSessionsData(String inputUserId) async{
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
     Map tempMap = jsonDecode(response.body);
     print("Server Response: $tempMap");
     tempMap.forEach((k, v) => sessionIDs.add(k));
-//    print("No. of Sessions: ${sessionIDs.length}");
 
       for( var i=0 ; i<sessionIDs.length ; i++ ){
         print("");
@@ -69,10 +80,10 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           custLabels.add(map["meetup_name"]);
           print("Meetup Name: ${custLabels[i]}");
 
-          //IMAGES
-          if (map["meeting_type"] == "outing"){custImgs.add("images/outing.jpg");}
-          else if (map["meeting_type"] == "food"){custImgs.add("images/food.jpg");}
-          else if (map["meeting_type"] == "meeting"){custImgs.add("images/meetingButton.jpg");}
+          //IMAGES//YOLO
+          if (map["meeting_type"] == "outing"){custImgs.add("images/purple.png");}
+          else if (map["meeting_type"] == "food"){custImgs.add("images/yellow.png");}
+          else if (map["meeting_type"] == "meeting"){custImgs.add("images/blue.png");}
           print("Meeting Image: ${custImgs[i]}");
 
           //STATES
@@ -83,6 +94,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           print(""); //for println spacing
         }
       }
+    print("allData: $allData");
   } // list of all sessionIds saved in
 
   Future<Null> _refresh() async{
@@ -127,7 +139,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   //Helper method to create layout of the buttons
   Widget _buildCustomButton(String label, String imgName, String state) {
-    return Container(
+
+    if (imgName == "images/purple.png"){return Container(
       height: 150.0,
       decoration: BoxDecoration(
           image: DecorationImage(
@@ -135,12 +148,10 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fit: BoxFit.cover
           )
       ),// set image background
-      child: Container(
+      child: Container( // yolo
         height:57,
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: <Color>[Colors.black54, Colors.white12],
-          ),
+          color: Color.fromRGBO(139, 73, 161, 0.7),
         ),
         padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
@@ -173,7 +184,98 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       ),
       alignment: Alignment.bottomLeft,
       padding: const EdgeInsets.all(0.0),
-    );
+    );}
+    else if (imgName == "images/yellow.png"){return Container(
+      height: 150.0,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage(imgName),
+              fit: BoxFit.cover
+          )
+      ),// set image background
+      child: Container( // yolo
+        height:57,
+        decoration: const BoxDecoration(
+          color: Color.fromRGBO(247, 147, 30, 0.7),
+        ),
+        padding: const EdgeInsets.all(10.0),
+        alignment: Alignment.bottomLeft,
+        child: Column(
+          children: <Widget>[
+            Container(
+              alignment: Alignment.topLeft,
+              child: Text(
+                label,
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17),
+              ),
+            ),
+            Container(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                state,
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10),
+              ),
+            ),
+          ],
+        ),
+      ),
+      alignment: Alignment.bottomLeft,
+      padding: const EdgeInsets.all(0.0),
+    );}
+    else if (imgName == "images/blue.png"){return Container(
+      height: 150.0,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage(imgName),
+              fit: BoxFit.cover
+          )
+      ),// set image background
+      child: Container( // yolo
+        height:57,
+        decoration: const BoxDecoration(
+          color: Color.fromRGBO(19, 176, 190, 0.7),
+        ),
+        padding: const EdgeInsets.all(10.0),
+        alignment: Alignment.bottomLeft,
+        child: Column(
+          children: <Widget>[
+            Container(
+              alignment: Alignment.topLeft,
+              child: Text(
+                label,
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17),
+              ),
+            ),
+            Container(
+              alignment: Alignment.bottomLeft,
+              child: Text(
+                state,
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10),
+              ),
+            ),
+          ],
+        ),
+      ),
+      alignment: Alignment.bottomLeft,
+      padding: const EdgeInsets.all(0.0),
+    );}
+    else {return Center(child: Text("ListTile Error"),);}
   }
 
   Widget slideRightBackground() {
@@ -277,7 +379,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       IconButton(
                         icon: Icon(Icons.person_add),
-                        onPressed: () async{
+                        onPressed: () async {
                           if (_joinController.text.isEmpty) {
                             Scaffold.of(context).showSnackBar(
                                 SnackBar(
@@ -290,16 +392,16 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                 ));
                           }
                           else{
-                              globals.saveMyLocationName();
-                              sessionJoin(_joinController.text);
-                              await Future.delayed(Duration(milliseconds:2000)); //TODO TIME.SLEEP FOR JOINING SESSION
-                              _joinController.clear();
-                              Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
-                            }
-                          },
+                            globals.saveMyLocationName();
+                            sessionEnter(_joinController.text);
+//                            await Future.delayed(Duration(milliseconds: 2000));
+                            _joinController.clear();
+                            Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
+                          }
+                        },
                         iconSize: 25,
                         color: Colors.black87,
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -311,7 +413,17 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           Container(
             child: Padding(
               padding: const EdgeInsets.all(1),
-              child: Center(child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w200),)),
+              child: Center(
+                  child: Text(
+
+                    "Scroll to refresh  |  Swipe to delete" ,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w100,
+                        color: Colors.black.withOpacity(1)
+                    )
+
+                  )
+              ),
             ),
           ),//scroll to refresh
 
@@ -320,69 +432,100 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               child: FutureBuilder(
                 future: _future,
                 builder: (BuildContext context, AsyncSnapshot snapshot){
-                    if (snapshot.connectionState ==  ConnectionState.done){
+                    if (snapshot.connectionState ==  ConnectionState.done && allData.isEmpty){
                     return RefreshIndicator(
                       onRefresh: _refresh,
-                      child: ListView.builder(
-                        padding: EdgeInsets.only(top: 0, bottom: 0, left:5, right:5),
-                        itemCount: custLabels.length,
-                        itemBuilder: (context, index) {
-                          final item = custLabels[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 5.0),
-                            child: Dismissible(
-                              dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
-//                            direction: DismissDirection.endToStart,
-                              background: slideRightBackground(),
-                              secondaryBackground: slideLeftBackground(),
-                              child: Container(
-                                child: FlatButton(
-                                  padding: EdgeInsets.all(0),
-                                  onPressed: (){
-
-                                    globals.sessionData = {};
-                                    globals.sessionUrlCarrier = "";
-                                    globals.sessionIdCarrier = "";
-
-                                    globals.sessionData = allData[index];
-                                    globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
-                                    globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
-
-                                    print("Current SessionID===>${globals.sessionIdCarrier}");
-                                    print("Current Session URL===>${globals.sessionUrlCarrier}");
-                                    print("Current Session Data ===> ${globals.sessionData}");
-
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
-
-                                  },
-                                  child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
-                                ),
-                              ),
-                              key: Key(item),
-                              onDismissed: (direction){
-                                if (direction == DismissDirection.endToStart) {
-                                  sessionRemove(sessionIDs[index]);
-                                  custLabels.removeAt(index);
-//                              setState(() {custLabels.removeAt(index);});
-                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted $item", textAlign: TextAlign.center,),));
-                                } else {
-                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
-                                }
-
-                              }
+                      child: ListView(
+                        children: <Widget>[Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 200),
+                            child: Center(
+                                child: Text(
+                                    "No Meetups",
+                                    style: TextStyle(
+                                        fontFamily: "Quicksand",
+                                        color: Colors.black.withOpacity(0.6)
+                                    )
+                                )
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        ),],
+                      )
                     );
                   }
+                    else if (snapshot.connectionState ==  ConnectionState.done){
+                      return RefreshIndicator(
+                        onRefresh: _refresh,
+                        child: ListView.builder(
+                          padding: EdgeInsets.only(top: 0, bottom: 0, left:5, right:5),
+                          itemCount: custLabels.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 5.0),
+                              child: Dismissible(
+                                key: Key(custLabels[index]),
+                                dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
+                                background: slideRightBackground(),
+                                secondaryBackground: slideLeftBackground(),
+                                child: Container(
+                                  child: FlatButton(
+                                    padding: EdgeInsets.all(0),
+                                    onPressed: (){
+
+                                      globals.sessionData = {};
+                                      globals.sessionUrlCarrier = "";
+                                      globals.sessionIdCarrier = "";
+
+                                      globals.sessionData = allData[index];
+                                      globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
+                                      globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+
+                                      print("Current SessionID===>${globals.sessionIdCarrier}");
+                                      print("Current Session URL===>${globals.sessionUrlCarrier}");
+                                      print("Current Session Data ===> ${globals.sessionData}");
+                                      print("Current Session Status ===> ${globals.sessionData["session_status"]}");
+
+                                      if (globals.sessionData["session_status"] == "pending_swipes") {
+                                        if (globals.sessionData["swipe_details"].isNotEmpty){
+                                          if (globals.sessionData["swipe_details"].containsKey(globals.uuid)){
+                                            if (globals.sessionData["swipe_details"][globals.uuid].length < 20){
+                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
+                                            }
+                                          }
+                                        }
+                                      }
+
+                                      else{
+                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                      }
+                                    },
+
+                                    child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+                                  ),
+                                ),
+                                onDismissed: (direction) async{
+                                  if (direction == DismissDirection.endToStart) {
+                                    sessionRemove(sessionIDs[index]);
+                                    setState(() {
+                                      custLabels.removeAt(index);
+                                      _future = getAllUserSessionsData(globals.uuid);
+                                    });
+                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted ${custLabels[index]}", textAlign: TextAlign.center,),));
+                                  }
+                                  else {
+                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
+                                  }
+                                }
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }
                     else if(snapshot.connectionState == ConnectionState.waiting){
-                      return Center(child: CircularProgressIndicator());
+                      return Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1000)));
                   }
                     else {return Center(child: Text("SNAPSHOT ERROR: ${snapshot.error}"),);}
-//                    else {return Center(
-//                        child: CircularProgressIndicator()
-//                    );}
                   },
               ),
             ),

@@ -1,8 +1,9 @@
-//import 'dart:html';
 import 'Globals.dart' as globals;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+import 'package:flutter_phoenix/flutter_phoenix.dart';
+
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key, this.title}) : super(key: key);
@@ -18,6 +19,12 @@ class _ProfilePageState extends State<ProfilePage> {
   String bio = "Add your bio";
   TextEditingController _nameController = TextEditingController();
   TextEditingController _bioController = TextEditingController();
+
+  void signOutGoogle() async{
+    await globals.googleSignIn.signOut();
+    await globals.auth.signOut();
+    print("User Sign Out");
+  }
 
   void _changed(bool editing, String button) {
     setState(() {
@@ -270,7 +277,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.w400,
                                 fontFamily: "Quicksand")),
                         trailing: Icon(Icons.keyboard_arrow_right),
-                        onTap: () {},
+                        onTap: () async{
+                          signOutGoogle();
+                          await Future.delayed(Duration(milliseconds: 2000));
+                          Phoenix.rebirth(context);
+                          },
                       ),
                     ),
                   ],

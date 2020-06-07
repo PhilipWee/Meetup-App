@@ -17,30 +17,6 @@ class DetailsState extends State<Details> {
   DetailsState({this.item});
 
 
-  //Function to build the carousel for images
-  Widget _buildImgCarousel(List images, double height) {
-    return Container(
-      child: GFCarousel(
-        items: images.map((img) {
-          return Container(
-            child: Image.network(img, fit: BoxFit.cover,),
-          );
-        }).toList(),
-        height: height,
-        viewportFraction: 1.0,
-        pagination: true,
-        pagerSize: 8.0,
-        passiveIndicator: Colors.grey,
-        activeIndicator: Colors.white,
-        onPageChanged: (index) {
-          setState(() {
-            index;
-          });
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     String details = item.details;
@@ -93,6 +69,7 @@ class DetailsState extends State<Details> {
                           activeIndicator: Colors.white,
                           onPageChanged: (index) {
                             setState(() {
+                              // ignore: unnecessary_statements
                               index;
                             });
                           },
