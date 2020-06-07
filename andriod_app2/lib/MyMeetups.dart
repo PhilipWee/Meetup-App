@@ -394,9 +394,16 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           else{
                             globals.saveMyLocationName();
                             sessionEnter(_joinController.text);
-//                            await Future.delayed(Duration(milliseconds: 2000));
-                            _joinController.clear();
-                            Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
+
+                            showDialog(
+                                context: context,
+                                builder: (context)
+                                {Future.delayed(Duration(milliseconds: 2000), () {
+                                    _joinController.clear();
+                                    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);;
+                                  });
+                                return Expanded(child: Center(child: CircularProgressIndicator()));
+                                });
                           }
                         },
                         iconSize: 25,

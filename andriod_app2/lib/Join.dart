@@ -116,8 +116,15 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                   onPressed: () async{
                     globals.tempData["userplace"] = _locationNameController.text;
                     print(globals.tempData);
-                    await sessionJoin();
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);
+                    sessionJoin();
+                    showDialog(
+                        context: context,
+                        builder: (context)
+                        {Future.delayed(Duration(milliseconds: 2000), () {
+                          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>MyHomePage()),);;
+                        });
+                        return Expanded(child: Center(child: CircularProgressIndicator()));
+                        });
                   },
                 ),
               ),
