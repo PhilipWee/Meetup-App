@@ -22,7 +22,7 @@ String userLocationName = "defaultLocation";
 
 bool isCreator = false;
 
-Map<String, dynamic> tempMeetingDetails = {"meetup_name": "meetup_name", "meeting_type":"meeting_type"};
+Map<String, dynamic> tempMeetingDetails = {"meetup_name": "Loading...", "meeting_type":"Loading..."};
 
 List<String> custLabels = [];
 List<String> custImgs = [];
@@ -154,10 +154,10 @@ class FakeData {
 } //for swipe page
 
 FakeData locationDetails = FakeData(
-    name: "Fisherman's Wharf",
-    address: "39 San Francisco Bay Area",
+    name: "Confirmed Location ERROR",
+    address: "Confirmed Location ERROR",
     details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
-    rating: 4.6,
+    rating: 0.0,
     images: ["https://i.ibb.co/kxvjKVJ/app-logo.png"]);
 
 

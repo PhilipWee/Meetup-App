@@ -92,7 +92,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     ///SOCKETS
     globals.socketIO.subscribe("location_found", (data)=>{
       print("Location Found!"),
-      print(data), //{'swipeIndex' : 12}
+      print(data),
       globals.sessionData["confirmed_index"] = data["swipeIndex"],
       print(globals.sessionData),
       globals.sessionData["session_status"] = "location_confirmed",

@@ -44,13 +44,15 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  void sessionJoin(String inputLink) async{
+  sessionEnter(String inputLink) async{
+    print("INPUTLINK $inputLink");
     globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
     print("Current Session Details ===> ${globals.tempMeetingDetails}");
     } //session details saved in global.tempMeetingDetails
+
 
   Future getAllUserSessionsData(String inputUserId) async{
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
@@ -377,7 +379,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       IconButton(
                         icon: Icon(Icons.person_add),
-                        onPressed: () async{
+                        onPressed: () async {
                           if (_joinController.text.isEmpty) {
                             Scaffold.of(context).showSnackBar(
                                 SnackBar(
@@ -390,16 +392,16 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                 ));
                           }
                           else{
-                              globals.saveMyLocationName();
-                              sessionJoin(_joinController.text);
-                              await Future.delayed(Duration(milliseconds:2000)); //TODO TIME.SLEEP FOR JOINING SESSION
-                              _joinController.clear();
-                              Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
-                            }
-                          },
+                            globals.saveMyLocationName();
+                            sessionEnter(_joinController.text);
+//                            await Future.delayed(Duration(milliseconds: 2000));
+                            _joinController.clear();
+                            Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
+                          }
+                        },
                         iconSize: 25,
                         color: Colors.black87,
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -431,14 +433,24 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                 future: _future,
                 builder: (BuildContext context, AsyncSnapshot snapshot){
                     if (snapshot.connectionState ==  ConnectionState.done && allData.isEmpty){
-                    return Center(
-                        child: Text(
-                            "No Meetups",
-                            style: TextStyle(
-                                fontFamily: "Quicksand",
-                                color: Colors.black.withOpacity(0.6)
-                            )
-                        )
+                    return RefreshIndicator(
+                      onRefresh: _refresh,
+                      child: ListView(
+                        children: <Widget>[Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 200),
+                            child: Center(
+                                child: Text(
+                                    "No Meetups",
+                                    style: TextStyle(
+                                        fontFamily: "Quicksand",
+                                        color: Colors.black.withOpacity(0.6)
+                                    )
+                                )
+                            ),
+                          ),
+                        ),],
+                      )
                     );
                   }
                     else if (snapshot.connectionState ==  ConnectionState.done){
@@ -471,34 +483,33 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                       print("Current SessionID===>${globals.sessionIdCarrier}");
                                       print("Current Session URL===>${globals.sessionUrlCarrier}");
                                       print("Current Session Data ===> ${globals.sessionData}");
-
-                                      if (globals.sessionData["session_status"] != "pending_members" ||
-                                          globals.sessionData["session_status"] != "location_confirmed") {
-                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
-                                      }
+                                      print("Current Session Status ===> ${globals.sessionData["session_status"]}");
 
                                       if (globals.sessionData["session_status"] == "pending_swipes") {
-
-                                        if (globals.sessionData["swipe_details"][globals.uuid] < 20){
-                                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
+                                        if (globals.sessionData["swipe_details"].isNotEmpty){
+                                          if (globals.sessionData["swipe_details"].containsKey(globals.uuid)){
+                                            if (globals.sessionData["swipe_details"][globals.uuid].length < 20){
+                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
+                                            }
+                                          }
                                         }
-                                        if (globals.sessionData["swipe_details"][globals.uuid] == 20){
-                                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
-                                        }
-                                        else {Scaffold.of(context).showSnackBar(SnackBar(content: Text("pendingSwipes Error", textAlign: TextAlign.center,),));}
                                       }
 
-                                      else {Scaffold.of(context).showSnackBar(SnackBar(content: Text("sessionStatus Error", textAlign: TextAlign.center,),));}
-
-
+                                      else{
+                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                      }
                                     },
+
                                     child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                                   ),
                                 ),
-                                onDismissed: (direction){
+                                onDismissed: (direction) async{
                                   if (direction == DismissDirection.endToStart) {
                                     sessionRemove(sessionIDs[index]);
-                                    setState(() {custLabels.removeAt(index);});
+                                    setState(() {
+                                      custLabels.removeAt(index);
+                                      _future = getAllUserSessionsData(globals.uuid);
+                                    });
                                     Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted ${custLabels[index]}", textAlign: TextAlign.center,),));
                                   }
                                   else {

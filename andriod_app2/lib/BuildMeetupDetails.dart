@@ -28,7 +28,7 @@ class MeetupPage extends StatelessWidget {
       onWillPop: _isBackPressed,
       child: Scaffold(
         appBar: AppBar(
-        automaticallyImplyLeading: false,
+          automaticallyImplyLeading: false,
           title: Text("${globals.sessionData["meetup_name"]}"),
           leading: IconButton(
               icon: Icon(Icons.arrow_back),
