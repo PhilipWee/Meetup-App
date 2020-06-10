@@ -152,9 +152,9 @@ class Carousel {
 		var src;
 		var username = member_details['username']
 		if (member_details['uuid'] == host_uuid) {
-			src = '"/static/mouseAvatar1.png"'
+			src = '"/static/host-purple.png"'
 		} else {
-			src = '"/static/mouseAvatar2.png"'
+			src = '"/static/member-yellow.png"'
 		}
 		//Start creating the element
 		var list_item = document.createElement('a')
