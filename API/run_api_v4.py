@@ -827,7 +827,7 @@ def calculate(sess_id,info):
 
         results_df = results_df[results_df['rating']>=min_rating]
         # results_df = results_df[results_df['min_price']>=min_price*10]
-        results_df = results_df[results_df['min_price']<=max_price*10]
+        results_df = results_df[results_df['min_price']<=max_price*10 | results_df['min_price']<=15]
         # return results_df
 
         # pprint.pprint(user_details)
