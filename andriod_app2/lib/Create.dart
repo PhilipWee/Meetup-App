@@ -98,7 +98,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
     Navigator.push(
       context,
       PopupLayout(
-        top: MediaQuery.of(context).size.height - 170,
+        top: MediaQuery.of(context).size.height - MediaQuery.of(context).size.height/4,
         left: 0,
         right: 0,
         bottom: 57,
