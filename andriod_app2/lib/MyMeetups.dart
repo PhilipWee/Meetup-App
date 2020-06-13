@@ -39,7 +39,10 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   @override
   initState(){
     super.initState();
-    _future = getAllUserSessionsData(globals.uuid);
+    setState(() {
+      _future = getAllUserSessionsData(globals.uuid);
+    });
+
   }
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
