@@ -8,9 +8,8 @@ import 'package:http/http.dart' as http;
 import 'Globals.dart' as globals;
 import 'PopUp.dart';
 import 'BuildMeetupDetails.dart';
+import 'color_loader.dart';
 
-//Fake data to generate cards
-// TODO: Get actual images and info of the results from database
 
 List<globals.FakeData> swipeData = [];
 
@@ -77,6 +76,14 @@ class ResultSwipeWidget extends StatefulWidget{
 
 class ResultSwipeState extends State<ResultSwipeWidget> {
 
+  List<Color> colors = <Color>[
+    Colors.blue,
+    Colors.purple,
+    Colors.red,
+    Colors.green,
+    Colors.pink
+  ];
+
 
   @override
   initState(){
@@ -85,7 +92,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     ///SOCKETS
     globals.socketIO.subscribe("location_found", (data)=>{
       print("Location Found!"),
-      print(data), //{'swipeIndex' : 12}
+      print(data),
       globals.sessionData["confirmed_index"] = data["swipeIndex"],
       print(globals.sessionData),
       globals.sessionData["session_status"] = "location_confirmed",
@@ -101,8 +108,10 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   Future getSessionResults (String inputSessID) async{
     swipeData = [];
     String url = '${globals.serverAddress}/session/$inputSessID/results';
+    print("SENDING SWIPEDATA RESULT REQUEST FOR $inputSessID");
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
+//    print(results);
     List possibleLocations = results["possible_locations"];
 
     for( var i=0 ; i<possibleLocations.length ; i++ ){
@@ -141,7 +150,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   _addCard(dynamic item) {
     Map<String, dynamic> data = {
-      'sessionID': globals.sessionData["sessionid"],
+      'sessionID': globals.sessionIdCarrier,
       'swipeIndex': swipeData.indexOf(item),
       'userIdentifier':globals.uuid,
       'selection':true
@@ -152,7 +161,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   _dismissCard(dynamic item) {
     Map<String, dynamic> data = {
-      'sessionID': globals.sessionData["sessionid"],
+      'sessionID': globals.sessionIdCarrier,
       'swipeIndex': swipeData.indexOf(item),
       'userIdentifier':globals.uuid,
       'selection':false
@@ -163,14 +172,13 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Size screen = MediaQuery.of(context).size;
+//    Size screen = MediaQuery.of(context).size;
 
     return Scaffold(
       body: FutureBuilder(
-        future: getSessionResults(globals.sessionData["sessionid"]),
+        future: getSessionResults(globals.sessionIdCarrier),
         builder: (BuildContext context, AsyncSnapshot snapshot){
         if (snapshot.connectionState == ConnectionState.done && swipeData.length != 0) {
-
               return Container(
                 child: Stack(
                   alignment: AlignmentDirectional.center,
@@ -195,10 +203,6 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                       },
                       child: Container(
                         color: Colors.white,
-//                      elevation: 0.5,
-//                      shape: RoundedRectangleBorder(
-//                          borderRadius: BorderRadius.all(Radius.circular(0))
-//                      ),
                         child: Container(
                           child: Column(
                             children: <Widget>[
@@ -277,7 +281,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
           return Center(child: Text("No Results Found", style: TextStyle(fontFamily: "Quicksand"),));
         }
-        else if (snapshot.connectionState == ConnectionState.waiting){return Center(child: CircularProgressIndicator());}
+        else if (snapshot.connectionState == ConnectionState.waiting){return Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200)));}
         else{return Center(child: Text("ERROR: ${snapshot.error}"));}
           }),
     );

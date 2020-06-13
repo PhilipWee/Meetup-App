@@ -1,25 +1,24 @@
+import 'package:andriod_app2/BottomTab.dart';
 import 'package:andriod_app2/ResultsSwipePage.dart';
 import 'package:flutter/rendering.dart';
-import 'dart:math' as math;
-import 'main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
-import 'package:geolocator/geolocator.dart';
 import 'Globals.dart' as globals;
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:getflutter/getflutter.dart';
+import 'color_loader.dart';
 
 
 class MeetupPage extends StatelessWidget {
 
   Future<bool> _isBackPressed() async{
-    globals.socketIO.sendMessage('leave', {'room':"${globals.sessionData["sessionid"]}"});
-    print("Exited Session: ${globals.sessionData["sessionid"]}, sessionData reset.");
+    globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
+    print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
     return true;
   }
 
@@ -29,14 +28,14 @@ class MeetupPage extends StatelessWidget {
       onWillPop: _isBackPressed,
       child: Scaffold(
         appBar: AppBar(
-        automaticallyImplyLeading: false,
+          automaticallyImplyLeading: false,
           title: Text("${globals.sessionData["meetup_name"]}"),
           leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
-                globals.socketIO.sendMessage('leave', {'room':"${globals.sessionData["sessionid"]}"});
-                print("Exited Session: ${globals.sessionData["sessionid"]}, sessionData reset.");
-                Navigator.of(context).pop();
+                globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
+                print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);
               },
           ),
           backgroundColor: Colors.deepOrange,
@@ -54,23 +53,35 @@ class MeetupPageWidget extends StatefulWidget {
 
 class MeetupPageState extends State<MeetupPageWidget> {
 
+  List<Color> colorsForLoad = [
+    Colors.red,
+    Colors.green,
+    Colors.indigo,
+    Colors.pinkAccent,
+    Colors.blue
+  ];
+
   Future _future;
 
   Future getMembers() async{
     http.Response response = await http.get('${globals.serverAddress}/session/${globals.sessionIdCarrier}');
     globals.sessionData = jsonDecode(response.body);
-    print("Getting Members ${globals.sessionData}");
+    print("Updating sessionData");
+//    print("Getting Members ${globals.sessionData}");
   }
 
   void calculateSession (String inputSessID) async{
     String url = '${globals.serverAddress}/session/$inputSessID/calculate';
     http.Response response = await http.get(url);
     print(response.body);
-    Map calculate = jsonDecode(response.body);
+//    Map calculate = jsonDecode(response.body);
   }
 
   @override
   initState(){
+
+    print("SESSIONDATA");
+    print(globals.sessionData);
 
     super.initState();
 
@@ -78,11 +89,15 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     setState((){});
 
-    if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
+    if (globals.sessionData["host_uuid"] == globals.uuid){
+      globals.isCreator = true;
+    }
     else{globals.isCreator = false;}
 
     ///SOCKETS
-    globals.socketIO.joinSession(globals.sessionData["sessionid"]);
+
+    print("Connecting SOCKETS to Session with SESSION ID: ${globals.sessionIdCarrier}");
+    globals.socketIO.joinSession(globals.sessionIdCarrier);
 
     globals.socketIO.subscribe("user_joined_room", (data)=>{
       print("INCOMING SOCKETS DATA: $data"),
@@ -131,11 +146,11 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   /////////////////////////////////////////////////////////////////////// [BUILDERS]
 
-    Future<Null> _refresh() async {
-      _future = getMembers();
-      setState((){});
-      return await Future.delayed(Duration(milliseconds: 1000));
-    }
+//    Future<Null> _refresh() async {
+//      _future = getMembers();
+//      setState((){});
+//      return await Future.delayed(Duration(milliseconds: 1000));
+//    }
 
     Future<void> _shareText() async {
       try {
@@ -172,18 +187,21 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
     //Function to show calculating
-    Widget _calculatingText() {
-      return Padding(
-        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
-        child: Center(child: Text("Calculating")),
-      );
-    }
+//    Widget _calculatingText() {
+//      return Padding(
+//        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
+//        child: Center(child: Text("Calculating")),
+//      );
+//    }
 
     // Function to show waiting
     Widget _waitingText() {
-      return Padding(
-        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
-        child: Center(child: Text("Waiting for the rest ...")),
+      return SizedBox(
+        height: 60,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
+          child: Center(child: Text("Waiting for the rest ...", style: TextStyle(fontFamily: "Quicksand"))),
+        ),
       );
     }
 
@@ -207,7 +225,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                     textColor: Colors.white,
                     onPressed: () {
                       setState(() {globals.sessionData["session_status"] = "is_calculating";});
-                      print("Calculating for session id: ${globals.sessionData["sessionid"]}");
+                      print("Calculating for session id: ${globals.sessionIdCarrier}");
                       calculateSession(globals.sessionIdCarrier);
                     },
                   ),
@@ -242,13 +260,14 @@ class MeetupPageState extends State<MeetupPageWidget> {
                            Text(
                              details.name,
                              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                             maxLines: 2,
+                             maxLines: 1,
                              overflow: TextOverflow.ellipsis,
                            ),
                            const Padding(padding: EdgeInsets.symmetric(vertical: 2.0)),
                            Text(
                              details.address,
                              style: const TextStyle(fontSize: 12.0),
+                             overflow: TextOverflow.ellipsis,
                            ),
                          ],
                        ),
@@ -300,6 +319,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
                   activeIndicator: Colors.white,
                   onPageChanged: (index) {
                     setState(() {
+                      // ignore: unnecessary_statements
                       index;
                     });
                   },
@@ -311,6 +331,32 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
+    Widget _memberTile(int index, Widget imageAsset ){
+      return ListTile(
+        leading: SizedBox(
+          width: 40,
+          height: 40,
+          child: imageAsset,
+        ),
+        title: Text(
+          globals.sessionData["users"][index]["username"].toString(),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          style: TextStyle(fontFamily: "Quicksand")
+        ),
+        subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
+        trailing: Container(
+          width: MediaQuery.of(context).size.width * 0.4,
+          child: Text(
+            globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), ''),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+            style: TextStyle(fontFamily: "Quicksand")
+          ),
+        ),
+      );
+    }
+
     ///Function to build the list of members in current session
     FutureBuilder membersList(BuildContext context, int index) {
 
@@ -318,23 +364,12 @@ class MeetupPageState extends State<MeetupPageWidget> {
         future: _future,
         builder: (BuildContext context, AsyncSnapshot snapshot){
           List<Widget> members = [];
-          members.add(ListTile(
-                leading: CircleAvatar(backgroundImage: AssetImage("images/mouseAvatar.jpg"),),
-                title: Text(
-                  globals.sessionData["users"][index]["username"].toString(),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-                subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
-                trailing: Container(
-                  width: MediaQuery.of(context).size.width*0.4,
-                  child: Text(
-                    globals.sessionData["users"][index]["user_place"].toString().replaceAll(new RegExp(r', Singapore'), ''),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
-                  ),
-                ),
-              ));
+          if (globals.sessionData["users"][index]["uuid"] == globals.sessionData["host_uuid"] ){
+            members.add(_memberTile(index, Image.asset("images/host-purple.png")));
+          }
+          else {
+            members.add(_memberTile(index, Image.asset("images/member-yellow.png")));
+          }
           return Column(
             children: members,
           );
@@ -348,97 +383,94 @@ class MeetupPageState extends State<MeetupPageWidget> {
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: RefreshIndicator(
-          onRefresh: _refresh,
-          child: CustomScrollView(
+        child: CustomScrollView(
             slivers: <Widget>[
               SliverList(
-                delegate: SliverChildListDelegate([
-                  Column(
-                    children: <Widget>[
-                      Visibility(
-                        visible:(globals.sessionData["session_status"] == "pending_members" && globals.sessionData["session_status"] != "is_calculating") ? true : false,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
-                          child: Row(
-                            children: <Widget>[
-                              Expanded(
-                                flex: 2,
-                                child: TextField(
-                                    controller: TextEditingController(text:globals.sessionUrlCarrier),
-                                    decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.content_copy),
-                                onPressed: () {
-                                  Clipboard.setData(ClipboardData(text: globals.sessionUrlCarrier));
-                                },
-                              ),
-                              IconButton(
-                                  icon: Icon(Icons.share),
-                                  onPressed: () async {
-                                    await _shareText();
-                                  }
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),//share link
-
-                      Visibility(
-                        visible: (globals.sessionData["session_status"] == "pending_members"  && globals.isCreator == true) ? true : false,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(child: _generateButton(),),
-                        )
-                      ),// generateButton
-
-                      Visibility(
-                          visible: (globals.sessionData["session_status"] == "is_calculating") ? true : false,
+                  delegate: SliverChildListDelegate([
+                    Column(
+                      children: <Widget>[
+                        Visibility(
+                          visible:(globals.sessionData["session_status"] == "pending_members" && globals.sessionData["session_status"] != "is_calculating") ? true : false,
                           child: Padding(
-                            padding: const EdgeInsets.all(15),
-                            child: Center(child: CircularProgressIndicator()),
-                          )
-                      ),// build Calculating text
+                            padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
+                            child: Row(
+                              children: <Widget>[
+                                Expanded(
+                                  flex: 2,
+                                  child: TextField(
+                                      controller: TextEditingController(text:globals.sessionUrlCarrier),
+                                      decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.content_copy),
+                                  onPressed: () {
+                                    Clipboard.setData(ClipboardData(text: globals.sessionUrlCarrier));
+                                  },
+                                ),
+                                IconButton(
+                                    icon: Icon(Icons.share),
+                                    onPressed: () async {
+                                      await _shareText();
+                                    }
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),//share link
 
-                      Visibility(
-                        visible: (globals.sessionData["session_status"] == "pending_swipes") ? true : false,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(child: _waitingText()),
-                        )
-                      ),// build Waiting text
+                        Visibility(
+                            visible: (globals.sessionData["session_status"] == "pending_members"  && globals.isCreator == true) ? true : false,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Center(child: _generateButton(),),
+                            )
+                        ),// generateButton
 
-                      Visibility(
-                        visible: (globals.sessionData["session_status"] == "location_confirmed") ? true : false,
-                        child: _buildLocationDetails(globals.locationDetails),
-                      ), //build confirmed location details
-                    ],
-                  ),
-                ])
+                        Visibility(
+                            visible: (globals.sessionData["session_status"] == "is_calculating") ? true : false,
+                            child: Padding(
+                              padding: const EdgeInsets.all(15),
+                              child: Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200))),
+                            )
+                        ),// build Calculating text
+
+                        Visibility(
+                            visible: (globals.sessionData["session_status"] == "pending_swipes") ? true : false,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Center(child: _waitingText()),
+                            )
+                        ),// build Waiting text
+
+                        Visibility(
+                          visible: (globals.sessionData["session_status"] == "location_confirmed") ? true : false,
+                          child: _buildLocationDetails(globals.locationDetails),
+                        ), //build confirmed location details
+                      ],
+                    ),
+                  ])
               ),
 
-              makeHeader("Mice Joining (${globals.sessionData["users"].length}) => ${globals.sessionData["session_status"]}"), //no. of members
+              makeHeader("Mice Joining (${globals.sessionData["users"].length})"), //no. of members
 
-              SliverToBoxAdapter(
-                child: Center(child: Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
-                )),
-              ), //scroll to refresh
+//              SliverToBoxAdapter(
+//                child: Center(child: Padding(
+//                  padding: const EdgeInsets.all(2),
+//                  child: Text("Scroll to refresh" , style: TextStyle(fontWeight: FontWeight.w100),),
+//                )),
+//              ), //scroll to refresh
 
               SliverList(
                 delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                      return membersList(context, index);
-                    },
+                      (BuildContext context, int index) {
+                    return membersList(context, index);
+                  },
                   childCount: globals.sessionData["users"].length,
-              ),
-            ),// membersList
+                ),
+              ),// membersList
             ]
-          ),
-        ),
+        ), // Refresh indicator used to be wrapped here
       ),
     );
   }

@@ -42,7 +42,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  sessionCreate() async {
+  Future<String> sessionCreate() async {
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
     String address = globals.serverAddress;
@@ -77,6 +77,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
               duration: Duration(seconds: 2),
             ));
+        return null;
       }
       else{
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
@@ -86,16 +87,18 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         print("SESSION ID : ${globals.tempData["sessionid"]}");
         globals.tempData["link"] = "$address/session/$sessionid/get_details";
         print('Link Created[ ${globals.tempData["link"]} ]');
+        return globals.tempData["link"];
       }
     }
     catch(e){print("Error caught at SessionCreate(): $e");}
+
   }
 
   showPopup(BuildContext context, Widget widget, {BuildContext popupContext}) {
     Navigator.push(
       context,
       PopupLayout(
-        top: MediaQuery.of(context).size.height - 170,
+        top: MediaQuery.of(context).size.height - MediaQuery.of(context).size.height/4,
         left: 0,
         right: 0,
         bottom: 57,
@@ -123,43 +126,53 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
   Widget _popupBody() {
 
-    Widget linkSection = Container(
-      height: 100,
-        child: Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 2,
-                      child: TextField(
-                          controller: TextEditingController(text:globals.tempData["link"]),
-                          decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+    return FutureBuilder(
+      future: sessionCreate(),
+      builder: (BuildContext context, AsyncSnapshot snapshot){
+        if (snapshot.connectionState == ConnectionState.done && snapshot.data != null){
+          return Container(child: Container(
+              height: 100,
+              child: Padding(
+                  padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                                controller: TextEditingController(text:snapshot.data),
+                                decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.content_copy),
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
+                              Navigator.pop(context);
+                            },
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.share),
+                              onPressed: () async {
+                                await _shareText();
+                                Navigator.pop(context);
+                              }
+                          ),
+                        ],
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.content_copy),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
-                        Navigator.pop(context);
-                      },
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.share),
-                        onPressed: () async {
-                          await _shareText();
-                          Navigator.pop(context);
-                        }
-                    ),
-                  ],
-                ),
-              ],
-            )
-        )
+                    ],
+                  )
+              )
+          ));
+        }
+        else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
 
-    return Container(child: linkSection);
+//    return Container(child: linkSection);
   }
 
   @override
@@ -177,6 +190,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 minWidth: 150,
                 height: 50,
                 child: FlatButton(
+                  child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
@@ -195,15 +209,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                           ));
                     }
                     else {
-                      globals.tempData["meetupname"] =
-                          _meetupNameController.text;
-                      globals.tempData["userplace"] =
-                          _locationNameController.text;
-                      await sessionCreate();
+                      globals.tempData["meetupname"] =_meetupNameController.text;
+                      globals.tempData["userplace"] =_locationNameController.text;
                       showPopup(context, _popupBody());
                     }
                   },
-                  child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                 ),
               ),
             ),

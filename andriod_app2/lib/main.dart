@@ -3,8 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'BottomTab.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(Phoenix(child: MyApp()));
 
 class MyApp extends StatelessWidget {
 
@@ -49,7 +50,7 @@ class CheckNetworkPage extends StatelessWidget {
               switch (result) {
                 case ConnectivityResult.none:
                   print("Internet service unavailable");
-                  return Center(child: Text("No Internet Connection!"));
+                  return Center(child: Text("Please connect to the Internet!"));
                 case ConnectivityResult.mobile:
                 case ConnectivityResult.wifi:
                   return MyHomePage();

@@ -2,21 +2,28 @@ library meetupmouse.globals;
 import 'package:location/location.dart';
 import 'package:geolocator/geolocator.dart';
 import 'socketiohelper.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final GoogleSignIn googleSignIn = GoogleSignIn();
+final FirebaseAuth auth = FirebaseAuth.instance;
 
 CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 
 //String serverAddress = "http://ec2-3-14-68-232.us-east-2.compute.amazonaws.com:5000";
-String serverAddress = "http://3.23.239.59:5000";
+//String serverAddress = "http://3.23.239.59:5000";
+String serverAddress = "https://meetup-mouse.com";
 
 String uuid = "defaultUser";
-String username = "defaultName";
-String profileurl = "https://upload-icon.s3.us-east-2.amazonaws.com/uploads/icons/png/19339625881548233621-512.png";
+String username = "Add your name";
+String bio = "Add your bio";
+String profileurl = "https://i.ibb.co/DPXsGcj/member.png";
 
 String userLocationName = "defaultLocation";
 
 bool isCreator = false;
 
-Map<String, dynamic> tempMeetingDetails = {"meetup_name": "meetup_name", "meeting_type":"meeting_type"};
+Map<String, dynamic> tempMeetingDetails = {"meetup_name": "Loading...", "meeting_type":"Loading..."};
 
 List<String> custLabels = [];
 List<String> custImgs = [];
@@ -148,13 +155,11 @@ class FakeData {
 } //for swipe page
 
 FakeData locationDetails = FakeData(
-    name: "Fisherman's Wharf",
-    address: "39 San Francisco Bay Area",
+    name: "Confirmed Location ERROR",
+    address: "Confirmed Location ERROR",
     details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
-    rating: 4.6,
-    images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
-      "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
-      "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]);
+    rating: 0.0,
+    images: ["https://i.ibb.co/kxvjKVJ/app-logo.png"]);
 
 
 //List swipeData = [

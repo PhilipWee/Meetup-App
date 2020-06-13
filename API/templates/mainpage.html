@@ -1,294 +1,287 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Idk what these are just copy pasting START -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
-  <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 
-  <!-- Include firebase.js -->
-  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+    <!-- Include firebase.js -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
 
-  <!-- TODO: Add SDKs for Firebase products that you want to use
+    <!-- TODO: Add SDKs for Firebase products that you want to use
        https://firebase.google.com/docs/web/setup#available-libraries -->
-  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-firestore.js"></script>
-  <!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script> -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-firestore.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script> -->
 
-  <!-- Configure firebase -->
-  <script>
-  // Your web app's Firebase configuration
-    var firebaseConfig = {
-      apiKey: "AIzaSyAJ__NSxJn-qEqWrHAVnH1duusK1rJPqx4",
-      authDomain: "meetup-mouse-265200.firebaseapp.com",
-      databaseURL: "https://meetup-mouse-265200.firebaseio.com",
-      projectId: "meetup-mouse-265200",
-      storageBucket: "meetup-mouse-265200.appspot.com",
-      messagingSenderId: "1052519191030",
-      appId: "1:1052519191030:web:90909ba515c20d766377d7",
-      measurementId: "G-FP46EYMK63"
-    };
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    //firebase.analytics();
-    console.log("Firebase initialized!");
-  </script>
+    <!-- Configure firebase -->
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyAJ__NSxJn-qEqWrHAVnH1duusK1rJPqx4",
+            authDomain: "meetup-mouse-265200.firebaseapp.com",
+            databaseURL: "https://meetup-mouse-265200.firebaseio.com",
+            projectId: "meetup-mouse-265200",
+            storageBucket: "meetup-mouse-265200.appspot.com",
+            messagingSenderId: "1052519191030",
+            appId: "1:1052519191030:web:90909ba515c20d766377d7",
+            measurementId: "G-FP46EYMK63"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        //firebase.analytics();
+        console.log("Firebase initialized!");
+    </script>
 
     <!-- Idk what these are just copy pasting END -->
 
-  <style>
+    <style>
+        body {
+            background-color: SeaShell;
+            background-image: url(/static/background.png);
+        }
+        
+        h1 {
+            color: white;
+            margin-left: 20px;
+            font-size: 5vw;
+            font-family: 'Pacifico';
+        }
+        
+        h2 {
+            margin-left: 20px;
+            margin-top: 1mm;
+            font-family: 'Patrick Hand SC';
+            font-size: 3vw;
+        }
+        
+        .block {
+            width: 30%;
+            text-align: center;
+        }
+        
+        hr.new5 {
+            border: 2px solid rgb(214, 129, 137);
+            border-radius: 5px;
+        }
+    </style>
 
-      body {
-      background-color: SeaShell;
-      background-image: url(/static/background.png);
+</head>
 
-    }
-
-    h1 {
-      color: white;
-      margin-left: 20px;
-      font-size: 5vw;
-      font-family: 'Pacifico';
-
-    }
-
-    h2 {
-      margin-left: 20px;
-      margin-top:1mm;
-      font-family: 'Patrick Hand SC';
-      font-size: 3vw;
-
-    }
-
-    .block {
-
-      width: 30%;
-
-      text-align: center;
-    }
-    hr.new5 {
-  border: 2px solid rgb(214,129,137);
-  border-radius: 5px;
-}
-  </style>
-
-  </head>
-
-  <body>
-      <div>
+<body>
+    <div>
 
 
-          <div style='position:absolute;' class='row '>
+        <div style='position:absolute;' class='row '>
             <div class='col col-8'>
 
             </div>
-            <div class='col col-2'style="margin-top:10%">
-              <img style="height:100%;width:200%;margin-right:0px;" src="/static/Mouse.png" alt="Mouse"
-                width="500" height="500">
+            <div class='col col-2' style="margin-top:10%">
+                <img style="height:100%;width:200%;margin-right:0px;" src="/static/Mouse.png" alt="Mouse" width="500" height="500">
 
             </div>
 
 
-          </div>
-          <div class='row pl-2' style='background-color:Tomato;height:100%;'>
-            <div class = 'col-10'>
-              <h1 id="homeButton" style='font-family:Pacifico; color: white;margin-left: 20px;font-size: 5vw;z-index:0; cursor:pointer;'>MeetUp Mouse</h1>
+        </div>
+        <div class='row pl-2' style='background-color:Tomato;height:100%;'>
+            <div class='col-10'>
+                <h1>MeetUp Mouse</h1>
             </div>
             <script>
-              firebase.auth().onAuthStateChanged(function(user) {
-                document.getElementById('loginStatusButton').innerHTML='';
-                if (user) {
-                  var isAnonymous = user.isAnonymous;
-                  if (isAnonymous) {
-                    // Create sign in button
-                    var btn = document.createElement("BUTTON");
-                    btn.style = 'font-family: Patrick Hand SC;font-size:2vw;margin-left:45%';
-                    btn.onclick = function() {
-                      // Redirect to correct page; Pending users, Pending swipes or Confirmed
-                      window.location.href = '/loginPage';
+                firebase.auth().onAuthStateChanged(function(user) {
+                    if (user) {
+                        var isAnonymous = user.isAnonymous;
+                        if (isAnonymous) {
+                            // Create sign in button
+                            var btn = document.createElement("BUTTON");
+                            btn.style = 'font-family: Patrick Hand SC;font-size:2vw;margin-left:45%';
+                            btn.onclick = function() {
+                                // Redirect to correct page; Pending users, Pending swipes or Confirmed
+                                window.location.href = '/loginPage';
+                            }
+                            btn.innerHTML = "Sign In";
+                            document.getElementById('loginStatusButton').appendChild(btn);
+                        } else {
+                            // Create sign out button
+                            var btn = document.createElement("BUTTON");
+                            btn.style = 'font-family: Patrick Hand SC;font-size:2vw;margin-left:45%';
+                            btn.onclick = function() {
+                                firebase.auth().signOut().then(function() {
+                                    console.log("Signed out")
+                                        // Sign-out successful.
+                                }).catch(function(error) {
+                                    // An error happened.
+                                });
+                                window.location.reload(true);
+                            }
+                            btn.innerHTML = "Sign Out";
+                            document.getElementById('loginStatusButton').appendChild(btn);
+                        }
+                    } else {
+                        firebase.auth().signInAnonymously().catch(function(error) {
+                            // Handle Errors here.
+                            var errorCode = error.code;
+                            var errorMessage = error.message;
+                            // ...
+                        });
                     }
-                    btn.innerHTML = "Sign In";
-                    document.getElementById('loginStatusButton').appendChild(btn);
-                  } else {
-                    // Create sign out button
-                    var btn = document.createElement("BUTTON");
-                    btn.style = 'font-family: Patrick Hand SC;font-size:2vw;margin-left:45%';
-                    btn.onclick = function() {
-                      firebase.auth().signOut().then(function() {
-                        console.log("Signed out")
-                        // Sign-out successful.
-                      }).catch(function(error) {
-                        // An error happened.
-                      });
-                      window.location.reload(true);
-                    }
-                    btn.innerHTML = "Sign Out";
-                    document.getElementById('loginStatusButton').appendChild(btn);
-                  }
-                } else {
-                    firebase.auth().signInAnonymously().catch(function(error) {
-                      // Handle Errors here.
-                      var errorCode = error.code;
-                      var errorMessage = error.message;
-                      // ...
-                    });
-                }
-              });
+                });
             </script>
             <div id='loginStatusButton' class='col-2' style='margin-top:2%;margin-left:0%'></div>
 
-          </div>
+        </div>
 
 
-          <div class='row pl-2' style="background-color:white;">
-            <h2 >Allow meetup mouse to access your location and squeak away!</h2>
-          </div>
+        <div class='row pl-2' style="background-color:white;">
+            <h2>Allow meetup mouse to access your location and squeak away!</h2>
+        </div>
 
 
-    <div class='row justify-content-center'>
-      <div class='col-1'></div>
+        <div class='row justify-content-center'>
+            <div class='col-1'></div>
             <div class='col-1 ' style='margin-top:2%;'>
                 <img class='row d-none d-lg-block' style="height:90%;width:240%;" src="/static/Map.png" alt="Map" class="map">
             </div>
             <div class='col-8 '>
-              <div class='row justify-content-center' style='margin-top:10%; margin-bottom:1%;'>
-                <button style='font-family: Patrick Hand SC;font-size:2vw;width:30%;' onclick='createMeetup()'>Create New Meetup</button><br>
-              </div>
+                <div class='row justify-content-center' style='margin-top:10%; margin-bottom:1%;'>
+                    <button style='font-family: Patrick Hand SC;font-size:2vw;width:30%;' onclick='createMeetup()'>Create New Meetup</button><br>
+                </div>
 
-              <div class='row justify-content-center' style='margin-top:1%; margin-bottom:1%;'>
-                <button style='font-family: Patrick Hand SC;font-size:2vw; width:30%;' onclick='joinMeetup()'>Join Meetup</button>
-                <input type="text" id="inputSessionId" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' placeholder="Enter session id">
-                <button style='font-family: Patrick Hand SC;font-size:2vw; display:none; ' id="enterSessionId" onclick='submitButton()'>Enter</button>
-              </div>
+                <div class='row justify-content-center' style='margin-top:1%; margin-bottom:1%;'>
+                    <button style='font-family: Patrick Hand SC;font-size:2vw; width:30%;' onclick='joinMeetup()'>Join Meetup</button>
+                    <input type="text" id="inputSessionId" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' placeholder="Enter session id">
+                    <button style='font-family: Patrick Hand SC;font-size:2vw; display:none; ' id="enterSessionId" onclick='submitButton()'>Enter</button>
+                </div>
 
-              <div class='row justify-content-center'>
-                <br><button style='font-family: Patrick Hand SC;font-size:2vw;width:30%;' onclick='reportBug()'>Feedback / Report a bug</button>
-                <input type="text" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="inputReport" placeholder="What bugs did you meet?" >
-                <button style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="enterBugReport" onclick='submitBugReport()'>Submit</button>
-              </div>
+                <div class='row justify-content-center'>
+                    <br><button style='font-family: Patrick Hand SC;font-size:2vw;width:30%;' onclick='reportBug()'>Feedback / Report a bug</button>
+                    <input type="text" style='font-family: Patrick Hand SC;font-size:2vw; display:none;' id="inputReport">
+                </div>
 
             </div>
 
 
             <div class='col-2'></div>
-          </div>
-            <!--  -->
-            <hr  class="new5">
-            <div class='row' style="justify-content: center;">
-              <div class='col col-2'></div>
+        </div>
+        <!--  -->
+        <hr class="new5">
+        <div class='row' style="justify-content: center;">
+            <div class='col col-2'></div>
 
-              <div class='col'>
+            <div class='col'>
                 <div class='row'>
-                <p style='font-family: Patrick Hand SC;font-size: 3vw; margin-left:1.5%;'> My Meetups</p>
-              </div>
+                    <p style='font-family: Patrick Hand SC;font-size: 3vw; margin-left:1.5%;'> My Meetups</p>
+                </div>
 
-          </div>
+            </div>
 
 
-                <script>
-                  firebase.auth().onAuthStateChanged(function(user) {
+            <script>
+                firebase.auth().onAuthStateChanged(function(user) {
                     if (user) {
-                      var isAnonymous = user.isAnonymous;
-                      var uid = user.uid;
-                      //console.log(uid);
-                      var db = firebase.firestore();
-                      var username = user.displayName;
-                      console.log(username);
+                        var isAnonymous = user.isAnonymous;
+                        var uid = user.uid;
+                        //console.log(uid);
+                        var db = firebase.firestore();
+                        var username = user.displayName;
+                        console.log(username);
 
-                      docUserData = db.collection("userData").doc(uid);
+                        docUserData = db.collection("userData").doc(uid);
 
-                      docUserData.get().then(function(doc) {
-                        if (doc.exists) {   // if User ID exists in the firebase
-                          savedData = doc.data();   // Retrieve user data
-                          // Check for user's meetings. If no meeting, returns empty array.
-                          // IMPORTANT: If new user and no sessionId is created, returns Undefined
-                          sessionsList = savedData['sessionId'];
-                          console.log("All Sessions.")
-                          console.log(sessionsList);
+                        docUserData.get().then(function(doc) {
+                            if (doc.exists) { // if User ID exists in the firebase
+                                savedData = doc.data(); // Retrieve user data
+                                // Check for user's meetings. If no meeting, returns empty array.
+                                // IMPORTANT: If new user and no sessionId is created, returns Undefined
+                                sessionsList = savedData['sessionId'];
+                                console.log("All Sessions.")
+                                console.log(sessionsList);
 
-                          for (i in sessionsList) (function(i) {
-                            // Open specific session document in Firebase
-                            //console.log(sessionsList[i]);
-                            //Get request for session details
-                            details_url = window.location.origin + '/session/' + sessionsList[i];
+                                for (i in sessionsList)(function(i) {
+                                    // Open specific session document in Firebase
+                                    //console.log(sessionsList[i]);
+                                    //Get request for session details
+                                    details_url = window.location.origin + '/session/' + sessionsList[i];
 
-                            $.getJSON(details_url,function(result){
-                              sessionData = result;
+                                    $.getJSON(details_url, function(result) {
+                                        sessionData = result;
 
-                              meetupName = sessionData['meetup_name'];
-                              meetupHost = sessionData['host_uuid'];
-                              console.log(sessionData);
-                              let sessionStatus = sessionData['session_status'];
-                              console.log(meetupName);
+                                        meetupName = sessionData['meetup_name'];
+                                        meetupHost = sessionData['host_uuid'];
+                                        console.log(sessionData);
+                                        let sessionStatus = sessionData['session_status'];
+                                        console.log(meetupName);
 
-                              div = document.createElement("div");
+                                        div = document.createElement("div");
 
-                              btn = document.createElement("BUTTON");
-                              btn.class = "block";
-                              div.className= 'col col-2';
-                              div.style='margin-left: 2.5%; margin-bottom: 15%;'
+                                        btn = document.createElement("BUTTON");
+                                        btn.class = "block";
+                                        div.className = 'col col-2';
+                                        div.style = 'margin-left: 2.5%; margin-bottom: 15%;'
 
-                              btn.innerHTML = meetupName;
-                              btn.id = sessionsList[i];
+                                        btn.innerHTML = meetupName;
+                                        btn.id = sessionsList[i];
 
-                              btn.addEventListener('click', function(e) {
-                                if (sessionStatus == "pending_members") {
-                                  if (uid == meetupHost) {
-                                    window.location.href = "/session/" + sessionsList[i] + "/results_display?isHost=true";
-                                  } else {
-                                    window.location.href = '/session/' + sessionsList[i] + "/results_display?isHost=false";
-                                  }
-                                } else {
-                                  window.location.href = "/session/" + sessionsList[i] + "/swipe";
-                                }
-                                //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
-                              })
+                                        btn.addEventListener('click', function(e) {
+                                            if (sessionStatus == "pending_members") {
+                                                if (uid == meetupHost) {
+                                                    window.location.href = "/session/" + sessionsList[i] + "/results_display?isHost=true";
+                                                } else {
+                                                    window.location.href = '/session/' + sessionsList[i] + "/results_display?isHost=false";
+                                                }
+                                            } else {
+                                                window.location.href = "/session/" + sessionsList[i] + "/swipe";
+                                            }
+                                            //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
+                                        })
 
-                              btn.style = 'font-family: Patrick Hand SC; font-size: 2vw;text-align: center;justify-items: center; width:100%; height:300%;'
+                                        btn.style = 'font-family: Patrick Hand SC; font-size: 2vw;text-align: center;justify-items: center; width:100%; height:300%;'
 
-                              div.appendChild(btn);
-                              document.getElementById('allSessionsDiv').appendChild(div);
+                                        div.appendChild(btn);
+                                        document.getElementById('allSessionsDiv').appendChild(div);
 
 
-                            }).catch(function (error){
-                              console.log('Unable to get results, Error: ' + error)
-                            })
+                                    }).catch(function(error) {
+                                        console.log('Unable to get results, Error: ' + error)
+                                    })
 
-                          })(i);
-                        } else {
-                          console.log("No such document!");
-                        }
-                      }).catch(function(error) {
-                        console.log("Error getting document: ", error);
-                      });
+                                })(i);
+                            } else {
+                                console.log("No such document!");
+                            }
+                        }).catch(function(error) {
+                            console.log("Error getting document: ", error);
+                        });
 
                     } else {
-                      firebase.auth().signInAnonymously().catch(function(error) {
-                        // Handle Errors here.
-                        var errorCode = error.code;
-                        var errorMessage = error.message;
-                        // ...
-                      });
+                        firebase.auth().signInAnonymously().catch(function(error) {
+                            // Handle Errors here.
+                            var errorCode = error.code;
+                            var errorMessage = error.message;
+                            // ...
+                        });
                     }
-                  });
-                </script>
+                });
+            </script>
 
 
 
-          </div>
+        </div>
 
 
-          <div class='row' style='margin-left:14%;' id="allSessionsDiv"></div>
+        <div class='row' style='margin-left:14%;' id="allSessionsDiv"></div>
 
 
 
-  </body>
+</body>
 
-  <script src="{{url_for('static', filename='js/mainpage.js')}}"></script>
+<script src="{{url_for('static', filename='js/mainpage.js')}}"></script>
+
 </html>

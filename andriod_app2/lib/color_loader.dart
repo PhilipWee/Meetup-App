@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+
 class ColorLoader extends StatefulWidget {
   final List<Color> colors;
   final Duration duration;
@@ -75,7 +76,7 @@ class _ColorLoaderState extends State<ColorLoader>
     return Container(
       child: Center(
         child: CircularProgressIndicator(
-          strokeWidth: 5.0,
+          strokeWidth: 3.0,
           valueColor: colorAnimations[tweenIndex],
         ),
       ),
