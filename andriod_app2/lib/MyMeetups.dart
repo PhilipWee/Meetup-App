@@ -38,8 +38,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   @override
   initState(){
-    _future = getAllUserSessionsData(globals.uuid);
     super.initState();
+    _future = getAllUserSessionsData(globals.uuid);
   }
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
@@ -516,7 +516,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                   sessionRemove(sessionIDs[index]);
                                   setState(() {
                                     custLabels.removeAt(index);
-                                    _future = getAllUserSessionsData(globals.uuid);
+//                                    _future = getAllUserSessionsData(globals.uuid); //refreshes on delete
                                   });
                                   Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted ${custLabels[index]}", textAlign: TextAlign.center,),));
                                 }
