@@ -402,7 +402,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     _joinController.clear();
                                     Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);;
                                   });
-                                return Expanded(child: Center(child: CircularProgressIndicator()));
+                                return Center(child: CircularProgressIndicator());
                                 });
                           }
                         },
