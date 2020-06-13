@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   }
   successfulCallBack(string){
     if(string==null){
-      throw PlatformException();
+      throw PlatformException;
     }
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
