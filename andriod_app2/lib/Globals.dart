@@ -15,7 +15,8 @@ CustomSocketIO socketIO = CustomSocketIO(serverAddress);
 String serverAddress = "https://meetup-mouse.com";
 
 String uuid = "defaultUser";
-String username = "defaultName";
+String username = "Add your name";
+String bio = "Add your bio";
 String profileurl = "https://i.ibb.co/DPXsGcj/member.png";
 
 String userLocationName = "defaultLocation";
