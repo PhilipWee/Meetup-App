@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'main.dart';
 import 'Globals.dart' as globals;
@@ -21,7 +22,18 @@ class _LoginPageState extends State<LoginPage> {
     try{globals.auth.currentUser().then((user) => userExists(user));}
     catch(error){print("there is some weird error");}
   }
-
+  successfulCallBack(string){
+    if(string==null){
+      throw PlatformException;
+    }
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) {
+          return CheckNetworkPage();
+        },
+      ),
+    );
+  }
   void userExists(user){
     if(user==null) {
       print("user doesn't exist");
@@ -40,32 +52,57 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
   }
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Whoops! Something went wrong."),
+          content: new Text("Please try logging in with Google Sign In again."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<String> signInWithGoogle() async {
-    final GoogleSignInAccount googleSignInAccount = await globals.googleSignIn.signIn();
-    final GoogleSignInAuthentication googleSignInAuthentication =
-    await googleSignInAccount.authentication;
+    try {
+      final GoogleSignInAccount googleSignInAccount = await globals.googleSignIn
+          .signIn();
+      final GoogleSignInAuthentication googleSignInAuthentication =
+      await googleSignInAccount.authentication;
 
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleSignInAuthentication.accessToken,
-      idToken: googleSignInAuthentication.idToken,
-    );
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
 
-    final FirebaseUser user = (await globals.auth.signInWithCredential(credential)).user;
+      final FirebaseUser user = (await globals.auth.signInWithCredential(
+          credential)).user;
 
-    assert(!user.isAnonymous);
-    assert(await user.getIdToken() != null);
+      assert(!user.isAnonymous);
+      assert(await user.getIdToken() != null);
 
-    final FirebaseUser currentUser = await globals.auth.currentUser();
-    assert(user.uid == currentUser.uid);
-    print("user " + user.uid + " is connected to firebase.");
-
-    globals.uuid = user.uid;
-    globals.username = user.displayName;
-    globals.profileurl = user.photoUrl;
-
-    return 'signInWithGoogle succeeded: $user';
-
+      final FirebaseUser currentUser = await globals.auth.currentUser();
+      assert(user.uid == currentUser.uid);
+      globals.uuid = user.uid;
+      globals.username = user.displayName;
+      globals.profileurl = user.photoUrl;
+      print('this is complete');
+      return ('this is complete');
+    } on PlatformException catch (error){
+      throw(error);
+    }
   }
 
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
@@ -94,14 +131,8 @@ class _LoginPageState extends State<LoginPage> {
     return FlatButton(
       color: Colors.white,
       onPressed: () async {
-        signInWithGoogle().whenComplete(() {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) {
-                return CheckNetworkPage();
-              },
-            ),
-          );
+        signInWithGoogle().then((value)=>this.successfulCallBack(value)).catchError((error) =>{
+          this._showDialog()
         });
       },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),

@@ -260,13 +260,14 @@ class MeetupPageState extends State<MeetupPageWidget> {
                            Text(
                              details.name,
                              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-                             maxLines: 2,
+                             maxLines: 1,
                              overflow: TextOverflow.ellipsis,
                            ),
                            const Padding(padding: EdgeInsets.symmetric(vertical: 2.0)),
                            Text(
                              details.address,
                              style: const TextStyle(fontSize: 12.0),
+                             overflow: TextOverflow.ellipsis,
                            ),
                          ],
                        ),
