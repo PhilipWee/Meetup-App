@@ -71,8 +71,14 @@
     body {
       background-color: SeaShell;
       background-image: url(/static/background.png);
+      width: 100%;
 
     }
+
+    html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
 
     @media screen and (max-width: 600px) {
   div.example {
@@ -208,6 +214,7 @@ div.example {
       <div class="col col-8" style='background-color:rgb(255,245,238); ' >
         <div class="row" >
         <form action=''+'/get_details?isHost=false' id='meetupData' method='POST'>
+          <div style='margin-left:6%;margin-bottom:2%;'>
           <script>
           // Firebase
           firebase.auth().onAuthStateChanged(function(user) {
@@ -227,7 +234,7 @@ div.example {
                 var title = document.createElement("p");
                 var node = document.createTextNode("Enter your name");
                 title.appendChild(node);
-                title.style = 'margin-top:2%;font-size:2vw;margin-left:1%;';
+                title.style = 'margin-top:2%;font-size:2vw;font-family: Patrick Hand SC; font-size: 2vw;'
                 document.getElementById('addName').appendChild(title);
 
                 var input = document.createElement("input");
@@ -254,8 +261,8 @@ div.example {
           </script>
 
           <div id='addName'></div>      <!-- Ask for anonymouse name -->
-
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;" >
+        </div>
+          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:5%;" >
             <!-- MADE CHANGES START -->
             <p style='font-size:2vw;margin-left:1%;'>Transport mode:</p>
             <p style='font-size:1.5vw;margin-left:1%;'><select name="transport_mode" id="transportPreference"></p>
@@ -282,7 +289,7 @@ div.example {
 
           </div>
         -->
-          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:22.5%;" >
+          <div style="font-family: 'Patrick Hand SC';font-size:1.7vw;margin-left:5%;" >
             <p style='font-size:2vw;margin-left:1%;'>Ratings:</p>
             <p style='font-size:1.5vw;margin-left:1%;'><select name='quality' id="ratingsPreference"></p>
               <option value="1">No Preference</option>
@@ -290,24 +297,24 @@ div.example {
               <option value="5">Best</option>
             </select>
           </div>
-
-          <p style='font-size:2vw;margin-left:1%;'>Price:</p>
-          <input style='font-size:1.5vw;margin-left:1%;' name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
-          <span  style='font-size:1.5vw;margin-left:1%; ' id='priceValue'>No Preference</span>
+          <div style='margin-left:6%;margin-bottom:1%;'> 
+          <p style='font-size:2vw;font-family: Patrick Hand SC;'>Price:</p>
+          <input style='font-size:1.5vw;font-family: Patrick Hand SC;' name='price' type="range" min="0" max="4" value="0" id="pricePreference"></input>
+          <span  style='font-size:1.5vw; font-family: Patrick Hand SC;' id='priceValue'>No Preference</span>
 
           <input name='speed' value='3' style="display:none"></input>
-
+          </div>
           <div class="row" style='margin-right:25%;' >
-           <input id="pac-input" style="font-family: Patrick Hand SC;margin-top:2%;margin-left:22.5%;margin-right:-25%;" class="controls" type="text" placeholder="   Search Location">
+           <input id="pac-input" style="font-family: Patrick Hand SC;margin-top:2%;margin-left:10%;margin-right:-25%;" class="controls" type="text" placeholder="   Search Location">
 
-           <div class="round3" id='basicMap' style='margin-top:2%;margin-bottom:3%;margin-left:22.5%;margin-right:-25%;'></div>
+           <div class="round3" id='basicMap' style='margin-top:2%;margin-bottom:3%;margin-left:10%;margin-right:-25%;'></div>
 
 
         <input style="margin-right:0%;margin-top:0%;" type='hidden' name='lat' id='lat' />
         <input style="margin-right:0%;margin-top:0%;" type='hidden' name='long' id='long' />
       </div>
-        <div class='row' style='margin-left:15.5%;'>
-            <div style='font-size: 2.2vw;font-family: Patrick Hand SC;width:400px;' ><button type='button'  id='submitbutton'>Submit</button></div>
+        <div class='row' >
+            <div style='font-size: 2.2vw;font-family: Patrick Hand SC;width:400px;margin-left:7.5%;' ><button type='button'  id='submitbutton'>Submit</button></div>
         </div>
       </div>
     </div>

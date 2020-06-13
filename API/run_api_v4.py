@@ -2,7 +2,6 @@
 from flask import Flask,jsonify,request,abort, redirect, url_for,render_template
 from flask_api import status
 from flask_dance.contrib.github import make_github_blueprint, github
-from flask_cors import CORS
 from flask_socketio import SocketIO
 from flask_socketio import emit, send
 from flask_socketio import join_room, leave_room
@@ -72,7 +71,7 @@ except:
 # eventlet.monk ey_patch()
 app = Flask(__name__)
 # socketio = SocketIO(app,logger=True,engineio_logger=True)
-socketio = SocketIO(app)
+socketio = SocketIO(app,cors_allowed_origins=["https://meetup-mouse.com"])
 
 # def bg_emit():
 #     socketio.emit('bg_emit', dict(foo='bar'))
@@ -407,7 +406,7 @@ def manage_details(session_id):
             swipe_details_dict = {}
 #            print("well well, i done fk-ed up.")
 
-        info.update(swipe_details_dict)
+        info.update({'swipe_details':swipe_details_dict})
 
 
         if info != 'Error':

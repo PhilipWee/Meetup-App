@@ -1,0 +1,1 @@
+cp ~/Meetup-App/API/nginx/meetupmouse.conf /etc/nginx/conf.d/meetupmouse.conf
