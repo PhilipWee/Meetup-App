@@ -42,7 +42,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  Future<String> sessionCreate() async {
+  Future sessionCreate() async {
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
     String address = globals.serverAddress;

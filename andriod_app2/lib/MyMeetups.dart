@@ -1,7 +1,6 @@
 import 'package:andriod_app2/BuildMeetupDetails.dart';
 import 'package:andriod_app2/ResultsSwipePage.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -64,7 +63,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     globals.tempMeetingDetails = jsonDecode(body);
     print("Current Session Details ===> ${globals.tempMeetingDetails}");
     Navigator.of(_keyLoader.currentContext,rootNavigator: true).pop();
-    Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
+    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
   } //session details saved in global.tempMeetingDetails
 
 //  sessionEnter(String inputLink) async{
@@ -417,15 +416,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           else{
                             globals.saveMyLocationName();
                             sessionEnter(_joinController.text, context);
-//                            Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
-//                            showDialog(
-//                              context: context,
-//                              builder: (context) {
-//                                Future.delayed(Duration(milliseconds: 2000), () {
-//                                  _joinController.clear();
-//                                  Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);;
-//                                }); return Center(child: CircularProgressIndicator());
-//                                });
                           }
                         },
                         iconSize: 25,

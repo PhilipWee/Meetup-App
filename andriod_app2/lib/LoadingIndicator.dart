@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class Dialogs {
   static Future<void> showLoadingDialog(
       BuildContext context, GlobalKey key) async {
@@ -9,13 +10,16 @@ class Dialogs {
           return WillPopScope(
               onWillPop: () async => false,
               child: SimpleDialog(
-                  key: key,
-                  backgroundColor: Colors.transparent,
-                  children: <Widget>[
-                    Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  ]));
+                shape: CircleBorder(),
+                elevation: 0.0,
+                key: key,
+                backgroundColor: Colors.transparent,
+                children: <Widget>[
+                  Center(
+                    child: CircularProgressIndicator(),
+                  )]
+              )
+          );
         });
   }
 }
