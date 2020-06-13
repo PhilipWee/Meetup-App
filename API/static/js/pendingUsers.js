@@ -1,4 +1,3 @@
-
 session_id = window.location.pathname.split('/')[2]
 base_url = window.location.origin;
 
@@ -7,8 +6,16 @@ document.getElementById("homeButton").addEventListener("click", homeButton);
 //Get the current session details
 var details_url = base_url + '/session/' + session_id;
 var results_url = base_url + '/session/' + session_id + '/results';
-
 document.getElementById('shareLink').value = details_url + '/get_details';
+
+var host_uuid;
+
+// Get Host UID
+$.getJSON(details_url, function (result){
+  display_meetup_details(result);
+}).catch(function (error) {
+  console.log('Unable to get meetup details, Error: ' + error)
+})
 
 var getParams = function (url) {
     var params = {};
@@ -57,6 +64,12 @@ function generate_page(results) {
     }
 }
 
+function display_meetup_details(result) {
+    host_uuid = result['host_uuid'];
+    var meetup_title = document.getElementById("meetup_title");
+    meetup_title.innerHTML = result['meetup_name'];
+  }
+
 function display_location_details(confirmed_place_index){
     $.getJSON(results_url, function (results) {
         location_name = results['possible_locations'][confirmed_place_index]
@@ -93,26 +106,50 @@ function display_location_details(confirmed_place_index){
 }
 
 function add_user_to_list(user) {
-    let user_place = user['user_place']
-    let username = user['username']
-    $('#user_details_div').append(`
-        <div class='row'
-        style='font-family: Patrick Hand SC; margin-top:1%;margin-left:2%;margin-right:2%;background-color: #FFFBF5;border-radius: 15px;'>
+    let user_place = user['user_place'];
+    let username = user['username'];
+    let uuid = user['uuid'];
 
-        <div class='col col-2'>
-        <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/avatar.png" alt="Avatar">
-        </div>
-        <div class='col' style='justify-content:left;align-items:left;' align=left>
-        <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>${user_place}</p>
-        <p>${username}</p>
-        </div>
-        <!-- <div class='col col-2'>
-        <button type='button' style='margin-top: 35%;'>
-            Remove
-        </button>
+    if (uuid == host_uuid) {
+      $('#user_details_div').append(`
+          <div class='row'
+          style='font-family: Patrick Hand SC; margin-top:1%;margin-left:2%;margin-right:2%;background-color: #FFFBF5;border-radius: 15px;'>
 
-        </div> -->
-    `)
+          <div class='col col-2'>
+          <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/host-purple.png" alt="Avatar">
+          </div>
+          <div class='col' style='justify-content:left;align-items:left;' align=left>
+          <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>${user_place}</p>
+          <p>${username}</p>
+          </div>
+          <!-- <div class='col col-2'>
+          <button type='button' style='margin-top: 35%;'>
+              Remove
+          </button>
+
+          </div> -->
+      `)
+    } else {
+      $('#user_details_div').append(`
+          <div class='row'
+          style='font-family: Patrick Hand SC; margin-top:1%;margin-left:2%;margin-right:2%;background-color: #FFFBF5;border-radius: 15px;'>
+
+          <div class='col col-2'>
+          <img style="height:100%;width:100%;margin-top:2%;" align=left src="/static/member-yellow.png" alt="Avatar">
+          </div>
+          <div class='col' style='justify-content:left;align-items:left;' align=left>
+          <p style='margin-top:2%;font-size: 1.5vw;justify-content:left;align-items:left;'>${user_place}</p>
+          <p>${username}</p>
+          </div>
+          <!-- <div class='col col-2'>
+          <button type='button' style='margin-top: 35%;'>
+              Remove
+          </button>
+
+          </div> -->
+      `)
+    }
+
 }
 
 function homeButton() {
@@ -166,7 +203,7 @@ socket.on('calculation_result', (data) => {
         let url = base_url + '/session/' + session_id + '/swipe';
         console.log("Replacing URL.")
         location.href = url
-        
+
     }
 })
 

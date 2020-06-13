@@ -1,8 +1,9 @@
-//import 'dart:html';
 import 'Globals.dart' as globals;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key key, this.title}) : super(key: key);
@@ -13,26 +14,48 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+
   bool _edit = false;
-  String name = globals.username;
-  String bio = "Add your bio";
+
+  createProfileInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('profile_name', globals.username); // cached profile name = globals.username
+    prefs.setString('profileBio', globals.bio); // cached profile bio = globals.bio
+    return null;
+  } /// SAVE INTO CACHE
+
+  updateProfileInfo() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    globals.username = prefs.getString('profile_name');
+    globals.bio = prefs.getString('profile_bio');
+    return null;
+  } /// SAVE INTO CACHE
+
   TextEditingController _nameController = TextEditingController();
+
   TextEditingController _bioController = TextEditingController();
 
+  void signOutGoogle() async{
+    await globals.googleSignIn.signOut();
+    await globals.auth.signOut();
+    print("User Sign Out");
+  }
+
   void _changed(bool editing, String button) {
-    setState(() {
+
+    setState(() { //to update globals and renew the state of the bio
+
     if (button == "edit") {
       _edit = editing;
     }
-    if (button == "done"){
+
+    if (button == "done") {
+
       if(_nameController.text.isNotEmpty) {
-        name = _nameController.text;
-        globals.username = name;
+        globals.username = _nameController.text;
       }
       if (_bioController.text.isNotEmpty){
-        bio = _bioController.text;
-      } else if (_bioController.text.isEmpty) {
-        bio = "Add your bio";
+        globals.bio = _bioController.text;
       }
       _edit = editing;
     }
@@ -51,7 +74,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = name;
+    globals.username =
+    _nameController.text = globals.username;
   }
 
   @override
@@ -106,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
 
                           Padding(padding: const EdgeInsets.symmetric(vertical:5.0)),
-                          Text(name,
+                          Text(globals.username,
                             style: new TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 25,
@@ -116,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                           Padding(
                             padding: const EdgeInsets.only(top:10.0, left: 15.0, right: 15.0),
-                            child: new Text(bio,
+                            child: new Text(globals.bio,
                               maxLines: 2,
                               style: new TextStyle(
                                   fontFamily: "Quicksand",
@@ -270,14 +294,16 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.w400,
                                 fontFamily: "Quicksand")),
                         trailing: Icon(Icons.keyboard_arrow_right),
-                        onTap: () {},
+                        onTap: () async{
+                          signOutGoogle();
+                          await Future.delayed(Duration(milliseconds: 2000));
+                          Phoenix.rebirth(context);
+                          },
                       ),
                     ),
                   ],
                 ),
               ),
-
-
             ],
           ),
         )
@@ -285,7 +311,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget rowCell(int count, String type) => new Expanded(child: new Column(children: <Widget>[
-    new Text('$count',style: new TextStyle(color: Colors.white),),
-    new Text(type,style: new TextStyle(color: Colors.white, fontWeight: FontWeight.normal))
+      new Text('$count',style: new TextStyle(color: Colors.white),),
+      new Text(type,style: new TextStyle(color: Colors.white, fontWeight: FontWeight.normal))
   ],));
+
 }
