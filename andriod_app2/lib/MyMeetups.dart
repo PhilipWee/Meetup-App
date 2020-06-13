@@ -1,12 +1,14 @@
 import 'package:andriod_app2/BuildMeetupDetails.dart';
 import 'package:andriod_app2/ResultsSwipePage.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'Globals.dart' as globals;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'Join.dart';
 import 'color_loader.dart';
+import 'LoadingIndicator.dart';
 
 
 class HomeUsernameWidget extends StatefulWidget {
@@ -30,6 +32,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   final _joinController = TextEditingController(text: "");
 
+  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
+
   List allData = [];
   List<String> custLabels = [];
   List<String> custImgs = [];
@@ -41,20 +45,36 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     super.initState();
     _future = getAllUserSessionsData(globals.uuid);
     setState(() {});
+  }
 
+  void showLoading2s() async{
+    Dialogs.showLoadingDialog(context, _keyLoader);
+    await Future.delayed(Duration(milliseconds: 2000));
+    Navigator.of(_keyLoader.currentContext,rootNavigator: true).pop();
   }
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  sessionEnter(String inputLink) async{
+  Future sessionEnter(String inputLink, BuildContext context) async{
+    Dialogs.showLoadingDialog(context, _keyLoader);
     print("INPUTLINK $inputLink");
     globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
     print("Current Session Details ===> ${globals.tempMeetingDetails}");
-    } //session details saved in global.tempMeetingDetails
+    Navigator.of(_keyLoader.currentContext,rootNavigator: true).pop();
+    Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
+  } //session details saved in global.tempMeetingDetails
 
+//  sessionEnter(String inputLink) async{
+//    print("INPUTLINK $inputLink");
+//    globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
+//    http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
+//    String body = response.body;
+//    globals.tempMeetingDetails = jsonDecode(body);
+//    print("Current Session Details ===> ${globals.tempMeetingDetails}");
+//    } //session details saved in global.tempMeetingDetails
 
   Future getAllUserSessionsData(String inputUserId) async{
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
@@ -382,7 +402,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       IconButton(
                         icon: Icon(Icons.person_add),
-                        onPressed: () async {
+                        onPressed: () {
                           if (_joinController.text.isEmpty) {
                             Scaffold.of(context).showSnackBar(
                                 SnackBar(
@@ -396,17 +416,16 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           }
                           else{
                             globals.saveMyLocationName();
-                            sessionEnter(_joinController.text);
-
-                            showDialog(
-                                context: context,
-                                builder: (context)
-                                {Future.delayed(Duration(milliseconds: 2000), () {
-                                    _joinController.clear();
-                                    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);;
-                                  });
-                                return Center(child: CircularProgressIndicator());
-                                });
+                            sessionEnter(_joinController.text, context);
+//                            Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
+//                            showDialog(
+//                              context: context,
+//                              builder: (context) {
+//                                Future.delayed(Duration(milliseconds: 2000), () {
+//                                  _joinController.clear();
+//                                  Navigator.push(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);;
+//                                }); return Center(child: CircularProgressIndicator());
+//                                });
                           }
                         },
                         iconSize: 25,
