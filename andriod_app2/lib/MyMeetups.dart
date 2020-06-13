@@ -464,7 +464,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               future: _future,
               builder: (BuildContext context, AsyncSnapshot snapshot){
                   if (snapshot.connectionState ==  ConnectionState.done && allData.isEmpty){
-                  return RefreshIndicator(
+                    return RefreshIndicator(
                     onRefresh: _refresh,
                     child: ListView(
                       children: <Widget>[Padding(
@@ -481,7 +481,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       ],
                     )
-                  );
+                  ); //NO MEETUPS
                 }
                   else if (snapshot.connectionState ==  ConnectionState.done){
                     return RefreshIndicator(
@@ -550,7 +550,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           );
                         },
                       ),
-                    );
+                    ); // LIST OF MEETUPS
                   }
                   else if(snapshot.connectionState == ConnectionState.waiting){
                     return Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1000)));

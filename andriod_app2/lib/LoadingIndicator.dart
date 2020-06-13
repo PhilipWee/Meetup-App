@@ -6,11 +6,11 @@ class Dialogs {
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return new WillPopScope(
+          return WillPopScope(
               onWillPop: () async => false,
               child: SimpleDialog(
                   key: key,
-                  backgroundColor: Colors.black54,
+                  backgroundColor: Colors.transparent,
                   children: <Widget>[
                     Center(
                       child: CircularProgressIndicator(),
