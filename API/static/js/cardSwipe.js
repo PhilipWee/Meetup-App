@@ -1,11 +1,17 @@
 //=================================== CAROUSEL =================================
+var user_uid, confirmed_place_index, user_display_name;
+
 class Carousel {
 
 	constructor(element) {
+
 		this.reachedLastCard = false;
 		this.result_details;
+
 		//TODO: Get the user uuid
-		this.uuid = "TESTINGUUID";
+		this.uuid = user_uid;
+		this.username = user_display_name;
+		console.log("HELLO " + this.username + "! What you doing looking at the console >,<");
 
 		this.curIndex = -1;
 		//Get the url depending on where the server is hosted
@@ -27,6 +33,16 @@ class Carousel {
 			console.log(data)
 		})
 
+		//Listen for the location confirmed
+		this.socket.on("location_found", (data) => {
+			//Repeat the functions here
+			window.alert("Location Found!");
+			setTimeout(location.reload.bind(location), 2000);
+
+			//that.push_confirmed();
+			//that._update_other_details(confirmed_place_index);
+		})
+
 		//temp session_id for testing
 		this.session_id = window.location.pathname.split('/')[2]
 
@@ -35,31 +51,93 @@ class Carousel {
 
 		var that = this;
 		// Get the location data for the particular session id
+
 		$.getJSON(results_url, function (result) {
 			that.display_location_details(result);
 		}).catch(function (error) {
 			console.log('Unable to get results, Error: ' + error)
 		})
 
-		// Get the user data for the particular session id
-		$.getJSON(details_url, function (result) {
-			that.display_meetup_details(result);
-		}).catch(function (error) {
-			console.log('Unable to get meetup details, Error: ' + error)
+		function get_confirmed_index(callback) {
+			// Get the user data for the particular session id
+			$.getJSON(details_url, function (result) {
+				that.display_meetup_details(result);
+				callback(result);
+
+			}).catch(function (error) {
+				console.log('Unable to get meetup details, Error: ' + error)
+			})
+		}
+
+		get_confirmed_index(function (data) {
+
+			console.log("MEETUP DETAILS BELOW");
+			console.log(data);
+//			var last_swiped_position = data[user_uid];
+//			console.log(last_swiped_position);
+
+			if ("confirmed_place_index" in data) {
+				confirmed_place_index = data["confirmed_place_index"];
+				console.log("CONFIRMED PLACE");
+				console.log(confirmed_place_index);
+
+				that.push_confirmed();
+				that._update_other_details(confirmed_place_index);
+
+			} else {
+				if (user_uid in data) { // If user has already swiped before
+					console.log("IT EXISTS.");
+
+					var continue_swipe_index = data[user_uid].length;
+
+//					if (continue_swipe_index) {
+//						console.log(continue_swipe_index);
+//					} else {
+//						console.log("Starting from 0");
+//					}
+
+					that.curIndex = continue_swipe_index;
+					console.log(that.curIndex);
+
+					confirmed_place_index = "notConfirmed";
+					console.log(confirmed_place_index);
+
+					that.push();
+					that._update_other_details(that.curIndex);
+
+					that.handle();
+
+				} else {								// If user has not swiped before
+					console.log("USER UID NON EXISTENT.");
+
+					that.push();
+
+					that.handle()
+				}
+
+				//=========
+
+				//========
+			}
 		})
 
 		this.board = element
 
-		// add first card programmatically
-		this.push()
-
-		// handle gestures
-		this.handle()
-
 	}
+
 
 	display_meetup_details(result) {
 		var host_uuid = result['host_uuid'];
+
+		var session_status = result['session_status'];
+		var meetup_title = document.getElementById("meetup_title");
+		if (session_status == "location_confirmed") {
+			meetup_title.innerHTML = result['meetup_name'] + " (Confirmed!)";
+		} else {
+			meetup_title.innerHTML = result['meetup_name'] + " (Please swipe :D)";
+		}
+
+
 		var that = this;
 		result['users'].forEach(member_details => {
 			let list_element = that.create_member_list_element(member_details, host_uuid)
@@ -68,16 +146,15 @@ class Carousel {
 		console.log(result)
 		//Change the meetup name
 		//Update the members list
-
 	}
 
 	create_member_list_element(member_details, host_uuid) {
 		var src;
 		var username = member_details['username']
 		if (member_details['uuid'] == host_uuid) {
-			src = '"/static/mouseAvatar1.png"'
+			src = '"/static/host-purple.png"'
 		} else {
-			src = '"/static/mouseAvatar2.png"'
+			src = '"/static/member-yellow.png"'
 		}
 		//Start creating the element
 		var list_item = document.createElement('a')
@@ -170,7 +247,11 @@ class Carousel {
 			data['selection'] = false
 		}
 
-		socket.emit('swipe_details', data);
+		if (this.curIndex != -1) {
+			socket.emit('swipe_details', data);
+		}
+
+		this.curIndex++;
 
 		//Update the other details depending on the index
 		this._update_other_details(this.curIndex);
@@ -351,8 +432,30 @@ class Carousel {
 
 	}
 
-	push() {
+	push_confirmed() {
+		//console.log("WELL WELL");
+		//console.log(confirmed_place_index);
 
+		let card = document.createElement('div')
+
+		card.classList.add('swipeCard')		// idk what is this just copied it in
+
+		var url;
+		var location_name;
+
+		location_name = this.result_details['possible_locations'][confirmed_place_index];
+		url = this.result_details[location_name]['pictures'][0];
+
+		card.style.backgroundImage = `url('${url}')`;
+
+		if (this.board.firstChild) {
+			this.board.insertBefore(card, this.board.firstChild)
+		} else {
+			this.board.append(card)
+		}
+	}
+
+	push() {
 
 		let card = document.createElement('div')
 
@@ -382,14 +485,88 @@ class Carousel {
 			this.board.append(card)
 		}
 
-		this.curIndex++;
+
 
 	}
-
-
-
 }
 
-let board = document.querySelector('#board')
 
-let carousel = new Carousel(board)
+
+
+class Auth {
+
+    constructor() {
+
+        // Initialize Firebase
+        this.firebaseConfig = {
+            apiKey: "AIzaSyAJ__NSxJn-qEqWrHAVnH1duusK1rJPqx4",
+            authDomain: "meetup-mouse-265200.firebaseapp.com",
+            databaseURL: "https://meetup-mouse-265200.firebaseio.com",
+            projectId: "meetup-mouse-265200",
+            storageBucket: "meetup-mouse-265200.appspot.com",
+            messagingSenderId: "1052519191030",
+            appId: "1:1052519191030:web:90909ba515c20d766377d7",
+            measurementId: "G-FP46EYMK63"
+        };
+
+        firebase.initializeApp(this.firebaseConfig);
+        //firebase.analytics();
+        console.log("Firebase initialized!");
+
+        //Check if the user is signed in
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+							user_uid = user.uid;
+							user_display_name = user.displayName;
+
+							let board = document.querySelector('#board')
+
+							let carousel = new Carousel(board)
+
+              var isAnonymous = user.isAnonymous;
+              if (isAnonymous) {
+                // Create sign in button
+                var btn = document.createElement("BUTTON");
+                btn.style = 'font-family: Patrick Hand SC;font-size:2vw;margin-left:45%';
+                btn.onclick = function() {
+                  // Redirect to correct page; Pending users, Pending swipes or Confirmed
+                  window.location.href = '/loginPage';
+                }
+                btn.innerHTML = "Sign In";
+                document.getElementById('loginStatusButton').appendChild(btn);
+              } else {
+                // Create sign out button
+                var btn = document.createElement("BUTTON");
+                btn.style = 'font-family: Patrick Hand SC;font-size:2vw;margin-left:45%';
+                btn.onclick = function() {
+                  firebase.auth().signOut().then(function() {
+                    console.log("Signed out")
+                    // Sign-out successful.
+                  }).catch(function(error) {
+                    // An error happened.
+                  });
+                  window.location.reload(true);
+                }
+                btn.innerHTML = "Sign Out";
+                document.getElementById('loginStatusButton').appendChild(btn);
+              }
+            } else {
+                firebase.auth().signInAnonymously().catch(function(error) {
+                  // Handle Errors here.
+                  var errorCode = error.code;
+                  var errorMessage = error.message;
+                  // ...
+                });
+            }
+          });
+    }
+}
+
+function homeButton() {
+	var base_url = window.location.origin;
+	location.replace(base_url);
+}
+
+document.getElementById("homeButton").addEventListener("click", homeButton);
+
+let auth = new Auth()

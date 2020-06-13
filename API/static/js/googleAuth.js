@@ -1,6 +1,8 @@
 class Auth {
     constructor() {
 
+        this.user_uid = 'TESTING';
+
         // Initialize Firebase
         this.firebaseConfig = {
             apiKey: "AIzaSyAJ__NSxJn-qEqWrHAVnH1duusK1rJPqx4",
@@ -12,7 +14,7 @@ class Auth {
             appId: "1:1052519191030:web:90909ba515c20d766377d7",
             measurementId: "G-FP46EYMK63"
         };
-        
+
         firebase.initializeApp(this.firebaseConfig);
         //firebase.analytics();
         console.log("Firebase initialized!");

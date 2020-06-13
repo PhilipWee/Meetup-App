@@ -19,16 +19,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_google_places: 0.2.3
+  flutter_google_places: ^0.2.5
+  google_maps_webservice: ^0.0.16
   share: ^0.6.2+1
   location: ^2.3.5
   google_maps_flutter: ^0.5.21
-  geolocator: ^5.1.3
+  geolocator: ^5.3.1
   http: ^0.12.0+2
   cupertino_icons: ^0.1.2
-  clipboard_manager: ^0.0.4
   esys_flutter_share: ^1.0.2
-  url_launcher: ^5.1.2
+  url_launcher: ^5.4.10
   connectivity: ^0.4.4
   pull_to_refresh: ^1.5.7
   loading_indicator: ^1.0.0
@@ -40,30 +40,34 @@ dependencies:
   firebase_core: 0.4.4+3
   getflutter: ^1.0.11
   flutter_rating_bar: ^3.0.1+1
+  flutter_phoenix: ^0.1.0
+  shared_preferences: ^0.5.7+3
+  hive: ^1.4.1+1
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.7.3"
   flutter_test:
     sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/app_logo.png"
 
 flutter:
   uses-material-design: true
 
   assets:
+    - images/app_logo.png
     - images/google_logo.png
-    - images/MeetUp_Logo.png
-    - images/dateButton.jpg
-    - images/meetingButton.jpg
-    - images/outingButton.jpg
-    - images/lake.jpg
-    - images/mouseAvatar.jpg
-    - images/Mouse_copy.png
-    - images/food.jpg
-    - images/outing.jpg
-    - images/zoo.jpg
-    - images/backyard.jpg
-    - images/sanf.jpg
-    - images/bikinibottom.jpg
-    - images/sanfrans.jpg
+    - images/host.png
+    - images/host-purple.png
+    - images/member.png
+    - images/member-yellow.png
+    - images/blue.png
+    - images/purple.png
+    - images/yellow.png
+
 
   fonts:
     - family: Pacifico

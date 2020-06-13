@@ -1,4 +1,5 @@
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
@@ -18,12 +19,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   final _meetupNameController = TextEditingController();
   final _locationNameController = TextEditingController(text: globals.userLocationName);
 
-  String value7 = "Recreation";
+  String value7 = "Outing";
   String value2 = "Public Transit";
   String value4 = "No Preference";
-  double value5 = 0;
+  double value5 = 1;
 
-  //Method for the labels on the slider
   String labels() {
     switch (value5.floor()) {
       case 0:
@@ -38,64 +38,142 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
         return "\$\$\$\$";
     }
     return "";
-  }
+  } //Method for the labels on the slider
+
+  //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
   Future<String> sessionCreate() async {
-
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
     String address = globals.serverAddress;
-
     String url = '$address/session/create';
-    String jsonpackage = '{"lat":${globals.tempData["lat"]}, "lat":${globals.tempData["lat"]}, "long":${globals.tempData["long"]}, "quality":${globals.tempData["quality"]}, "speed":${globals.tempData["speed"]}, "transport_mode":"${globals.tempData["transportMode"]}", "username": "philip"}';
-    print("Sending Jsonpackage To Server >>> $jsonpackage");
+
+    String jsonpackage = '{ '
+        '"uuid":"${globals.uuid}", '
+        '"meetup_name":"${globals.tempData["meetupname"]}", '
+        '"username":"${globals.username}", '
+        '"meeting_type":"${globals.tempData["meetingtype"]}", '
+        '"lat":${globals.tempData["lat"]}, '
+        '"long":${globals.tempData["long"]}, '
+        '"user_place":"${globals.tempData["userplace"]}", '
+        '"transport_mode":"${globals.tempData["transportmode"]}", '
+        '"metrics": {'
+        '"quality":${globals.tempData["quality"]}, '
+        '"price":${globals.tempData["price"]}, '
+        '"speed":0'
+        '}'
+        '}';
+
+    print("[sessionCreate] Sending Jsonpackage To Server >>> $jsonpackage");
+
     try{
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
       int statusCode = response.statusCode;
-      String message = response.body;
 
       if (statusCode != 200){
-//        print(message);
+        print(response.body);
         Scaffold.of(context).showSnackBar(
             SnackBar(
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
               duration: Duration(seconds: 2),
             ));
+        return null;
       }
       else{
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
-        print("PostData successfull with statuscode: $statusCode");
-        print("Get Session ID successfull with body : $body");
-        //decode the string-map
         Map<String, dynamic> sessionidjsonversion = jsonDecode(body);
         var sessionid = sessionidjsonversion['session_id'];
         globals.tempData["sessionid"] = sessionid;
-        globals.tempData["sessionid"] = "$address/session/$sessionid/get_details";
-        String theLink = globals.tempData["sessionid"];
-        print('Link Created[ $theLink ]');
-        return theLink;
+        print("SESSION ID : ${globals.tempData["sessionid"]}");
+        globals.tempData["link"] = "$address/session/$sessionid/get_details";
+        print('Link Created[ ${globals.tempData["link"]} ]');
+        return globals.tempData["link"];
       }
     }
-    catch(e){print("Error caught at SessioCreate(): $e");}
+    catch(e){print("Error caught at SessionCreate(): $e");}
+
   }
 
-//  void initState() {
-//    super.initState();
-//    _locationNameController.addListener(() {
-//      final text = _locationNameController.text.toLowerCase();
-//      _locationNameController.value = _locationNameController.value.copyWith(
-//        text: text,
-//        selection:
-//        TextSelection(baseOffset: text.length, extentOffset: text.length),
-//        composing: TextRange.empty,
-//      );
-//    });
-//  }
-//
-//  void dispose() {
-//    _locationNameController.dispose();
-//    super.dispose();
-//  }
+  showPopup(BuildContext context, Widget widget, {BuildContext popupContext}) {
+    Navigator.push(
+      context,
+      PopupLayout(
+        top: MediaQuery.of(context).size.height - 170,
+        left: 0,
+        right: 0,
+        bottom: 57,
+        child: PopupContent(
+          content: Scaffold(
+              resizeToAvoidBottomPadding: false,
+              body: widget,
+              backgroundColor: Colors.white
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _shareText() async {
+    try {
+      Share.text('Link', globals.tempData["link"], 'text/plain');
+    } catch (e) {
+      print('error: $e');
+    }
+  }
+
+
+  /////////////////////////////////////// [ALL WIDGETS] ///////////////////////////////////////////////
+
+  Widget _popupBody() {
+
+    return FutureBuilder(
+      future: sessionCreate(),
+      builder: (BuildContext context, AsyncSnapshot snapshot){
+        if (snapshot.connectionState == ConnectionState.done && snapshot.data != null){
+          return Container(child: Container(
+              height: 100,
+              child: Padding(
+                  padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            flex: 2,
+                            child: TextField(
+                                controller: TextEditingController(text:snapshot.data),
+                                decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.content_copy),
+                            onPressed: () {
+                              Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
+                              Navigator.pop(context);
+                            },
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.share),
+                              onPressed: () async {
+                                await _shareText();
+                                Navigator.pop(context);
+                              }
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+              )
+          ));
+        }
+        else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+
+//    return Container(child: linkSection);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,17 +190,30 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                 minWidth: 150,
                 height: 50,
                 child: FlatButton(
+                  child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
-                  onPressed: () {
-                    showPopup(context, _popupBody());
-                    globals.tempData["meetupname"] = _meetupNameController.text;
-                    globals.tempData["userplace"] = _locationNameController.text;
-                    print(globals.tempData);
-                    sessionCreate();
-                    },
-                  child: Text('Create Meetup', style: TextStyle(fontFamily: "Quicksand")),
+                  onPressed: () async{
+                    if (_meetupNameController.text.isEmpty) {
+                      Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Enter Meetup Name!",
+                              style: TextStyle(
+                                fontFamily: "Quicksand",
+                                fontWeight: FontWeight.w400),
+                                textAlign: TextAlign.center,
+                            ),
+                            duration: Duration(seconds: 1),
+                          ));
+                    }
+                    else {
+                      globals.tempData["meetupname"] =_meetupNameController.text;
+                      globals.tempData["userplace"] =_locationNameController.text;
+                      showPopup(context, _popupBody());
+                    }
+                  },
                 ),
               ),
             ),
@@ -188,12 +279,12 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value7 = newValue;
-                          if (value7=="Recreation"){globals.tempData["meetingType"]="Recreation";}
-                          else if (value7=="Food"){globals.tempData["meetingType"]="Food";}
-                          else {globals.tempData["meetingType"]="Meeting";}
+                          if (value7=="Outing"){globals.tempData["meetingtype"]="outing";}
+                          else if (value7=="Food"){globals.tempData["meetingtype"]="food";}
+                          else {globals.tempData["meetingtype"]="meeting";}
                         });
                       },
-                      items: <String>["Recreation", "Food", "Meeting"].map<DropdownMenuItem<String>>((String value) {
+                      items: <String>["Outing", "Food", "Meeting"].map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -239,6 +330,12 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       leading: Icon(Icons.search, color: Colors.black),
                       hint: "Enter Location",
                       mode: Mode.overlay,
+                      onSelected: (selected) async {
+                        List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
+                        await Future.delayed(Duration(milliseconds: 1000));
+                        globals.tempData["lat"] = placemark[0].position.latitude;
+                        globals.tempData["long"] = placemark[0].position.longitude;
+                      },
                     )
                 ),
               ),
@@ -275,10 +372,10 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value2 = newValue;
-                          if (value2=="Walk"){globals.tempData["transportMode"]="Walk";}
-                          else if (value2=="Driving"){globals.tempData["transportMode"]="Driving";}
-                          else if (value2=="Riding"){globals.tempData["transportMode"]="Riding";}
-                          else {globals.tempData["transportMode"]="Public Transit";}
+                          if (value2=="Walk"){globals.tempData["transportmode"]="walking";}
+                          else if (value2=="Driving"){globals.tempData["transportmode"]="driving";}
+                          else if (value2=="Riding"){globals.tempData["transportmode"]="riding";}
+                          else {globals.tempData["transportmode"]="public";}
                         });
                       },
                       items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
@@ -326,8 +423,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       onChanged: (String newValue) {
                         setState(() {
                           value4 = newValue;
-                          if (value4=="Best"){globals.tempData["quality"]=3;}
-                          else if (value4=="Regular"){globals.tempData["quality"]=2;}
+                          if (value4=="Best"){globals.tempData["quality"]=5;}
+                          else if (value4=="Regular"){globals.tempData["quality"]=3;}
                           else if (value4=="No Preference"){globals.tempData["quality"]=1;}
                         });
                       },
@@ -375,11 +472,11 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       value: value5,
                       onChanged: (newValue) => setState(() {
                         value5 = newValue;
-                        if (value5==1){globals.tempData["price"]=1;}
-                        else if (value5==2){globals.tempData["price"]=2;}
-                        else if (value5==3){globals.tempData["price"]=3;}
-                        else if (value5==4){globals.tempData["price"]=4;}
-                        else{globals.tempData["price"]=0;}
+                        if (value5==1){globals.tempData["price"]=2;}
+                        else if (value5==2){globals.tempData["price"]=3;}
+                        else if (value5==3){globals.tempData["price"]=4;}
+                        else if (value5==4){globals.tempData["price"]=5;}
+                        else{globals.tempData["price"]=1;}
                       }),
                       max: 4,
                       min: 0,
@@ -391,77 +488,9 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
             ],
           ), //for price
           Divider(height: 40,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
-          Container(child: buttonSection),
+          Container(child: buttonSection), //for creating meetup
         ], //children of ListView
       ),
     );
   }
-
-  showPopup(BuildContext context, Widget widget, {BuildContext popupContext}) {
-    Navigator.push(
-      context,
-      PopupLayout(
-        top: 565,
-        left: 0,
-        right: 0,
-        bottom: 57,
-        child: PopupContent(
-          content: Scaffold(
-            resizeToAvoidBottomPadding: false,
-            body: widget,
-            backgroundColor: Colors.white
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _shareText() async {
-    try {
-      Share.text('Link', "", 'text/plain');
-    } catch (e) {
-      print('error: $e');
-    }
-  }
-
-  Widget _popupBody() {
-
-    Widget linkSection = Container(
-        child: Padding(
-            padding: const EdgeInsets.only(left: 15.0, top: 15.0, right: 15.0, bottom: 15.0),
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 2,
-                      child: TextField(
-                          controller: TextEditingController(text:globals.tempData["link"]),
-                          decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.content_copy),
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: globals.tempData["link"]));
-                        Navigator.pop(context);
-                        },
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.share),
-                        onPressed: () async {
-                          await _shareText();
-                          Navigator.pop(context);
-                        }
-                    ),
-                  ],
-                ),
-              ],
-            )
-        )
-    );
-
-    return Container(child: linkSection);
-  }
-
 }

@@ -48,6 +48,11 @@ function objectifyForm(formArray) { //serialize data function
   return returnArray;
 }
 
+function homeButton() {
+  var base_url = window.location.origin;
+  location.replace(base_url);
+}
+
 function submitButton() {
 
     meetupForm = $('#meetupData')
@@ -81,8 +86,8 @@ function submitButton() {
             data: JSON.stringify(meetupData),
             contentType:'application/json',
             success: function (response_data) {
-                console.log("Everything looks good!")
-                //window.location.href='/' //form submission
+                //console.log("Everything looks good!")
+                window.location.href= 'results_display?isHost=false' //form submission
             },
             error: function(response_data) {
               console.log(response_data['responseText']);
@@ -91,11 +96,8 @@ function submitButton() {
 
 
     }
-document.getElementById('jayson').addEventListener("onclick", jayson);
-
-
-
 
   };
 
-  document.getElementById ("submitbutton").addEventListener ("click", submitButton);
+document.getElementById ("submitbutton").addEventListener ("click", submitButton);
+document.getElementById ("homeButton").addEventListener ("click", homeButton);

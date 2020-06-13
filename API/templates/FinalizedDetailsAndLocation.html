@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Patrick Hand SC' rel='stylesheet'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script> -->
+
+    <!-- Include firebase.js -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+			 https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-firestore.js"></script> -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script> -->
+    <style>
+        .stars-outer {
+            display: inline-block;
+            position: relative;
+            font-family: FontAwesome;
+        }
+        
+        .stars-outer::before {
+            content: "\f006 \f006 \f006 \f006 \f006";
+        }
+        
+        .stars-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 50%;
+        }
+        
+        .stars-inner::before {
+            content: "\f005 \f005 \f005 \f005 \f005";
+            color: #f8ce0b;
+        }
+        
+        #board {
+            /* width: 100%;
+			height: 100vh; */
+            flex: 1 1 auto;
+            position: relative;
+            overflow: hidden;
+            background-color: rgb(245, 247, 250);
+        }
+        
+        .enclosingBox {
+            /* flex: 1 0 auto; */
+            height: 100vh;
+        }
+        
+        .swipeCard {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 1%;
+            box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.1);
+            background-color: rgb(255, 240, 199);
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            transform: translateX(-50%) translateY(-50%) scale(0.95);
+        }
+        
+        body {
+            background-color: SeaShell;
+            background-image: url(/static/background.png);
+        }
+        
+        h1 {
+            color: white;
+            font-size: 5vw;
+            font-family: 'Pacifico';
+        }
+        
+        h2 {
+            margin-top: 1mm;
+            font-family: 'Patrick Hand SC';
+            font-size: 3vw;
+        }
+        
+        h3 {
+            margin-left: 20px;
+            font-family: 'Patrick Hand SC';
+            font-size: 1vw;
+        }
+        
+        .block {
+            width: 30%;
+            text-align: center;
+        }
+        
+        .starChecked {
+            color: orange;
+        }
+        
+        hr.new5 {
+            border: 2px solid rgb(214, 129, 137);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="enclosingBox">
+        <div class='row pl-2' style='background-color:Tomato;'>
+            <div class='col-10 ml-2 mt-2 mb-2'>
+                <h1>MeetUp Mouse</h1>
+            </div>
+            <div id='loginStatusButton' class='col' style='margin-top:2%;margin-left:0%'></div>
+        </div>
+        <div class='row pl-2' style="background-color: #fff3cd;">
+            <h2 class='w-100 mb-0 text-center'>MEW MOUSE MEETUP</h2>
+        </div>
+        <div class='row pl-2' style="background-color:#fff3cd;text-align: center">
+            <h3 class='w-100'>19 December 2019</h3>
+        </div>
+        <div class="row">
+            <!-- Members in meetup -->
+            <div class="col-2 pr-0" id="meetup_members">
+                <div class="list-group list-group-flush h-100" id="meetup_members_list">
+                    <li href="#" class="list-group-item" style="text-align: center" id="meetup_members_title">
+                        Members
+                    </li>
+                    <li class="list-group-item h-100" tabindex="-1" aria-disabled="true"></li>
+                </div>
+            </div>
+            <!-- Additional Images for particular location -->
+            <div class="col-2 ml-2 mr-2 mt-2 align-self-center" id="additional_images">
+                <div class="row mb-2">
+                    <img class="img-fluid" src="https://sethlui.com/wp-content/uploads/2019/03/Misato-Restaurant-9049.jpg">
+                </div>
+                <div class="row mb-2">
+                    <img class="img-fluid" src="https://sethlui.com/wp-content/uploads/2019/03/Misato-Restaurant-9049.jpg">
+                </div>
+                <div class="row">
+                    <img class="img-fluid" src="https://sethlui.com/wp-content/uploads/2019/03/Misato-Restaurant-9049.jpg">
+                </div>
+
+            </div>
+            <!-- Initialise the board -->
+            <div class="col-5 mt-2" id="board"></div>
+            <!-- Aditional details for particular location -->
+            <div class="col ml-2 mr-2 pl-0 pr-0" id="additional_info">
+                <div class="h-100">
+                    <div class="list-group list-group-flush h-100">
+                        <li href="#" class="list-group-item" style="text-align: left">
+                            <h2 id='location_name'>
+                                New Mouse Cafe
+                            </h2>
+                        </li>
+                        <li class="list-group-item list-group-item-action">
+                            <div class="row pl-2"> Rating</div>
+                            <div class="row pl-2" id="stars_container">
+                                <div class="stars-outer">
+                                    <div class="stars-inner"></div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item list-group-item-action">
+                            <div class="row pl-2"> Price</div>
+                            <div class="row pl-2" id='price_div'></div>
+                        </li>
+
+                        <li class="list-group-item" style="max-height:60vh" tabindex="-1">
+                            <div class="pl-2 overflow-auto" style="max-height:100%" id='writeup_div'>
+                                the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+                                over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+                                over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the
+                                quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog
+                                the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the quick brown fox
+                                jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown
+                                fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the quick brown fox jumped over the
+                                lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over
+                                the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the quick brown fox jumped over the lazy dog the quick
+                                brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the
+                                quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the quick brown fox jumped over the lazy dog the quick brown fox jumped
+                                over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped
+                                over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the
+                                quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog
+                                the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox
+                                jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown
+                                fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick brown fox fox jumped over the lazy dog the quick brown fox jumped over the lazy dog the quick
+
+                            </div>
+
+                        </li>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- Initialise the page Javascript -->
+    <script src="{{url_for('static', filename='js/googleAuth.js')}}"></script>
+    <script src="{{url_for('static', filename='js/cardSwipe.js')}}"></script>
+</body>
+
+</html>

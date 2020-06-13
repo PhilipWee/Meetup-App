@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'main.dart';
 import 'Globals.dart' as globals;
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,11 +11,38 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+//  final FirebaseAuth _auth = FirebaseAuth.instance;
+//  final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  /////////////////////////////////////////////////////////////////////// [FUNCTIONS]
+  @override
+  void initState(){
+    super.initState();
+    try{globals.auth.currentUser().then((user) => userExists(user));}
+    catch(error){print("there is some weird error");}
+  }
+
+  void userExists(user){
+    if(user==null) {
+      print("user doesn't exist");
+    }
+    else {
+      globals.uuid = user.uid;
+      globals.username = user.displayName;
+      globals.profileurl = user.photoUrl;
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) {
+            return CheckNetworkPage();
+          },
+        ),
+      );
+    }
+  }
 
   Future<String> signInWithGoogle() async {
-    final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+    final GoogleSignInAccount googleSignInAccount = await globals.googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
     await googleSignInAccount.authentication;
 
@@ -26,61 +51,36 @@ class _LoginPageState extends State<LoginPage> {
       idToken: googleSignInAuthentication.idToken,
     );
 
-    final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+    final FirebaseUser user = (await globals.auth.signInWithCredential(credential)).user;
 
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);
 
-    final FirebaseUser currentUser = await _auth.currentUser();
+    final FirebaseUser currentUser = await globals.auth.currentUser();
     assert(user.uid == currentUser.uid);
     print("user " + user.uid + " is connected to firebase.");
 
-    try {
-      QuerySnapshot docs = await Firestore.instance.collection('userData').where('uid',isEqualTo: user.uid).getDocuments();
-      if (!docs.documents[0].exists){
-        Firestore.instance.collection('userData').document(user.uid).setData({
-          'activityType': 'activityType',
-          'lat': 0.0,
-          'long': 0.0,
-          'link': 'link',
-          'price': 0,
-          'quality': 'No Preference',
-          'sessionId': "ABCDE",
-          'transportMode': 'Public Transit',
-          'userName': user.displayName,
-          'uid': user.uid
-        }).whenComplete(() =>
-            print("created userData for " + user.displayName));
-      }
-      else{
-        print("userData already exists.");
-
-      }
-    }on PlatformException{
-      print("userData already exists.");
-    }
-
+    globals.uuid = user.uid;
+    globals.username = user.displayName;
+    globals.profileurl = user.photoUrl;
 
     return 'signInWithGoogle succeeded: $user';
 
   }
-  void signOutGoogle() async{
-    await googleSignIn.signOut();
-    print("User Sign Out");
-  }
 
+  /////////////////////////////////////////////////////////////////////// [WIDGETS]
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.deepOrange,
+        color: Color.fromRGBO(247, 147, 30, 1),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image(image: AssetImage("images/Mouse_copy.png"), height: 170),
+              Image(image: AssetImage("images/app_logo.png"), height: 350),
               SizedBox(height: 50),
               _signInButton(),
             ],
@@ -94,7 +94,6 @@ class _LoginPageState extends State<LoginPage> {
     return FlatButton(
       color: Colors.white,
       onPressed: () async {
-        globals.saveMyLocationName();
         signInWithGoogle().whenComplete(() {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
