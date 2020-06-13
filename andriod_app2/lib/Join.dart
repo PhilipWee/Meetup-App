@@ -121,7 +121,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                         context: context,
                         builder: (context)
                         {Future.delayed(Duration(milliseconds: 2000), () {
-                          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>MyHomePage()),);;
+                          Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>MyHomePage()),);
                         });
                         return Center(child: CircularProgressIndicator());
                         });
@@ -134,241 +134,248 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
       ) ,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Center(
-          child: Text("Join Meetup", style: TextStyle(fontFamily: "Quicksand")),
-        ),
-        backgroundColor: Colors.deepOrange,
-        automaticallyImplyLeading: true,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Center(
+            child: Text("Join Meetup", style: TextStyle(fontFamily: "Quicksand")),
+          ),
+          backgroundColor: Colors.deepOrange,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>MyHomePage()),);},
+          ),
 
-      ),
-      body: ListView(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                  flex: 1,
-                  child: Padding(
-                      padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
-                      child: Text("${globals.tempMeetingDetails["meetup_name"]}",
-                        style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
-                  )
-              )
-            ],
-          ),//for meetup name
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                  flex: 1,
-                  child: Padding(
-                      padding:const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 8),
-                      child: Text("$mtype",
-                        style: TextStyle(fontFamily: "QuickSand", fontSize: 15, fontWeight: FontWeight.bold),)
-                  )
-              )
-            ],
-          ),//for activity
-          Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:15),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.location_on, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Location", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                            fontFamily: "Quicksand"
-                        ),),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child:Padding(
-                    padding:const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
-                    child: PlacesAutocompleteField(
-                      controller: _locationNameController,
-                      apiKey: 'AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g',
-                      leading: Icon(Icons.search, color: Colors.black),
-                      hint: "Enter Location",
-                      mode: Mode.overlay,
-                      onSelected: (selected) async {
-                        List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
-                        await Future.delayed(Duration(milliseconds: 1000));
-                        globals.tempData["lat"] = placemark[0].position.latitude;
-                        globals.tempData["long"] = placemark[0].position.longitude;
-                      },
+
+        ),
+        body: ListView(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                    flex: 1,
+                    child: Padding(
+                        padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
+                        child: Text("${globals.tempMeetingDetails["meetup_name"]}",
+                          style: TextStyle(fontFamily: "QuickSand", fontSize: 20, fontWeight: FontWeight.bold),)
                     )
-                ),
-              ),
-            ],
-          ), //for location
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.directions_car, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Transport", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                            fontFamily: "Quicksand"
-                        ),),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value2,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value2 = newValue;
-                          if (value2=="Walk"){globals.tempData["transportmode"]="walking";}
-                          else if (value2=="Driving"){globals.tempData["transportmode"]="driving";}
-                          else if (value2=="Riding"){globals.tempData["transportmode"]="riding";}
-                          else {globals.tempData["transportmode"]="public";}
-                        });
-                      },
-                      items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+                )
+              ],
+            ),//for meetup name
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                    flex: 1,
+                    child: Padding(
+                        padding:const EdgeInsets.only(left: 20, top: 0, right: 20, bottom: 8),
+                        child: Text("$mtype",
+                          style: TextStyle(fontFamily: "QuickSand", fontSize: 15, fontWeight: FontWeight.bold),)
+                    )
+                )
+              ],
+            ),//for activity
+            Divider(height: 15,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:15),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.location_on, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Location", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                              fontFamily: "Quicksand"
+                          ),),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              )
-            ],
-          ),//for transport
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.star, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("Ratings", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                            fontFamily: "Quicksand"
-                        ),),
-                      ),
-                    ],
+                Expanded(
+                  flex: 1,
+                  child:Padding(
+                      padding:const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
+                      child: PlacesAutocompleteField(
+                        controller: _locationNameController,
+                        apiKey: 'AIzaSyCCwub_R6P_vJ-zthJeVAmfZ2Lwmp-UA-g',
+                        leading: Icon(Icons.search, color: Colors.black),
+                        hint: "Enter Location",
+                        mode: Mode.overlay,
+                        onSelected: (selected) async {
+                          List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
+                          await Future.delayed(Duration(milliseconds: 1000));
+                          globals.tempData["lat"] = placemark[0].position.latitude;
+                          globals.tempData["long"] = placemark[0].position.longitude;
+                        },
+                      )
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 5,
-                child: Container(
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: value4,
-                      onChanged: (String newValue) {
-                        setState(() {
-                          value4 = newValue;
-                          if (value4=="Best"){globals.tempData["quality"]=5;}
-                          else if (value4=="Regular"){globals.tempData["quality"]=3;}
-                          else if (value4=="No Preference"){globals.tempData["quality"]=1;}
-                        });
-                      },
-                      items: <String>["No Preference", "Regular", "Best"]
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
+              ],
+            ), //for location
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.directions_car, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Transport", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                              fontFamily: "Quicksand"
+                          ),),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              )
-            ],
-          ),//for ratings
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                flex: 5,
-                child: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8, left: 15, right:8),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.attach_money, color: Colors.black),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right:8),
-                        child: Text("Price", style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20.0,
-                            fontFamily: "Quicksand"
-                        ),),
+                Expanded(
+                  child: Container(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: value2,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            value2 = newValue;
+                            if (value2=="Walk"){globals.tempData["transportmode"]="walking";}
+                            else if (value2=="Driving"){globals.tempData["transportmode"]="driving";}
+                            else if (value2=="Riding"){globals.tempData["transportmode"]="riding";}
+                            else {globals.tempData["transportmode"]="public";}
+                          });
+                        },
+                        items: <String>["Public Transit", "Driving", "Riding", "Walk"].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
                       ),
-                    ],
+                    ),
+                  ),
+                )
+              ],
+            ),//for transport
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 8, bottom: 5, left: 15, right:8),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.star, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Ratings", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                              fontFamily: "Quicksand"
+                          ),),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Expanded(
-                flex: 6,
-                child: Container(
-                    child: Slider(
-                      value: value5,
-                      onChanged: (newValue) => setState(() {
-                        value5 = newValue;
-                        if (value5==1){globals.tempData["price"]=2;}
-                        else if (value5==2){globals.tempData["price"]=3;}
-                        else if (value5==3){globals.tempData["price"]=4;}
-                        else if (value5==4){globals.tempData["price"]=5;}
-                        else{globals.tempData["price"]=1;}
-                      }),
-                      max: 4,
-                      min: 0,
-                      divisions: 4,
-                      label: labels(),
-                    )
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: value4,
+                        onChanged: (String newValue) {
+                          setState(() {
+                            value4 = newValue;
+                            if (value4=="Best"){globals.tempData["quality"]=5;}
+                            else if (value4=="Regular"){globals.tempData["quality"]=3;}
+                            else if (value4=="No Preference"){globals.tempData["quality"]=1;}
+                          });
+                        },
+                        items: <String>["No Preference", "Regular", "Best"]
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),//for ratings
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  flex: 5,
+                  child: Container(
+                    padding: const EdgeInsets.only(top: 8, bottom: 8, left: 15, right:8),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(Icons.attach_money, color: Colors.black),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right:8),
+                          child: Text("Price", style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                              fontFamily: "Quicksand"
+                          ),),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              )
-            ],
-          ), //for price
-          Divider(height: 40,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
-          Container(child: buttonSection),
-        ], //children of ListView
+                Expanded(
+                  flex: 6,
+                  child: Container(
+                      child: Slider(
+                        value: value5,
+                        onChanged: (newValue) => setState(() {
+                          value5 = newValue;
+                          if (value5==1){globals.tempData["price"]=2;}
+                          else if (value5==2){globals.tempData["price"]=3;}
+                          else if (value5==3){globals.tempData["price"]=4;}
+                          else if (value5==4){globals.tempData["price"]=5;}
+                          else{globals.tempData["price"]=1;}
+                        }),
+                        max: 4,
+                        min: 0,
+                        divisions: 4,
+                        label: labels(),
+                      )
+                  ),
+                )
+              ],
+            ), //for price
+            Divider(height: 40,color: Colors.black12, thickness: 1.5, indent: 10, endIndent: 10,),
+            Container(child: buttonSection),
+          ], //children of ListView
+        ),
       ),
     );
   }
