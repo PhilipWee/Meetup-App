@@ -123,7 +123,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
                         {Future.delayed(Duration(milliseconds: 2000), () {
                           Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>MyHomePage()),);;
                         });
-                        return Expanded(child: Center(child: CircularProgressIndicator()));
+                        return Center(child: CircularProgressIndicator());
                         });
                   },
                 ),
