@@ -145,7 +145,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
           backgroundColor: Colors.deepOrange,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () {Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>MyHomePage()),);},
+            onPressed: () => Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>MyHomePage()),),
           ),
 
 
