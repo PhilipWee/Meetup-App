@@ -407,7 +407,7 @@ def manage_details(session_id):
             swipe_details_dict = {}
 #            print("well well, i done fk-ed up.")
 
-        info.update(swipe_details_dict)
+        info.update('swipe_details':swipe_details_dict)
 
 
         if info != 'Error':
