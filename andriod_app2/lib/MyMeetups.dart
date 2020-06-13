@@ -352,6 +352,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Center(
           child: Text('My Meetups', style: TextStyle(fontFamily: "Quicksand")),
         ),
