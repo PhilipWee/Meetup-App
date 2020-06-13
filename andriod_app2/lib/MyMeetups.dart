@@ -46,17 +46,10 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     setState(() {});
   }
 
-  void showLoading2s() async{
-    Dialogs.showLoadingDialog(context, _keyLoader);
-    await Future.delayed(Duration(milliseconds: 2000));
-    Navigator.of(_keyLoader.currentContext,rootNavigator: true).pop();
-  }
-
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
   Future sessionEnter(String inputLink, BuildContext context) async{
     Dialogs.showLoadingDialog(context, _keyLoader);
-    print("INPUTLINK $inputLink");
     globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
@@ -64,16 +57,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     print("Current Session Details ===> ${globals.tempMeetingDetails}");
     Navigator.of(_keyLoader.currentContext,rootNavigator: true).pop();
     Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
-  } //session details saved in global.tempMeetingDetails
 
-//  sessionEnter(String inputLink) async{
-//    print("INPUTLINK $inputLink");
-//    globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
-//    http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
-//    String body = response.body;
-//    globals.tempMeetingDetails = jsonDecode(body);
-//    print("Current Session Details ===> ${globals.tempMeetingDetails}");
-//    } //session details saved in global.tempMeetingDetails
+  } //session details saved in global.tempMeetingDetails
 
   Future getAllUserSessionsData(String inputUserId) async{
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
@@ -101,7 +86,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           custLabels.add(map["meetup_name"]);
           print("Meetup Name: ${custLabels[i]}");
 
-          //IMAGES//YOLO
+          //IMAGES/
           if (map["meeting_type"] == "outing"){custImgs.add("images/purple.png");}
           else if (map["meeting_type"] == "food"){custImgs.add("images/yellow.png");}
           else if (map["meeting_type"] == "meeting"){custImgs.add("images/blue.png");}
@@ -146,7 +131,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         Scaffold.of(context).showSnackBar(
             SnackBar(
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
-              duration: Duration(milliseconds: 800)
+              duration: Duration(seconds: 2)
             ));
       }
       else{
@@ -339,14 +324,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               Icons.delete,
               color: Colors.white,
             ),
-//            Text(
-//              " Delete",
-//              style: TextStyle(
-//                color: Colors.white,
-//                fontWeight: FontWeight.w700,
-//              ),
-//              textAlign: TextAlign.right,
-//            ),
             SizedBox(
               width: 20,
             ),
@@ -410,7 +387,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     style: TextStyle(fontWeight: FontWeight.w400, fontFamily: "Quicksand",),
                                     textAlign: TextAlign.center,
                                   ),
-                                  duration: Duration(milliseconds: 400),
+                                  duration: Duration(seconds: 1),
                                 ));
                           }
                           else{
@@ -500,6 +477,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
                                     globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
 
+
                                     print("Current SessionID===>${globals.sessionIdCarrier}");
                                     print("Current Session URL===>${globals.sessionUrlCarrier}");
                                     print("Current Session Data ===> ${globals.sessionData}");
@@ -526,14 +504,13 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                               onDismissed: (direction) async{
                                 if (direction == DismissDirection.endToStart) {
                                   sessionRemove(sessionIDs[index]);
-                                  setState(() {
-                                    custLabels.removeAt(index);
-//                                    _future = getAllUserSessionsData(globals.uuid); //refreshes on delete
-                                  });
-                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted ${custLabels[index]}", textAlign: TextAlign.center,),));
+                                  custLabels.removeAt(index);
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text("Leaving ${custLabels[index]}", textAlign: TextAlign.center,)));
                                 }
                                 else {
-                                  Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,)));
                                 }
                               }
                             ),

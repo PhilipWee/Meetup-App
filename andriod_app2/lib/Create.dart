@@ -24,6 +24,8 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
   String value4 = "No Preference";
   double value5 = 1;
 
+  FocusNode _focusNode = new FocusNode();
+
   String labels() {
     switch (value5.floor()) {
       case 0:
@@ -195,6 +197,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   color: Colors.deepOrange,
                   textColor: Colors.white,
                   onPressed: () async{
+                    _focusNode.unfocus();
                     if (_meetupNameController.text.isEmpty) {
                       Scaffold.of(context).showSnackBar(
                           SnackBar(
@@ -231,7 +234,6 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
       ),
       body: ListView(
         children: [
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
@@ -242,6 +244,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                   padding:const EdgeInsets.only(left: 20, top: 15, right: 20, bottom: 8),
                   child: TextFormField(
                     controller: _meetupNameController,
+                    focusNode: _focusNode,
                     decoration: InputDecoration(labelText: "Name of Meetup", border: OutlineInputBorder()),
                   ),
                 )
@@ -332,7 +335,7 @@ class CustomizationPageState extends State<CustomizationPageWidget> {
                       mode: Mode.overlay,
                       onSelected: (selected) async {
                         List<Placemark> placemark = await Geolocator().placemarkFromAddress("${selected.description}");
-                        await Future.delayed(Duration(milliseconds: 1000));
+                        await Future.delayed(Duration(milliseconds: 500));
                         globals.tempData["lat"] = placemark[0].position.latitude;
                         globals.tempData["long"] = placemark[0].position.longitude;
                       },

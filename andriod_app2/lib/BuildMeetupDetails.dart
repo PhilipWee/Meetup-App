@@ -17,8 +17,6 @@ import 'color_loader.dart';
 class MeetupPage extends StatelessWidget {
 
   Future<bool> _isBackPressed() async{
-    globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
-    print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
     return true;
   }
 
@@ -34,6 +32,7 @@ class MeetupPage extends StatelessWidget {
               icon: Icon(Icons.arrow_back),
               onPressed: () async {
                 globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
+                print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
                 print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);
               },
@@ -80,7 +79,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
   @override
   initState(){
 
-    print("SESSIONDATA");
+    print("SESSION DATA");
     print(globals.sessionData);
 
     super.initState();
@@ -99,45 +98,26 @@ class MeetupPageState extends State<MeetupPageWidget> {
     print("Connecting SOCKETS to Session with SESSION ID: ${globals.sessionIdCarrier}");
     globals.socketIO.joinSession(globals.sessionIdCarrier);
 
-    globals.socketIO.subscribe("user_joined_room", (data)=>{
-      print("INCOMING SOCKETS DATA: $data"),
-      globals.sessionData["users"].add(data),
-      print("UPDATED SESSION'S USER DATA: ${globals.sessionData["users"]}"),
-      setState((){})
-    });
+    globals.socketIO.subscribe("user_joined_room", (data)=>{ /// WHEN USER JOINS SESSION
+      setState((){globals.sessionData["users"].add(data);}), //updates globals.sessionData and refreshes the state of the page
+      print('''
+      ${data["username"]} has entered the session.
+      There are now ${globals.sessionData["users"].length} users in this session.
+      '''),});
 
     globals.socketIO.subscribe("calculation_result", (data)=>{
       print("Calculation Done!"),
       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)
     });
 
-//    globals.socketIO.subscribe("location_found", (data)=>{
-//      print("Location Found!"),
-//      print(data), //{'swipeIndex' : 12}
-//      globals.sessionData["confirmed_index"] = data["swipeIndex"],
-//      print(globals.sessionData),
-//      globals.sessionData["session_status"] = "location_confirmed",
-//    });
-
     globals.socketIO.subscribe("Error", (data)=>{
       print("SOCKET ERROR FOUND!"),
       print(data)
-
     });
 
-//    setState(() {});
+    setState(() {});
 
   } //SOCKETS
-
-//  globals.FakeData locationDetails = globals.FakeData(
-//      name: "Fisherman's Wharf",
-//      address: "39 San Francisco Bay Area",
-//      details: "Fisherman's Wharf @ Pier 39, where you can find the most delicious clam chowder! Visit the old-fashioned arcade with only mechanical games while you are there as well!",
-//      rating: 4.6,
-//      images: ["https://irepo.primecp.com/2015/07/230563/Fishermans-Wharf-Clam-Chowder_ExtraLarge1000_ID-1117267.jpg?v=1117267",
-//        "https://cdn.britannica.com/13/77413-050-95217C0B/Golden-Gate-Bridge-San-Francisco.jpg",
-//        "https://www.mercurynews.com/wp-content/uploads/2018/10/SJM-L-WEEKENDER-1018-01.jpg",]);
-
 
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
 

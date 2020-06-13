@@ -33,6 +33,7 @@ class CustomSocketIO {
   _unSubscribeAll() {
     this.socketIO.unSubscribesAll();
     this.subscribedEvents = [];
+    print("All sessions unsubscribed");
   }
 
   ///For joining a particular room
