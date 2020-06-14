@@ -460,7 +460,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 5.0),
                             child: Dismissible(
-                              key: Key(custLabels[index]),
+//                              key: Key(custLabels[index]),
+                              key: Key(UniqueKey().toString()),
                               dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
                               background: slideRightBackground(),
                               secondaryBackground: slideLeftBackground(),
@@ -501,10 +502,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                   child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                                 ),
                               ),
-                              onDismissed: (direction) async{
+                              onDismissed: (direction) {
                                 if (direction == DismissDirection.endToStart) {
                                   sessionRemove(sessionIDs[index]);
-                                  custLabels.removeAt(index);
                                   Scaffold.of(context).showSnackBar(SnackBar(
                                     content: Text("Leaving ${custLabels[index]}", textAlign: TextAlign.center,)));
                                 }
