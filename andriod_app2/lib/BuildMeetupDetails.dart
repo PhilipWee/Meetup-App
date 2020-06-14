@@ -12,36 +12,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:getflutter/getflutter.dart';
 import 'color_loader.dart';
+import 'socketiohelper.dart';
 
+
+CustomSocketIO socketIO = CustomSocketIO(globals.serverAddress);
 
 class MeetupPage extends StatelessWidget {
-
-  Future<bool> _isBackPressed() async{
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _isBackPressed,
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: Text("${globals.sessionData["meetup_name"]}"),
-          leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () async {
-                globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
-                print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
-                print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);
-              },
-          ),
-          backgroundColor: Colors.deepOrange,
-        ),
-        body: MeetupPageWidget(),
-      ),
-    );
+    return MeetupPageWidget();
   }
 }
 
@@ -78,44 +57,39 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
   @override
   initState(){
-
     print("SESSION DATA");
     print(globals.sessionData);
+    if (globals.sessionData["host_uuid"] == globals.uuid){globals.isCreator = true;}
+    else{globals.isCreator = false;}
 
-    super.initState();
+    setState(() {});
 
     _future = getMembers();
 
-    setState((){});
 
-    if (globals.sessionData["host_uuid"] == globals.uuid){
-      globals.isCreator = true;
-    }
-    else{globals.isCreator = false;}
-
-    ///SOCKETS
+    /// SOCKETS
 
     print("Connecting SOCKETS to Session with SESSION ID: ${globals.sessionIdCarrier}");
-    globals.socketIO.joinSession(globals.sessionIdCarrier);
 
-    globals.socketIO.subscribe("user_joined_room", (data)=>{ /// WHEN USER JOINS SESSION
+    socketIO.joinSession(globals.sessionIdCarrier);
+
+    socketIO.subscribe("user_joined_room", (data)=>{
       setState((){globals.sessionData["users"].add(data);}), //updates globals.sessionData and refreshes the state of the page
       print('''
       ${data["username"]} has entered the session.
       There are now ${globals.sessionData["users"].length} users in this session.
       '''),});
 
-    globals.socketIO.subscribe("calculation_result", (data)=>{
+    socketIO.subscribe("calculation_result", (data)=>{
       print("Calculation Done!"),
-      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)
-    });
+      Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)});
 
-    globals.socketIO.subscribe("Error", (data)=>{
+    socketIO.subscribe("Error", (data)=>{
       print("SOCKET ERROR FOUND!"),
       print(data)
     });
 
-    setState(() {});
+    super.initState();
 
   } //SOCKETS
 
@@ -124,13 +98,11 @@ class MeetupPageState extends State<MeetupPageWidget> {
   @override
   Widget build(BuildContext context) {
 
-  /////////////////////////////////////////////////////////////////////// [BUILDERS]
+    Future<bool> _isBackPressed() async{
+      return true;
+    }
 
-//    Future<Null> _refresh() async {
-//      _future = getMembers();
-//      setState((){});
-//      return await Future.delayed(Duration(milliseconds: 1000));
-//    }
+  /////////////////////////////////////////////////////////////////////// [BUILDERS]
 
     Future<void> _shareText() async {
       try {
@@ -140,7 +112,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       }
     }
 
-    //Function to create sub-headers within the page
+    //to create sub-headers within the page
     SliverPersistentHeader makeHeader(String headerText) {
       return SliverPersistentHeader(
         pinned: true,
@@ -166,15 +138,8 @@ class MeetupPageState extends State<MeetupPageWidget> {
         ),
       );
     }
-    //Function to show calculating
-//    Widget _calculatingText() {
-//      return Padding(
-//        padding: const EdgeInsets.only(left: 15, right: 15.0, top: 8, bottom: 8),
-//        child: Center(child: Text("Calculating")),
-//      );
-//    }
 
-    // Function to show waiting
+    //to show waiting
     Widget _waitingText() {
       return SizedBox(
         height: 60,
@@ -185,7 +150,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
-    //Function to generate the search button for host
+    //to generate the search button for host
     Widget _generateButton() {
       return Container(
         height: 50.0,
@@ -217,7 +182,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
-    //Function to build details of tabulated final location
+    //to build details of tabulated final location
     Widget _buildLocationDetails(globals.FakeData details) {
       List images = details.images;
       return Container(
@@ -311,7 +276,15 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
+    // to build memberTile
     Widget _memberTile(int index, Widget imageAsset ){
+
+      String tMode = globals.sessionData["users"][index]["transport_mode"].toString();
+
+      if (tMode == "public"){tMode = "Public Transport";}
+      if (tMode == "driving"){tMode = "Driving";}
+      if (tMode == "walking"){tMode = "Walking";}
+
       return ListTile(
         leading: SizedBox(
           width: 40,
@@ -324,7 +297,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
           maxLines: 1,
           style: TextStyle(fontFamily: "Quicksand")
         ),
-        subtitle: Text(globals.sessionData["users"][index]["transport_mode"].toString()),
+        subtitle: Text(tMode, style: TextStyle(fontFamily: "Quicksand")),
         trailing: Container(
           width: MediaQuery.of(context).size.width * 0.4,
           child: Text(
@@ -337,7 +310,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
       );
     }
 
-    ///Function to build the list of members in current session
+    //to build the list of members in current session
     FutureBuilder membersList(BuildContext context, int index) {
 
       return FutureBuilder(
@@ -359,80 +332,96 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     /////////////////////////////////////////////////////////////////////// [SCAFFOLD]
 
-    return Scaffold(
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: CustomScrollView(
-            slivers: <Widget>[
-              SliverList(
-                  delegate: SliverChildListDelegate([
-                    Column(
-                      children: <Widget>[
-                        Visibility(
-                          visible:(globals.sessionData["session_status"] == "pending_members" && globals.sessionData["session_status"] != "is_calculating") ? true : false,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
-                            child: Row(
-                              children: <Widget>[
-                                Expanded(
-                                  flex: 2,
-                                  child: TextField(
-                                      controller: TextEditingController(text:globals.sessionUrlCarrier),
-                                      decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+    return WillPopScope(
+      onWillPop: _isBackPressed,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: Text("${globals.sessionData["meetup_name"]}"),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () async {
+              socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
+              print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
+              print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);
+            },
+          ),
+          backgroundColor: Colors.deepOrange,
+        ),
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: CustomScrollView(
+              slivers: <Widget>[
+                SliverList(
+                    delegate: SliverChildListDelegate([
+                      Column(
+                        children: <Widget>[
+                          Visibility(
+                            visible:(globals.sessionData["session_status"] == "pending_members" && globals.sessionData["session_status"] != "is_calculating") ? true : false,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top:20, bottom:8, left:12, right:10),
+                              child: Row(
+                                children: <Widget>[
+                                  Expanded(
+                                    flex: 2,
+                                    child: TextField(
+                                        controller: TextEditingController(text:globals.sessionUrlCarrier),
+                                        decoration: InputDecoration(labelText: "Tap here for link", border: OutlineInputBorder())
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.content_copy),
-                                  onPressed: () {
-                                    Clipboard.setData(ClipboardData(text: globals.sessionUrlCarrier));
-                                  },
-                                ),
-                                IconButton(
-                                    icon: Icon(Icons.share),
-                                    onPressed: () async {
-                                      await _shareText();
-                                    }
-                                ),
-                              ],
+                                  IconButton(
+                                    icon: Icon(Icons.content_copy),
+                                    onPressed: () {
+                                      Clipboard.setData(ClipboardData(text: globals.sessionUrlCarrier));
+                                    },
+                                  ),
+                                  IconButton(
+                                      icon: Icon(Icons.share),
+                                      onPressed: () async {
+                                        await _shareText();
+                                      }
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ),//share link
+                          ),//share link
 
-                        Visibility(
-                            visible: (globals.sessionData["session_status"] == "pending_members"  && globals.isCreator == true) ? true : false,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(child: _generateButton(),),
-                            )
-                        ),// generateButton
+                          Visibility(
+                              visible: (globals.sessionData["session_status"] == "pending_members"  && globals.isCreator == true) ? true : false,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(child: _generateButton(),),
+                              )
+                          ),// generateButton
 
-                        Visibility(
-                            visible: (globals.sessionData["session_status"] == "is_calculating") ? true : false,
-                            child: Padding(
-                              padding: const EdgeInsets.all(15),
-                              child: Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200))),
-                            )
-                        ),// build Calculating text
+                          Visibility(
+                              visible: (globals.sessionData["session_status"] == "is_calculating") ? true : false,
+                              child: Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200))),
+                              )
+                          ),// build Calculating text
 
-                        Visibility(
-                            visible: (globals.sessionData["session_status"] == "pending_swipes") ? true : false,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(child: _waitingText()),
-                            )
-                        ),// build Waiting text
+                          Visibility(
+                              visible: (globals.sessionData["session_status"] == "pending_swipes") ? true : false,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(child: _waitingText()),
+                              )
+                          ),// build Waiting text
 
-                        Visibility(
-                          visible: (globals.sessionData["session_status"] == "location_confirmed") ? true : false,
-                          child: _buildLocationDetails(globals.locationDetails),
-                        ), //build confirmed location details
-                      ],
-                    ),
-                  ])
-              ),
+                          Visibility(
+                            visible: (globals.sessionData["session_status"] == "location_confirmed") ? true : false,
+                            child: _buildLocationDetails(globals.locationDetails),
+                          ), //build confirmed location details
+                        ],
+                      ),
+                    ])
+                ),
 
-              makeHeader("Mice Joining (${globals.sessionData["users"].length})"), //no. of members
+                makeHeader("Mice Joining (${globals.sessionData["users"].length})"), //no. of members
 
 //              SliverToBoxAdapter(
 //                child: Center(child: Padding(
@@ -441,16 +430,17 @@ class MeetupPageState extends State<MeetupPageWidget> {
 //                )),
 //              ), //scroll to refresh
 
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                    return membersList(context, index);
-                  },
-                  childCount: globals.sessionData["users"].length,
-                ),
-              ),// membersList
-            ]
-        ), // Refresh indicator used to be wrapped here
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                      return membersList(context, index);
+                    },
+                    childCount: globals.sessionData["users"].length,
+                  ),
+                ),// membersList
+              ]
+          ), // Refresh indicator used to be wrapped here
+        ),
       ),
     );
   }

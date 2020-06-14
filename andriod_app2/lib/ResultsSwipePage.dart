@@ -9,7 +9,10 @@ import 'Globals.dart' as globals;
 import 'PopUp.dart';
 import 'BuildMeetupDetails.dart';
 import 'color_loader.dart';
+import 'socketiohelper.dart';
 
+
+CustomSocketIO socketIO = CustomSocketIO(globals.serverAddress);
 
 List<globals.FakeData> swipeData = [];
 
@@ -87,10 +90,9 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   @override
   initState(){
-    super.initState();
 
     ///SOCKETS
-    globals.socketIO.subscribe("location_found", (data)=>{
+    socketIO.subscribe("location_found", (data)=>{
       print("Location Found!"),
       print(data),
       globals.sessionData["confirmed_index"] = data["swipeIndex"],
@@ -101,7 +103,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MeetupPage()),)
     });
 
-    setState(() {});
+    super.initState();
 
   } //SOCKETS
 
@@ -111,7 +113,6 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
     print("SENDING SWIPEDATA RESULT REQUEST FOR $inputSessID");
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
-//    print(results);
     List possibleLocations = results["possible_locations"];
 
     for( var i=0 ; i<possibleLocations.length ; i++ ){
@@ -119,7 +120,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       Map oneLocation = results[possibleLocations[i]];
 
 //      print(possibleLocations);
-      print(possibleLocations[i]);
+      print("$i: ${possibleLocations[i]}");
 //      print(oneLocation);
 //      print(oneLocation["address"]);
 //      print(oneLocation["writeup"]);
@@ -155,7 +156,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       'userIdentifier':globals.uuid,
       'selection':true
     };
-    globals.socketIO.sendMessage("swipe_details", data);
+    socketIO.sendMessage("swipe_details", data);
 
   }
 
@@ -166,7 +167,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       'userIdentifier':globals.uuid,
       'selection':false
     };
-    globals.socketIO.sendMessage("swipe_details", data);
+    socketIO.sendMessage("swipe_details", data);
 
   }
 
@@ -190,6 +191,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
                         if (swipeData.indexOf(item) == swipeData.indexOf(swipeData.last)){
                           globals.sessionData["session_status"] = "pending_swipes";
+
                           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MeetupPage()),);
                         }
 //                        else if (globals.sessionData["session_status"] == "location_found"){

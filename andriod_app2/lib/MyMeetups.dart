@@ -467,6 +467,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                               secondaryBackground: slideLeftBackground(),
                               child: Container(
                                 child: FlatButton(
+                                  child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                                   padding: EdgeInsets.all(0),
                                   onPressed: (){
 
@@ -477,12 +478,15 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     globals.sessionData = allData[index];
                                     globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
                                     globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+                                    print('');
+                                    print("CURRENT SESSION INFO");
+                                    print("SessionIDCarrier===>${globals.sessionIdCarrier}");
+                                    print("URL===>${globals.sessionUrlCarrier}");
+//                                    print("Session Data ===> ${globals.sessionData}");
+                                    print("Session Status ===> ${globals.sessionData["session_status"]}");
+                                    print("User Swipe Progress ===> ${globals.sessionData["swipe_details"][globals.uuid]}");
+                                    print('');
 
-
-                                    print("Current SessionID===>${globals.sessionIdCarrier}");
-                                    print("Current Session URL===>${globals.sessionUrlCarrier}");
-                                    print("Current Session Data ===> ${globals.sessionData}");
-                                    print("Current Session Status ===> ${globals.sessionData["session_status"]}");
 
                                     if (globals.sessionData["session_status"] == "pending_swipes") {
                                       if (globals.sessionData["swipe_details"].isNotEmpty){
@@ -498,10 +502,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
                                     }
                                   },
-
-                                  child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
                                 ),
                               ),
+
                               onDismissed: (direction) {
                                 if (direction == DismissDirection.endToStart) {
                                   sessionRemove(sessionIDs[index]);
