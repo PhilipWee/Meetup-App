@@ -1,12 +1,15 @@
 import 'dart:convert';
-import 'package:flutter_socket_io/flutter_socket_io.dart';
-import 'package:flutter_socket_io/socket_io_manager.dart';
+// import 'package:flutter_socket_io/flutter_socket_io.dart';
+// import 'package:flutter_socket_io/socket_io_manager.dart';
+// import 'package:adhara_socket_io/adhara_socket_io.dart';
+import 'package:socket_io_client/socket_io_client.dart';
 
 class CustomSocketIO {
   String url;
   String sessionID;
-  SocketIO socketIO;
+  // SocketIO socketIO;
   List<String> subscribedEvents;
+  Socket socketIO;
 
   ///Create a Socket Class that will work with the flask back end.
   ///
@@ -14,26 +17,44 @@ class CustomSocketIO {
   ///
   ///Example:
   ///```socketIO = CustomSocketIO('http://10.0.2.2:5000');```
+  // CustomSocketIO(String url) {
+  //   if (this.socketIO == null) {
+  //     this.subscribedEvents = [];
+  //     this.url = url;
+  //     //Create the socket connection
+  //     this.socketIO = SocketIOManager().createSocketIO(
+  //       url,
+  //       '/',
+  //     );
+  //     this.socketIO.init();
+  //     this.socketIO.connect();
+  //   } else {
+  //     print("Socket already exists, why are you trying to recreate it?");
+  //   }
+  // }
   CustomSocketIO(String url) {
-    if (this.socketIO == null) {
-      this.subscribedEvents = [];
-      this.url = url;
-      //Create the socket connection
-      this.socketIO = SocketIOManager().createSocketIO(
-        url,
-        '/',
-      );
-      this.socketIO.init();
-      this.socketIO.connect();
-    } else {
-      print("Socket already exists, why are you trying to recreate it?");
-    }
+    print(url);
+    this.socketIO = io(url,<String,dynamic>{
+      'transports':['websocket']
+    });
+    // if (this.socketIO == null) {
+    //   this.subscribedEvents = [];
+    //   this.url = url;
+    //   //Create the socket connection
+    //   this.socketIO = SocketIOManager().createSocketIO(
+    //     url,
+    //     '/',
+    //   );
+    //   this.socketIO.init();
+    //   this.socketIO.connect();
+    // } else {
+    //   print("Socket already exists, why are you trying to recreate it?");
+    // }
   }
 
   _unSubscribeAll() {
-    this.socketIO.unSubscribesAll();
+    this.socketIO.clearListeners();
     this.subscribedEvents = [];
-    print("All sessions unsubscribed");
   }
 
   ///For joining a particular room
@@ -44,13 +65,14 @@ class CustomSocketIO {
   ///Example:
   ///```socketIO.joinSession('1111');```
   joinSession(String sessionID) {
+    
     if (this.sessionID != null) {
       //Leave the session
-      this.socketIO.sendMessage('leave', {'room': this.sessionID});
+      this.socketIO.emit('leave',{'room': this.sessionID});
       this._unSubscribeAll();
     }
     this.sessionID = sessionID;
-    this.socketIO.sendMessage('join', json.encode({'room': this.sessionID}));
+    this.socketIO.emit('join',{'room': this.sessionID});
   }
 
   ///For subscribing to events emitted by the server
@@ -67,12 +89,15 @@ class CustomSocketIO {
   ///in this case a print statement
   ///
   subscribe(String event, Function runOnEvent) {
-    this.socketIO.unSubscribe(event);
-    this.subscribedEvents.add(event);
-    this.socketIO.subscribe(event, (jsonData) {
-      Map<String, dynamic> data = json.decode(jsonData);
-      runOnEvent(data);
-    });
+    if (! this.socketIO.hasListeners(event)) {
+      this.socketIO.on(event, (data) => runOnEvent(data));
+    }
+    // this.socketIO.unSubscribe(event);
+    // this.subscribedEvents.add(event);
+    // this.socketIO.subscribe(event, (jsonData) {
+    //   Map<String, dynamic> data = json.decode(jsonData);
+    //   runOnEvent(data);
+    // });
   }
 
   ///For emitting an event to the server
@@ -82,6 +107,6 @@ class CustomSocketIO {
   ///Example:
   ///```socketIO.sendMessage('send_message', {'hello':'there'});```
   sendMessage(String event, Map<String, dynamic> data) {
-    socketIO.sendMessage(event, json.encode(data));
+    socketIO.emit(event, data);
   }
 }

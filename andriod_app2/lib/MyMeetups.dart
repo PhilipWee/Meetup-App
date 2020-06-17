@@ -491,7 +491,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     if (globals.sessionData["session_status"] == "pending_swipes") {
                                       if (globals.sessionData["swipe_details"].isNotEmpty){
                                         if (globals.sessionData["swipe_details"].containsKey(globals.uuid)){
-                                          if (globals.sessionData["swipe_details"][globals.uuid].length < 20){
+                                          if (globals.sessionData["swipe_details"][globals.uuid].length == 20){
                                             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
                                           }
                                         }

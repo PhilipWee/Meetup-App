@@ -15,7 +15,7 @@ import 'color_loader.dart';
 import 'socketiohelper.dart';
 
 
-CustomSocketIO socketIO = CustomSocketIO(globals.serverAddress);
+
 
 class MeetupPage extends StatelessWidget {
   @override
@@ -71,20 +71,20 @@ class MeetupPageState extends State<MeetupPageWidget> {
 
     print("Connecting SOCKETS to Session with SESSION ID: ${globals.sessionIdCarrier}");
 
-    socketIO.joinSession(globals.sessionIdCarrier);
+    globals.socketIO.joinSession(globals.sessionIdCarrier);
 
-    socketIO.subscribe("user_joined_room", (data)=>{
+    globals.socketIO.subscribe("user_joined_room", (data)=>{
       setState((){globals.sessionData["users"].add(data);}), //updates globals.sessionData and refreshes the state of the page
       print('''
       ${data["username"]} has entered the session.
       There are now ${globals.sessionData["users"].length} users in this session.
       '''),});
 
-    socketIO.subscribe("calculation_result", (data)=>{
+    globals.socketIO.subscribe("calculation_result", (data)=>{
       print("Calculation Done!"),
       Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => ResultSwipePage()),)});
 
-    socketIO.subscribe("Error", (data)=>{
+    globals.socketIO.subscribe("Error", (data)=>{
       print("SOCKET ERROR FOUND!"),
       print(data)
     });
@@ -341,7 +341,7 @@ class MeetupPageState extends State<MeetupPageWidget> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () async {
-              socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
+              globals.socketIO.sendMessage('leave', {'room':"${globals.sessionIdCarrier}"});
               print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
               print("Exited Session: ${globals.sessionIdCarrier}, sessionData reset.");
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MyHomePage()),);

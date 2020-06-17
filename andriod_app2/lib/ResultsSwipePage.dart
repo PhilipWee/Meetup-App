@@ -12,8 +12,6 @@ import 'color_loader.dart';
 import 'socketiohelper.dart';
 
 
-CustomSocketIO socketIO = CustomSocketIO(globals.serverAddress);
-
 List<globals.FakeData> swipeData = [];
 
 //Build the individual card description
@@ -92,7 +90,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   initState(){
 
     ///SOCKETS
-    socketIO.subscribe("location_found", (data)=>{
+    globals.socketIO.subscribe("location_found", (data)=>{
       print("Location Found!"),
       print(data),
       globals.sessionData["confirmed_index"] = data["swipeIndex"],
@@ -156,7 +154,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       'userIdentifier':globals.uuid,
       'selection':true
     };
-    socketIO.sendMessage("swipe_details", data);
+    globals.socketIO.sendMessage("swipe_details", data);
 
   }
 
@@ -167,7 +165,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       'userIdentifier':globals.uuid,
       'selection':false
     };
-    socketIO.sendMessage("swipe_details", data);
+    globals.socketIO.sendMessage("swipe_details", data);
 
   }
 
