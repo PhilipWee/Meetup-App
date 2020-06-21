@@ -89,9 +89,9 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           print("Meetup Name: ${custLabels[i]}");
 
           //IMAGES/
-          if (map["meeting_type"] == "outing"){custImgs.add("images/purple.png");}
+          if (map["meeting_type"] == "outing"){custImgs.add("images/blue.png");}
           else if (map["meeting_type"] == "food"){custImgs.add("images/yellow.png");}
-          else if (map["meeting_type"] == "meeting"){custImgs.add("images/blue.png");}
+          else if (map["meeting_type"] == "meeting"){custImgs.add("images/purple.png");}
           print("Meeting Image: ${custImgs[i]}");
 
           //STATES
