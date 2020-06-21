@@ -618,6 +618,9 @@ def get_details_for_session_id(session_id):
         return 'Error'
 
 def edit_user_details(details,session_id,remove=False):
+
+
+    #Edit the userdata
     doc_ref = get_doc_ref_for_id(session_id)
     doc_dict = doc_ref.get().to_dict()
     try:
@@ -635,6 +638,9 @@ def edit_user_details(details,session_id,remove=False):
 
                     break
         else:
+            #The details passed here is for the new user
+            #Make sure to add the user here
+            update_userdata_sessionid(details,session_id)
             doc_dict['info']['users'].append(details)
             doc_ref.set(doc_dict)
 
