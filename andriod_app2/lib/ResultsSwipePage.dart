@@ -277,11 +277,12 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                 ),
               );
             }
+
         else if (snapshot.connectionState == ConnectionState.done && swipeData.length == 0){
           return Center(child: Text("No Results Found", style: TextStyle(fontFamily: "Quicksand"),));
         }
         else if (snapshot.connectionState == ConnectionState.waiting){
-          return Center(child: ColorLoader(colors: colorsForLoad));
+          return Center(child: CircularProgressIndicator());
         }
         else{
           return Center(child: Text("ERROR: ${snapshot.error}"));
