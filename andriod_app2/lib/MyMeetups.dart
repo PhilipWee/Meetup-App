@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'Join.dart';
 import 'color_loader.dart';
+import 'LoadingIndicator.dart';
 
 
 class HomeUsernameWidget extends StatefulWidget {
@@ -30,6 +31,8 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   final _joinController = TextEditingController(text: "");
 
+  final GlobalKey<State> _keyLoader = new GlobalKey<State>();
+
   List allData = [];
   List<String> custLabels = [];
   List<String> custImgs = [];
@@ -38,23 +41,27 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
   @override
   initState(){
-    _future = getAllUserSessionsData(globals.uuid);
     super.initState();
+    _future = getAllUserSessionsData(globals.uuid);
+    setState(() {});
   }
 
   //////////////////////////////////// [ALL FUNCTIONS] /////////////////////////////////////////////////
 
-  sessionEnter(String inputLink) async{
-    print("INPUTLINK $inputLink");
+  Future sessionEnter(String inputLink, BuildContext context) async{
+    Dialogs.showLoadingDialog(context, _keyLoader);
     globals.tempData["joinlink"] = inputLink.replaceAll(new RegExp(r'/get_details'), '');
     http.Response response = await http.get(globals.tempData["joinlink"]); //get session details
     String body = response.body;
     globals.tempMeetingDetails = jsonDecode(body);
     print("Current Session Details ===> ${globals.tempMeetingDetails}");
-    } //session details saved in global.tempMeetingDetails
+    Navigator.of(_keyLoader.currentContext,rootNavigator: true).pop();
+    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);
 
+  } //session details saved in global.tempMeetingDetails
 
   Future getAllUserSessionsData(String inputUserId) async{
+    sessionIDs = [];
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
     Map tempMap = jsonDecode(response.body);
@@ -80,7 +87,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           custLabels.add(map["meetup_name"]);
           print("Meetup Name: ${custLabels[i]}");
 
-          //IMAGES//YOLO
+          //IMAGES/
           if (map["meeting_type"] == "outing"){custImgs.add("images/purple.png");}
           else if (map["meeting_type"] == "food"){custImgs.add("images/yellow.png");}
           else if (map["meeting_type"] == "meeting"){custImgs.add("images/blue.png");}
@@ -125,7 +132,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         Scaffold.of(context).showSnackBar(
             SnackBar(
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
-              duration: Duration(milliseconds: 800)
+              duration: Duration(seconds: 2)
             ));
       }
       else{
@@ -148,7 +155,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fit: BoxFit.cover
           )
       ),// set image background
-      child: Container( // yolo
+      child: Container(
         height:57,
         decoration: const BoxDecoration(
           color: Color.fromRGBO(139, 73, 161, 0.7),
@@ -193,7 +200,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fit: BoxFit.cover
           )
       ),// set image background
-      child: Container( // yolo
+      child: Container(
         height:57,
         decoration: const BoxDecoration(
           color: Color.fromRGBO(247, 147, 30, 0.7),
@@ -238,7 +245,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fit: BoxFit.cover
           )
       ),// set image background
-      child: Container( // yolo
+      child: Container(
         height:57,
         decoration: const BoxDecoration(
           color: Color.fromRGBO(19, 176, 190, 0.7),
@@ -318,14 +325,6 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               Icons.delete,
               color: Colors.white,
             ),
-//            Text(
-//              " Delete",
-//              style: TextStyle(
-//                color: Colors.white,
-//                fontWeight: FontWeight.w700,
-//              ),
-//              textAlign: TextAlign.right,
-//            ),
             SizedBox(
               width: 20,
             ),
@@ -350,6 +349,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Center(
           child: Text('My Meetups', style: TextStyle(fontFamily: "Quicksand")),
         ),
@@ -379,7 +379,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                       ),
                       IconButton(
                         icon: Icon(Icons.person_add),
-                        onPressed: () async {
+                        onPressed: () {
                           if (_joinController.text.isEmpty) {
                             Scaffold.of(context).showSnackBar(
                                 SnackBar(
@@ -388,22 +388,12 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     style: TextStyle(fontWeight: FontWeight.w400, fontFamily: "Quicksand",),
                                     textAlign: TextAlign.center,
                                   ),
-                                  duration: Duration(milliseconds: 400),
+                                  duration: Duration(seconds: 1),
                                 ));
                           }
                           else{
                             globals.saveMyLocationName();
-                            sessionEnter(_joinController.text);
-
-                            showDialog(
-                                context: context,
-                                builder: (context)
-                                {Future.delayed(Duration(milliseconds: 2000), () {
-                                    _joinController.clear();
-                                    Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>CustomizationPage2Widget()),);;
-                                  });
-                                return Expanded(child: Center(child: CircularProgressIndicator()));
-                                });
+                            sessionEnter(_joinController.text, context);
                           }
                         },
                         iconSize: 25,
@@ -417,12 +407,14 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
           ),//join text controller
 
-          Container(
-            child: Padding(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Padding(
               padding: const EdgeInsets.all(1),
               child: Center(
                   child: Text(
-
                     "Scroll to refresh  |  Swipe to delete" ,
                     style: TextStyle(
                         fontWeight: FontWeight.w100,
@@ -431,110 +423,111 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
 
                   )
               ),
-            ),
+            )
+            ],
           ),//scroll to refresh
 
-          Container(
-            child: Expanded(
-              child: FutureBuilder(
-                future: _future,
-                builder: (BuildContext context, AsyncSnapshot snapshot){
-                    if (snapshot.connectionState ==  ConnectionState.done && allData.isEmpty){
+          Expanded(
+            child: FutureBuilder(
+              future: _future,
+              builder: (BuildContext context, AsyncSnapshot snapshot){
+                  if (snapshot.connectionState ==  ConnectionState.done && allData.isEmpty){
+                    return RefreshIndicator(
+                    onRefresh: _refresh,
+                    child: ListView(
+                      children: <Widget>[Padding(
+                        padding: const EdgeInsets.only(top: 200),
+                        child: Center(
+                            child: Text(
+                                "No Meetups",
+                                style: TextStyle(
+                                    fontFamily: "Quicksand",
+                                    color: Colors.black.withOpacity(0.6)
+                                )
+                            )
+                        ),
+                      ),
+                      ],
+                    )
+                  ); //NO MEETUPS
+                }
+                  else if (snapshot.connectionState ==  ConnectionState.done){
                     return RefreshIndicator(
                       onRefresh: _refresh,
-                      child: ListView(
-                        children: <Widget>[Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 200),
-                            child: Center(
-                                child: Text(
-                                    "No Meetups",
-                                    style: TextStyle(
-                                        fontFamily: "Quicksand",
-                                        color: Colors.black.withOpacity(0.6)
-                                    )
-                                )
-                            ),
-                          ),
-                        ),],
-                      )
-                    );
-                  }
-                    else if (snapshot.connectionState ==  ConnectionState.done){
-                      return RefreshIndicator(
-                        onRefresh: _refresh,
-                        child: ListView.builder(
-                          padding: EdgeInsets.only(top: 0, bottom: 0, left:5, right:5),
-                          itemCount: custLabels.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 5.0),
-                              child: Dismissible(
-                                key: Key(custLabels[index]),
-                                dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
-                                background: slideRightBackground(),
-                                secondaryBackground: slideLeftBackground(),
-                                child: Container(
-                                  child: FlatButton(
-                                    padding: EdgeInsets.all(0),
-                                    onPressed: (){
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(top: 0, bottom: 0, left:5, right:5),
+                        itemCount: custLabels.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 5.0),
+                            child: Dismissible(
+//                              key: Key(custLabels[index]),
+                              key: Key(UniqueKey().toString()),
+                              dismissThresholds: {DismissDirection.endToStart : 0.4, DismissDirection.startToEnd: 1.0},
+                              background: slideRightBackground(),
+                              secondaryBackground: slideLeftBackground(),
+                              child: Container(
+                                child: FlatButton(
+                                  child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
+                                  padding: EdgeInsets.all(0),
+                                  onPressed: (){
 
-                                      globals.sessionData = {};
-                                      globals.sessionUrlCarrier = "";
-                                      globals.sessionIdCarrier = "";
+                                    globals.sessionData = {};
+                                    globals.sessionUrlCarrier = "";
+                                    globals.sessionIdCarrier = "";
 
-                                      globals.sessionData = allData[index];
-                                      globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
-                                      globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+                                    globals.sessionData = allData[index];
+                                    globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
+                                    globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
+                                    print('');
+                                    print("CURRENT SESSION INFO");
+                                    print("SessionIDCarrier===>${globals.sessionIdCarrier}");
+                                    print("URL===>${globals.sessionUrlCarrier}");
+//                                    print("Session Data ===> ${globals.sessionData}");
+                                    print("Session Status ===> ${globals.sessionData["session_status"]}");
+                                    print("User Swipe Progress ===> ${globals.sessionData["swipe_details"][globals.uuid]}");
+                                    print('');
 
-                                      print("Current SessionID===>${globals.sessionIdCarrier}");
-                                      print("Current Session URL===>${globals.sessionUrlCarrier}");
-                                      print("Current Session Data ===> ${globals.sessionData}");
-                                      print("Current Session Status ===> ${globals.sessionData["session_status"]}");
 
-                                      if (globals.sessionData["session_status"] == "pending_swipes") {
-                                        if (globals.sessionData["swipe_details"].isNotEmpty){
-                                          if (globals.sessionData["swipe_details"].containsKey(globals.uuid)){
-                                            if (globals.sessionData["swipe_details"][globals.uuid].length < 20){
-                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
-                                            }
+                                    if (globals.sessionData["session_status"] == "pending_swipes") {
+                                      if (globals.sessionData["swipe_details"].isNotEmpty){
+                                        if (globals.sessionData["swipe_details"].containsKey(globals.uuid)){
+                                          if (globals.sessionData["swipe_details"][globals.uuid].length == 20){
+                                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
                                           }
                                         }
                                       }
+                                    }
 
-                                      else{
-                                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
-                                      }
-                                    },
-
-                                    child:_buildCustomButton(custLabels[index], custImgs[index], custStates[index]) ,
-                                  ),
+                                    else{
+                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MeetupPage()),);
+                                    }
+                                  },
                                 ),
-                                onDismissed: (direction) async{
-                                  if (direction == DismissDirection.endToStart) {
-                                    sessionRemove(sessionIDs[index]);
-                                    setState(() {
-                                      custLabels.removeAt(index);
-                                      _future = getAllUserSessionsData(globals.uuid);
-                                    });
-                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text("Deleted ${custLabels[index]}", textAlign: TextAlign.center,),));
-                                  }
-                                  else {
-                                    Scaffold.of(context).showSnackBar(SnackBar(content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,),));
-                                  }
-                                }
                               ),
-                            );
-                          },
-                        ),
-                      );
-                    }
-                    else if(snapshot.connectionState == ConnectionState.waiting){
-                      return Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1000)));
+
+                              onDismissed: (direction) {
+                                if (direction == DismissDirection.endToStart) {
+                                  sessionRemove(sessionIDs[index]);
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text("Leaving ${custLabels[index]}", textAlign: TextAlign.center,)));
+                                }
+                                else {
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                    content: Text("COMING SOON! (ᵔᴥᵔ)", textAlign: TextAlign.center,)));
+                                }
+                              }
+                            ),
+                          );
+                        },
+                      ),
+                    ); // LIST OF MEETUPS
                   }
-                    else {return Center(child: Text("SNAPSHOT ERROR: ${snapshot.error}"),);}
-                  },
-              ),
+                  else if(snapshot.connectionState == ConnectionState.waiting){
+                    return Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1000)));
+                }
+                  else {return Center(child: Text("SNAPSHOT ERROR: ${snapshot.error}"),);}
+                },
             ),
           ),//list of stuff
         ],
