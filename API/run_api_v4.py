@@ -41,7 +41,7 @@ if (not len(firebase_admin._apps)):
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
     cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
-    # cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
+    #cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/joelp/Desktop/Meetup-App/meetup-mouse-265200-2bcf88fc79cc.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
@@ -71,7 +71,8 @@ except:
 # eventlet.monk ey_patch()
 app = Flask(__name__)
 # socketio = SocketIO(app,logger=True,engineio_logger=True)
-socketio = SocketIO(app,cors_allowed_origins=["https://meetup-mouse.com", "http://localhost:5000"])
+# socketio = SocketIO(app,cors_allowed_origins=["https://meetup-mouse.com", "http://localhost:5000"])
+socketio = SocketIO(app,cors_allowed_origins=["https://meetup-mouse.com", "http://localhost:5000"],engineio_logger=True)
 
 # def bg_emit():
 #     socketio.emit('bg_emit', dict(foo='bar'))
