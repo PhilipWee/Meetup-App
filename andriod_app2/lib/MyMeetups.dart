@@ -205,7 +205,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       child: Container(
         height:57,
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(247, 147, 30, 0.7),
+          color: Color.fromRGBO(247, 147, 30, 0.6),
         ),
         padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
@@ -250,7 +250,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
       child: Container(
         height:57,
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(19, 176, 190, 0.7),
+          color: Color.fromRGBO(19, 176, 190, 0.6),
         ),
         padding: const EdgeInsets.all(10.0),
         alignment: Alignment.bottomLeft,
