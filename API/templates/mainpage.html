@@ -47,26 +47,26 @@
             background-color: SeaShell;
             background-image: url(/static/background.png);
         }
-        
+
         h1 {
             color: white;
             margin-left: 20px;
             font-size: 5vw;
             font-family: 'Pacifico';
         }
-        
+
         h2 {
             margin-left: 20px;
             margin-top: 1mm;
             font-family: 'Patrick Hand SC';
             font-size: 3vw;
         }
-        
+
         .block {
             width: 30%;
             text-align: center;
         }
-        
+
         hr.new5 {
             border: 2px solid rgb(214, 129, 137);
             border-radius: 5px;
@@ -188,7 +188,26 @@
                     if (user) {
                         var isAnonymous = user.isAnonymous;
                         var uid = user.uid;
+                        var sessionIdDict = {};
                         //console.log(uid);
+                        get_sessions_url = window.location.origin + '/session/get?username=' + uid;
+                        console.log(get_sessions_url);
+                        $.getJSON(get_sessions_url, function(result) {
+                          sessionIdDict = result;
+                        })
+
+                        console.log(sessionIdDict);
+
+                        var result = "";
+                        for (var p in sessionIdDict) {
+                          if (sessionIdDict.hasOwnProperty(p)) {
+                            result += p + " , " + obj[p] + "\n";
+                          }
+                        }
+                        console.log("HELLO");
+                        console.log(result);
+
+                        /*
                         var db = firebase.firestore();
                         var username = user.displayName;
                         console.log(username);
@@ -258,7 +277,7 @@
                             }
                         }).catch(function(error) {
                             console.log("Error getting document: ", error);
-                        });
+                        }); */
 
                     } else {
                         firebase.auth().signInAnonymously().catch(function(error) {

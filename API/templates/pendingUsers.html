@@ -21,7 +21,7 @@
 
   <style>
     html, body {
-      height: 70%;
+      height: 100%;
       margin: 0;
       padding: 0;
     }
@@ -49,6 +49,10 @@
       background-image: url(/static/background.png);
 
     }
+
+    html, body {
+    max-height: 100%;
+}
 
     #homeButton {
       color: white;
@@ -131,62 +135,29 @@
 
   <div class='row'>
     <div class='col-2'></div>
-    <div class='col-8'>
-      <div id='location_details_div' style='display:none;'>
-        <div class='row' style='margin-top:5%;'>
-          <button style='margin-left:2%;margin-right:2%;'>
-            <div class='row w-100'>
-              <div class="col" style='margin-left:2%;'>
+    <div class='col-8' >
 
+      <h3 style='margin-left:1%;margin-top:2%;font-family: Patrick Hand SC;'>Share Link</h3>
 
-                <p style='font-family: Patrick Hand SC;font-size:2vw;line-height: 0.7; margin-top:4%;' align=left
-                  id='location_name'> Mew
-                  Mouse Cafe</p>
-                <p style='font-family: Patrick Hand SC;font-size:2vw;line-height: 0.7;margin-bottom:4%;' align=left
-                  id='address'>
-                  Location</p>
-
-              </div>
-
-              <div class="col">
-
-                <!-- <img style='width:40%;height:40%;margin-top:6%;margin-right:4%;' align=right src="/static/Ratings.png"
-                  id=alt="Ratings"> -->
-                <div class="stars-outer" align=right>
-                  <div class="stars-inner"></div>
-                </div>
-              </div>
-
-            </div>
-
-          </button>
-        </div>
-
-        <img
-          style='background-color:rgb(255,245,238); width: 100%;height: 50%; align-items: center; justify-content: center;margin-top:2%; margin-bottom:2%;border:5px dotted rgb(214,129,137);border-radius:12px;position:relative;'
-          class="round3" src="/static/Cafe.png" alt='Cafe' id='location_image'>
-      </div>
-
-      <h3 style='margin-left:1%;margin-top:3%;'>Share Link</h3>
-
-      <input id='shareLink' style="margin-left:1%;" aria-label="Link to share">
+      <input id='shareLink' style="margin-left:1%;font-family: Patrick Hand SC;" aria-label="Link to share">
       <textarea rows="3" type="text" aria-label="Link to share" style="display: none;margin-left:1%;"></textarea>
-      <button style='margin-left:1%;font-size:1.5vw;' type='button' onclick='copyLinkFunction()'>Copy Link</button>
+      <button style='margin-left:1%;font-size:1.5vw;font-family: Patrick Hand SC;' type='button' onclick='copyLinkFunction()'>Copy Link</button>
 
       <div class='row' style='margin-left:1%;'>
         <p style='font-family: Patrick Hand SC;font-size:2vw;line-height: 0.7; margin-top:4%;' align=left> Mice Joining
         </p>
       </div>
+
       <hr class="new5">
 
-      <div id="user_details_div">
-      </div>
-      <div class='row' style='margin-left:2%;margin-top: 2%;font-family: Patrick Hand SC;'>
-        <button type="button" id='calculation_button' style='display:none;'>
+      <div id="user_details_div"></div>
+
+        <button type="button" id='calculation_button' style='display:none;font-family: Patrick Hand SC; font-size:1.5vw;margin-top:2%;margin-left:2%;'>
           Begin Calculation
         </button>
-      </div>
+      
     </div>
   </div>
+
   <script src="{{url_for('static', filename='js/pendingUsers.js')}}"></script>
 </body>

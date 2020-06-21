@@ -71,7 +71,7 @@ except:
 # eventlet.monk ey_patch()
 app = Flask(__name__)
 # socketio = SocketIO(app,logger=True,engineio_logger=True)
-socketio = SocketIO(app,cors_allowed_origins=["https://meetup-mouse.com"])
+socketio = SocketIO(app,cors_allowed_origins=["https://meetup-mouse.com", "http://localhost:5000"])
 
 # def bg_emit():
 #     socketio.emit('bg_emit', dict(foo='bar'))

@@ -85,16 +85,11 @@ class Carousel {
 				that._update_other_details(confirmed_place_index);
 
 			} else {
-				if (user_uid in data) { // If user has already swiped before
+				if (user_uid in data["swipe_details"]) { // If user has already swiped before
 					console.log("IT EXISTS.");
 
-					var continue_swipe_index = data[user_uid].length;
-
-//					if (continue_swipe_index) {
-//						console.log(continue_swipe_index);
-//					} else {
-//						console.log("Starting from 0");
-//					}
+					var swipe_details = data["swipe_details"];
+					var continue_swipe_index = swipe_details[user_uid].length;
 
 					that.curIndex = continue_swipe_index;
 					console.log(that.curIndex);
@@ -467,10 +462,12 @@ class Carousel {
 		//Determine the picture to use
 		if (this.curIndex == -1) {
 			url = '/static/swipeLeftRight.png'
-		} else if (this.curIndex >= this.result_details['possible_locations'].length) {
+		} else if (this.curIndex >= this.result_details['possible_locations'].length - 1) {
 			//TODO fix dont have result details yet bug
 			this.reachedLastCard = true;
-			url = '/static/pleaseWait.png'
+			window.alert("Reached last card! Returning to homepage..");
+			var base_url = window.location.origin;
+			setTimeout(location.replace(base_url), 1000);
 		} else {
 			location_name = this.result_details['possible_locations'][this.curIndex]
 			url = this.result_details[location_name]['pictures'][0]
