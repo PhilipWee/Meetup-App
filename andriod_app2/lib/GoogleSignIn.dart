@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Image(image: AssetImage("images/app_logo.png"), height: 350),
-              SizedBox(height: 50),
+              _versionNumber(),
               _signInButton(),
             ],
           ),
@@ -150,6 +150,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text(
                 'Sign in with Google',
                 style: TextStyle(
+                  fontFamily: "Quicksand",
                   fontSize: 20,
                   color: Colors.black45
                 ),
@@ -157,6 +158,16 @@ class _LoginPageState extends State<LoginPage> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _versionNumber(){
+    return SizedBox(
+      height: 50,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 15),
+        child: Center(child: Text("v1.0.5", style: TextStyle(fontFamily: "Quicksand"),)),
       ),
     );
   }
