@@ -32,6 +32,7 @@ class CustomSocketIO {
   //     print("Socket already exists, why are you trying to recreate it?");
   //   }
   // }
+
   CustomSocketIO(String url) {
     print(url);
     this.socketIO = io(url,<String,dynamic>{

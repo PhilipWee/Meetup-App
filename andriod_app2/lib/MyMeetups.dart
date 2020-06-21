@@ -61,6 +61,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
   } //session details saved in global.tempMeetingDetails
 
   Future getAllUserSessionsData(String inputUserId) async{
+    sessionIDs = [];
     String url = '${globals.serverAddress}/session/get?username=$inputUserId';
     http.Response response = await http.get(url);
     Map tempMap = jsonDecode(response.body);
@@ -154,7 +155,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fit: BoxFit.cover
           )
       ),// set image background
-      child: Container( // yolo
+      child: Container(
         height:57,
         decoration: const BoxDecoration(
           color: Color.fromRGBO(139, 73, 161, 0.7),
@@ -199,7 +200,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fit: BoxFit.cover
           )
       ),// set image background
-      child: Container( // yolo
+      child: Container(
         height:57,
         decoration: const BoxDecoration(
           color: Color.fromRGBO(247, 147, 30, 0.7),
@@ -244,7 +245,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
               fit: BoxFit.cover
           )
       ),// set image background
-      child: Container( // yolo
+      child: Container(
         height:57,
         decoration: const BoxDecoration(
           color: Color.fromRGBO(19, 176, 190, 0.7),
