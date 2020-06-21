@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'Join.dart';
 import 'color_loader.dart';
 import 'LoadingIndicator.dart';
+import 'ConfirmedDetails.dart';
 
 
 class HomeUsernameWidget extends StatefulWidget {
@@ -101,7 +102,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
           print(""); //for println spacing
         }
       }
-    print("allData: $allData");
+//    print("allData: $allData");
   } // list of all sessionIds saved in
 
   Future<Null> _refresh() async{
@@ -480,23 +481,27 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
                                     globals.sessionIdCarrier = sessionIDs[index]; ///NEW DATA
                                     globals.sessionUrlCarrier = "${globals.serverAddress}/session/${sessionIDs[index]}/get_details";
                                     print('');
-                                    print("CURRENT SESSION INFO");
-                                    print("SessionIDCarrier===>${globals.sessionIdCarrier}");
-                                    print("URL===>${globals.sessionUrlCarrier}");
-//                                    print("Session Data ===> ${globals.sessionData}");
-                                    print("Session Status ===> ${globals.sessionData["session_status"]}");
-                                    print("User Swipe Progress ===> ${globals.sessionData["swipe_details"][globals.uuid]}");
+//                                  print("Session Data ===> ${globals.sessionData}");
+                                    print("Chosen Session's Details");
+                                    print("SessionIDCarrier: ${globals.sessionIdCarrier}");
+                                    print("Session Status: ${globals.sessionData["session_status"]}");
+                                    print("Swipe Progress: ${globals.sessionData["swipe_details"][globals.uuid]}");
                                     print('');
 
 
                                     if (globals.sessionData["session_status"] == "pending_swipes") {
                                       if (globals.sessionData["swipe_details"].isNotEmpty){
                                         if (globals.sessionData["swipe_details"].containsKey(globals.uuid)){
-                                          if (globals.sessionData["swipe_details"][globals.uuid].length == 20){
+//                                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),); //TODO
+                                          if (globals.sessionData["swipe_details"][globals.uuid].length < 20){
                                             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ResultSwipePage()),);
                                           }
                                         }
                                       }
+                                    }
+
+                                    else if (globals.sessionData["session_status"] == "location_confirmed"){
+                                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ConfirmedPage()),);
                                     }
 
                                     else{
