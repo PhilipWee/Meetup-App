@@ -135,6 +135,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       );
 
       swipeData.add(placeInfo);
+      await Future.delayed(Duration(milliseconds: 500));
     } //for loop ends here!
   }
 

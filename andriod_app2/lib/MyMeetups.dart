@@ -75,6 +75,7 @@ class HomeUsernameState extends State<HomeUsernameWidget> {
         String url = '${globals.serverAddress}/session/${sessionIDs[i]}';
         http.Response response = await http.get(url);
         Map map = jsonDecode(response.body);
+        print({response.statusCode});
 
         allData.add(map);
 
