@@ -188,96 +188,60 @@
                     if (user) {
                         var isAnonymous = user.isAnonymous;
                         var uid = user.uid;
-                        var sessionIdDict = {};
+
                         //console.log(uid);
                         get_sessions_url = window.location.origin + '/session/get?username=' + uid;
-                        console.log(get_sessions_url);
+
                         $.getJSON(get_sessions_url, function(result) {
-                          sessionIdDict = result;
-                        })
 
-                        console.log(sessionIdDict);
+                          for (var key in result) {
+                              // check if the property/key is defined in the object itself, not in parent
+                              if (result.hasOwnProperty(key)) {
+                                  console.log(key, result[key]);
 
-                        var result = "";
-                        for (var p in sessionIdDict) {
-                          if (sessionIdDict.hasOwnProperty(p)) {
-                            result += p + " , " + obj[p] + "\n";
+                                  //Get request for session details
+                                  details_url = window.location.origin + '/session/' + key;
+
+                                  $.getJSON(details_url, function(result) {
+                                      sessionData = result;
+
+                                      meetupName = sessionData['meetup_name'];
+                                      meetupHost = sessionData['host_uuid'];
+                                      console.log(sessionData);
+                                      let sessionStatus = sessionData['session_status'];
+                                      console.log(meetupName);
+
+                                      div = document.createElement("div");
+
+                                      btn = document.createElement("BUTTON");
+                                      btn.class = "block";
+                                      div.className = 'col col-2';
+                                      div.style = 'margin-left: 2.5%; margin-bottom: 15%;'
+
+                                      btn.innerHTML = meetupName;
+                                      btn.id = key;
+
+                                      btn.addEventListener('click', function(e) {
+                                          if (sessionStatus == "pending_members") {
+                                              if (uid == meetupHost) {
+                                                  window.location.href = "/session/" + sessionsList[i] + "/results_display?isHost=true";
+                                              } else {
+                                                  window.location.href = '/session/' + sessionsList[i] + "/results_display?isHost=false";
+                                              }
+                                          } else {
+                                              window.location.href = "/session/" + sessionsList[i] + "/swipe";
+                                          }
+                                          //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
+                                      })
+
+                                      btn.style = 'font-family: Patrick Hand SC; font-size: 2vw;text-align: center;justify-items: center; width:100%; height:300%;'
+
+                                      div.appendChild(btn);
+                                      document.getElementById('allSessionsDiv').appendChild(div);
+                              })
                           }
                         }
-                        console.log("HELLO");
-                        console.log(result);
-
-                        /*
-                        var db = firebase.firestore();
-                        var username = user.displayName;
-                        console.log(username);
-
-                        docUserData = db.collection("userData").doc(uid);
-
-                        docUserData.get().then(function(doc) {
-                            if (doc.exists) { // if User ID exists in the firebase
-                                savedData = doc.data(); // Retrieve user data
-                                // Check for user's meetings. If no meeting, returns empty array.
-                                // IMPORTANT: If new user and no sessionId is created, returns Undefined
-                                sessionsList = savedData['sessionId'];
-                                console.log("All Sessions.")
-                                console.log(sessionsList);
-
-                                for (i in sessionsList)(function(i) {
-                                    // Open specific session document in Firebase
-                                    //console.log(sessionsList[i]);
-                                    //Get request for session details
-                                    details_url = window.location.origin + '/session/' + sessionsList[i];
-
-                                    $.getJSON(details_url, function(result) {
-                                        sessionData = result;
-
-                                        meetupName = sessionData['meetup_name'];
-                                        meetupHost = sessionData['host_uuid'];
-                                        console.log(sessionData);
-                                        let sessionStatus = sessionData['session_status'];
-                                        console.log(meetupName);
-
-                                        div = document.createElement("div");
-
-                                        btn = document.createElement("BUTTON");
-                                        btn.class = "block";
-                                        div.className = 'col col-2';
-                                        div.style = 'margin-left: 2.5%; margin-bottom: 15%;'
-
-                                        btn.innerHTML = meetupName;
-                                        btn.id = sessionsList[i];
-
-                                        btn.addEventListener('click', function(e) {
-                                            if (sessionStatus == "pending_members") {
-                                                if (uid == meetupHost) {
-                                                    window.location.href = "/session/" + sessionsList[i] + "/results_display?isHost=true";
-                                                } else {
-                                                    window.location.href = '/session/' + sessionsList[i] + "/results_display?isHost=false";
-                                                }
-                                            } else {
-                                                window.location.href = "/session/" + sessionsList[i] + "/swipe";
-                                            }
-                                            //TODO: Redirect to correct page; Pending users, Pending swipes or Confirmed
-                                        })
-
-                                        btn.style = 'font-family: Patrick Hand SC; font-size: 2vw;text-align: center;justify-items: center; width:100%; height:300%;'
-
-                                        div.appendChild(btn);
-                                        document.getElementById('allSessionsDiv').appendChild(div);
-
-
-                                    }).catch(function(error) {
-                                        console.log('Unable to get results, Error: ' + error)
-                                    })
-
-                                })(i);
-                            } else {
-                                console.log("No such document!");
-                            }
-                        }).catch(function(error) {
-                            console.log("Error getting document: ", error);
-                        }); */
+                      })
 
                     } else {
                         firebase.auth().signInAnonymously().catch(function(error) {
