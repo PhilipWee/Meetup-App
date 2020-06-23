@@ -24,9 +24,9 @@ import copy
 import eventlet
 from distutils.util import strtobool
 
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+import firebase_postgres as firebase_admin
+# from firebase_postgres import credentials
+from firebase_postgres import firestore
 #--------------------------------------REQUIREMENTS--------------------------------------
 
 #--------------------------------------SETTINGS------------------------------------------
@@ -41,11 +41,11 @@ if (not len(firebase_admin._apps)):
     # Use a service account
     # cred = credentials.Certificate('/Users/vedaalexandra/Desktop/meetup-mouse-265200-2bcf88fc79cc.json')
     # cred = credentials.Certificate('C:/Users/Omnif/Documents/meetup-mouse-265200-2bcf88fc79cc.json')
-    cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
+    # cred = credentials.Certificate('/home/ubuntu/Meetup App Confidential/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/Philip Wee/Documents/MeetupAppConfidential/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/fanda/Documents/SUTD SOAR/Meetup Mouse/meetup-mouse-265200-2bcf88fc79cc.json')
     #cred = credentials.Certificate('C:/Users/joelp/Desktop/Meetup-App/meetup-mouse-265200-2bcf88fc79cc.json')
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app(creds)
     db = firestore.client()
 else:
     db = firestore.client()
@@ -427,10 +427,22 @@ def manage_details(session_id):
 def calculate(session_id):
     ###Check the OAuth details
 
-    #Get all the meetup details
-    result = set_calculate_flag(session_id)
+    #Begin the calculation
+    print(u'Requires calculation: {}'.format(session_id))
+    sess_id = session_id
+    info = get_details_for_session_id(sess_id)
+    results = calculate(sess_id,info)
+    upload_calculated_route(sess_id,results)
+    
+    #Calculation complete, emit the socket
+    print("Session ID [ " + data['session_id'] + " ] has been calculated")
+    session_id = data['session_id']
+    # print(data['session_id'])
+    update_session_status(session_id,'pending_swipes')
+    socketio.emit('calculation_result',{"info":'done'})
+
     if result != 'Error':
-        return jsonify({"info":"calculating"})
+        return jsonify({"info":"done"})
     else:
         return jsonify({'error':'sesson_id or username is wrong'})
 
@@ -984,35 +996,35 @@ def upload_calculated_route(sess_id,result):
 # info = get_details_for_session_id('000000')
 # pprint.pprint(info)
 # results = calculate('000000',info)
-# upload_calculated_route('000000',results)
-sio = socketioclient.Client()
+# # upload_calculated_route('000000',results)
+# sio = socketioclient.Client()
 
-# Create a callback on_snapshot function to capture changes
-def on_snapshot(col_snapshot, changes, read_time):
-    print(u'Callback received query snapshot.')
-    for change in changes:
-        if change.type.name == 'ADDED':
-            sio.connect('http://127.0.0.1:5000')
-            print(u'Requires calculation: {}'.format(change.document.id))
-            sess_id = change.document.id
-            info = get_details_for_session_id(sess_id)
-            results = calculate(sess_id,info)
-            upload_calculated_route(sess_id,results)
-            #Send a message to the server saying that the calculation is done
-            sio.emit('calculation_done',{'session_id':sess_id})
-            # socketio.emit('calculation_done',content,room=session_id)
-            data = {'session_id':sess_id}
-            sio.disconnect()
-            # calculation_done(data)
-        elif change.type.name == 'MODIFIED':
-            print(u'Modification Made: {}'.format(change.document.id))
-        elif change.type.name == 'REMOVED':
-            print(u'No Longer Needs calculation: {}'.format(change.document.id))
+# # Create a callback on_snapshot function to capture changes
+# def on_snapshot(col_snapshot, changes, read_time):
+#     print(u'Callback received query snapshot.')
+#     for change in changes:
+#         if change.type.name == 'ADDED':
+#             sio.connect('http://127.0.0.1:5000')
+#             print(u'Requires calculation: {}'.format(change.document.id))
+#             sess_id = change.document.id
+#             info = get_details_for_session_id(sess_id)
+#             results = calculate(sess_id,info)
+#             upload_calculated_route(sess_id,results)
+#             #Send a message to the server saying that the calculation is done
+#             sio.emit('calculation_done',{'session_id':sess_id})
+#             # socketio.emit('calculation_done',content,room=session_id)
+#             data = {'session_id':sess_id}
+#             sio.disconnect()
+#             # calculation_done(data)
+#         elif change.type.name == 'MODIFIED':
+#             print(u'Modification Made: {}'.format(change.document.id))
+#         elif change.type.name == 'REMOVED':
+#             print(u'No Longer Needs calculation: {}'.format(change.document.id))
 
-col_query = db.collection(u'sessions').where(u'calculate', u'==', u'True')
+# col_query = db.collection(u'sessions').where(u'calculate', u'==', u'True')
 
-# Watch the collection query
-query_watch = col_query.on_snapshot(on_snapshot)
+# # Watch the collection query
+# query_watch = col_query.on_snapshot(on_snapshot)
 
 #-----------------------------------CALCULATOR RELATED CODE------------------------------------
 
