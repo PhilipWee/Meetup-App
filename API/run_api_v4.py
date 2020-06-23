@@ -5,7 +5,7 @@ from flask_dance.contrib.github import make_github_blueprint, github
 from flask_socketio import SocketIO
 from flask_socketio import emit, send
 from flask_socketio import join_room, leave_room
-from schema import Schema, SchemaError, And, Use
+from schema import Schema, SchemaError, And, Use, Optional
 import sys, os
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ import json
 import time
 import uuid
 import datetime
-import firebase_admin
+
 import random
 import pprint
 import credentials as creds
@@ -23,6 +23,8 @@ import socketio as socketioclient
 import copy
 import eventlet
 from distutils.util import strtobool
+
+import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
 #--------------------------------------REQUIREMENTS--------------------------------------
@@ -282,6 +284,10 @@ def check_dict_correct_format(dct,schema_str):
         return x
 
 
+#Latency test
+@app.route('/ping', methods=['GET'])
+def ping_pong():
+    return 'PONG'
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -334,7 +340,8 @@ def create_session():
             "username":str,
             "uuid":str,
             "user_place":str,
-            "meeting_type" : lambda x: x in ["food","outing","meeting"]
+            "meeting_type" : lambda x: x in ["food","outing","meeting"],
+            Optional("testing"): bool
         }
         """
         content = request.get_json()
@@ -610,13 +617,6 @@ def set_calculate_flag(session_id):
     else:
         return 'Error'
 
-def get_details_for_session_id(session_id):
-    try:
-        doc_ref = get_doc_ref_for_id(session_id)
-        return doc_ref.get().get('info').to_dict()
-    except:
-        return 'Error'
-
 def edit_user_details(details,session_id,remove=False):
 
 
@@ -670,10 +670,11 @@ def update_session_status(session_id,status,index=None):
 
 
 def create_firebase_session(content):
+    
+
     meetup_name = content.pop('meetup_name')
     meeting_type = content.pop('meeting_type')
     host_user_details = content
-    session_id = str(uuid.uuid1())
     time_created = str(datetime.datetime.now())
 
     #Consolidate the session details
@@ -683,8 +684,12 @@ def create_firebase_session(content):
                'meetup_name':meetup_name,
                'host_uuid':host_user_details['uuid']}
 
-    #Generate session id
-    session_id = str(uuid.uuid1())
+    #If its set to testing mode, force the session id to 000000
+    if 'testing' in content.keys() and content['testing'] == True:
+
+        session_id = '000000'
+    else:
+        session_id = str(uuid.uuid1())
 
     #Upload the user's details
     doc_ref = get_doc_ref_for_id(session_id)
@@ -759,15 +764,15 @@ def get_details_for_session_id(session_id):
         print('Error getting user details, does session id exist?')
         return 'Error'
 
-def check_requires_calculation():
-    ids_that_need_calc = []
-    for sess in db.collection(u'sessions').stream():
-        try:
-            if sess.get('calculate') == True or sess.get('calculate') == 'True':
-                ids_that_need_calc.append(sess.id)
-        except:
-            continue
-    return ids_that_need_calc
+# def check_requires_calculation():
+#     ids_that_need_calc = []
+#     for sess in db.collection(u'sessions').stream():
+#         try:
+#             if sess.get('calculate') == True or sess.get('calculate') == 'True':
+#                 ids_that_need_calc.append(sess.id)
+#         except:
+#             continue
+#     return ids_that_need_calc
 
 
 def check_calculate_done(session_id):
