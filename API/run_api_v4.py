@@ -197,6 +197,7 @@ API important links explanation:
 -> Returns the website for friends to input details
 
 /edit_session (POST)
+
 -> Can be used to remove a user from a session
 -> Sample Data:
     {"action":"remove_user",
@@ -461,7 +462,6 @@ def edit_session_details():
     if result != "":
         return result, status.HTTP_400_BAD_REQUEST
     if content['action'] == 'remove_user':
-
         edit_user_details(content,content['session_id'],remove=True)
 
         print('user [ ' + content['uuid'] + " ] removed from session [ " + content['session_id'] + " ]")
@@ -618,23 +618,44 @@ def get_details_for_session_id(session_id):
         return 'Error'
 
 def edit_user_details(details,session_id,remove=False):
+
+
+    #Edit the userdata
     doc_ref = get_doc_ref_for_id(session_id)
     doc_dict = doc_ref.get().to_dict()
     try:
         if remove:
+            
             for index,user_details in enumerate(doc_dict['info']['users']):
+                
                 if user_details['uuid'] == details['uuid']:
-                    doc_dict['info']['users'].pop(index)
+                    
+                    # add in extra logic here to remove entire doc_ref if user is host (i.e. user == 0)
+                    if index==0:
+                        
+                        for i,userDetails in enumerate(doc_dict['info']['users']):
+                            #remove session from userdata collection
+                            update_userdata_sessionid(userDetails,session_id,remove=True)
+                            
+                        doc_ref.delete()
+                    else:
+                        
+                        update_userdata_sessionid(details,session_id,remove=True)
+                        
+                        doc_dict['info']['users'].pop(index)
+                        doc_ref.set(doc_dict)
+
+
                     break
         else:
+            #The details passed here is for the new user
+            #Make sure to add the user here
+            update_userdata_sessionid(details,session_id)
             doc_dict['info']['users'].append(details)
+            doc_ref.set(doc_dict)
 
-        doc_ref.set(doc_dict)
 
-        if len(doc_dict['info']['users']) == 0:
-            doc_ref.delete()
-
-        update_userdata_sessionid(details,session_id,remove=remove)
+        
     except Exception as e:
         print(e)
         return "Error"
@@ -691,6 +712,7 @@ def update_userdata_sessionid(details,session_id,remove=False):
             print("Unable to remove sessionid from userdata, is user in session?")
             return "Error"
         else:
+            print("removing " +details['uuid'] + " from " + session_id)
             data['sessionId'].remove(session_id)
     else:
 

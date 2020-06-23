@@ -29,6 +29,9 @@
       <excludeFolder url="file://$MODULE_DIR$/philip_test/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/philip_test/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/philip_test/build" />
+      <excludeFolder url="file://$MODULE_DIR$/socket_testing/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/socket_testing/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/socket_testing/build" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
