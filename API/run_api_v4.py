@@ -625,16 +625,26 @@ def edit_user_details(details,session_id,remove=False):
     doc_dict = doc_ref.get().to_dict()
     try:
         if remove:
+            
             for index,user_details in enumerate(doc_dict['info']['users']):
+                
                 if user_details['uuid'] == details['uuid']:
-                    doc_dict['info']['users'].pop(index)
-                    doc_ref.set(doc_dict)
+                    
                     # add in extra logic here to remove entire doc_ref if user is host (i.e. user == 0)
                     if index==0:
+                        
                         for i,userDetails in enumerate(doc_dict['info']['users']):
                             #remove session from userdata collection
-                            update_userdata_sessionid(userDetails,session_id,True)
+                            update_userdata_sessionid(userDetails,session_id,remove=True)
+                            
                         doc_ref.delete()
+                    else:
+                        
+                        update_userdata_sessionid(details,session_id,remove=True)
+                        
+                        doc_dict['info']['users'].pop(index)
+                        doc_ref.set(doc_dict)
+
 
                     break
         else:
