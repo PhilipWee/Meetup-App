@@ -71,11 +71,20 @@ class Document:
         self.collection_name = collection_name
         self.data_conn = data_conn
 
+    def delete(self):
+        cur = self.data_conn.cursor()
+        command_string = """DELETE FROM {} WHERE id = \'{}\'
+            """.format(self.collection_name,self.document_id)
+        cur.execute(command_string)
+        self.data_conn.commit()
+        cur.close()
+        return None
+
     def get(self):
         # Pull the data
         return DocumentData(self.document_id, self.collection_name, self.data_conn)
-    
-    def update(self,dct):
+
+    def update(self, dct):
         if len(dct) > 1:
             print("Error: The update dict can only have one key")
             return
@@ -85,13 +94,12 @@ class Document:
             'collec_name': self.collection_name,
             'doc_id': self.document_id,
             'json_data': json.dumps(dct[dct_key]),
-            'dct_key':dct_key
+            'dct_key': dct_key
         }
-        command_string = """UPDATE {collec_name} 
+        command_string = """UPDATE {collec_name}
         SET data = jsonb_set(data,\'{{{dct_key}}}\',\'{json_data}\')
         WHERE id = \'{doc_id}\'
             """.format(**string_formatter)
-        print(command_string)
         cur.execute(command_string)
         self.data_conn.commit()
         cur.close()
@@ -102,7 +110,7 @@ class Document:
         string_formatter = {
             'collec_name': self.collection_name,
             'doc_id': self.document_id,
-            'json_data': json.dumps(data)
+            'json_data': json.dumps(data).replace("'","''")
         }
         command_string = """INSERT INTO public."{collec_name}" (id, data)
             VALUES (\'{doc_id}\',\'{json_data}\')
@@ -111,7 +119,6 @@ class Document:
             UPDATE
             SET data= EXCLUDED.data
             """.format(**string_formatter)
-        print(command_string)
         cur.execute(command_string)
         self.data_conn.commit()
         cur.close()
@@ -127,10 +134,17 @@ class DocumentData:
     def get(self, path):
         cur = self.data_conn.cursor()
         cur.execute('SELECT data->\'{}\' FROM public."{}" WHERE ID = \'{}\''.format(
-            path,self.collection_name, self.document_id))
+            path, self.collection_name, self.document_id))
         result = cur.fetchone()
         cur.close()
-        return result[0]
+        # Ensure the key is there, seems like default behavior is to return anyway
+     
+
+        if result and result[0]:
+            return result[0]
+        else:
+            raise KeyError
+
 
     def to_dict(self):
         cur = self.data_conn.cursor()

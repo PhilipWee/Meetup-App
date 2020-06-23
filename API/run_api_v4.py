@@ -435,13 +435,11 @@ def calculate(session_id):
     upload_calculated_route(sess_id,results)
     
     #Calculation complete, emit the socket
-    print("Session ID [ " + data['session_id'] + " ] has been calculated")
-    session_id = data['session_id']
-    # print(data['session_id'])
+    print("Session ID [ " + sess_id + " ] has been calculated")
     update_session_status(session_id,'pending_swipes')
     socketio.emit('calculation_result',{"info":'done'})
 
-    if result != 'Error':
+    if results != 'Error':
         return jsonify({"info":"done"})
     else:
         return jsonify({'error':'sesson_id or username is wrong'})
