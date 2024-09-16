@@ -42,6 +42,7 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
     //send json package to server as POST
     Map<String, String> headers = {"Content-type": "application/json"};
     String url = globals.tempData["joinlink"];
+
     String jsonpackage = '{ '  //this package has no MeetupName and MeetupType
         '"uuid":"${globals.uuid}", '
         '"username":"${globals.username}", '
@@ -54,11 +55,17 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
         '"price":${globals.tempData["price"]}, '
         '"speed":0}'
         '}';
+
     print("Sending Jsonpackage To Server >>> $jsonpackage");
     print("Using Link: $url");
     try{
       http.Response response = await http.post(url, headers:headers, body:jsonpackage);
       int statusCode = response.statusCode;
+
+      String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
+      print("PostData successfull with statuscode: $statusCode");
+      print("Get Session ID successfull with body : $body");
+
 
       if (statusCode != 200){
         print(response.body);
@@ -66,15 +73,18 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
             SnackBar(
               content: Text("Oops! Server Error. StatusCode:$statusCode"),
               duration: Duration(seconds: 2),
-            ));
+            )
+        );
       }
+
       else{
         String body = response.body; //store returned string-map "{sessionid: XXX}"" into String body
         print("PostData successfull with statuscode: $statusCode");
         print("Get Session ID successfull with body : $body");
+
       }
     }
-    catch(e){print("Error caught at SessionCreate(): $e");}
+    catch(e){print("Error caught at SessionJoin(): $e");}
   }
 
   /////////////////////////////////////////////////////////////////////// [WIDGETS]
@@ -83,7 +93,6 @@ class CustomizationPage2State extends State<CustomizationPage2Widget> {
   initState() {
     super.initState();
     setState(() {});
-
   }
 
   Future<bool> _isBackPressed() async{

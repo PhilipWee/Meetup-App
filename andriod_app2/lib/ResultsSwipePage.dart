@@ -12,8 +12,6 @@ import 'color_loader.dart';
 import 'socketiohelper.dart';
 
 
-List<globals.FakeData> swipeData = [];
-
 //Build the individual card description
 class _Description extends StatelessWidget {
   const _Description({
@@ -77,6 +75,8 @@ class ResultSwipeWidget extends StatefulWidget{
 
 class ResultSwipeState extends State<ResultSwipeWidget> {
 
+  List<globals.FakeData> swipeData = [];
+
   List<Color> colors = <Color>[
     Colors.blue,
     Colors.purple,
@@ -88,7 +88,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
 
   @override
   initState(){
-
+    swipeData = [];
     ///SOCKETS
     globals.socketIO.subscribe("location_found", (data)=>{
       print("Location Found!"),
@@ -108,7 +108,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
   Future getSessionResults (String inputSessID) async{
     swipeData = [];
     String url = '${globals.serverAddress}/session/$inputSessID/results';
-    print("SENDING SWIPEDATA RESULT REQUEST FOR $inputSessID");
+    print("Requesting Results for $inputSessID");
     http.Response response = await http.get(url);
     Map results = jsonDecode(response.body);
     List possibleLocations = results["possible_locations"];
@@ -135,6 +135,7 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
       );
 
       swipeData.add(placeInfo);
+      await Future.delayed(Duration(milliseconds: 500));
     } //for loop ends here!
   }
 
@@ -277,12 +278,16 @@ class ResultSwipeState extends State<ResultSwipeWidget> {
                 ),
               );
             }
-        else if (snapshot.connectionState == ConnectionState.done && swipeData.length == 0){
 
+        else if (snapshot.connectionState == ConnectionState.done && swipeData.length == 0){
           return Center(child: Text("No Results Found", style: TextStyle(fontFamily: "Quicksand"),));
         }
-        else if (snapshot.connectionState == ConnectionState.waiting){return Center(child: ColorLoader(colors: colorsForLoad, duration: Duration(milliseconds: 1200)));}
-        else{return Center(child: Text("ERROR: ${snapshot.error}"));}
+        else if (snapshot.connectionState == ConnectionState.waiting){
+          return Center(child: CircularProgressIndicator());
+        }
+        else{
+          return Center(child: Text("ERROR: ${snapshot.error}"));
+        }
           }),
     );
   }
